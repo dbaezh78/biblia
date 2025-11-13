@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor Bíblico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <img class="ima" src="src/img/bibliaima.png" alt="">
+        <h1>Biblia de Jerusalen</h1>
+        <p>Libros y Capítulos</p>
+    </header>
+
+    <div id="audio-player-container">
+        <audio id="audio-player" controls autoplay></audio>
+
+        <div id="now-playing">
+            Reproduciendo: <span id="current-track-info">Ninguno</span>
+        </div>
+
+        <div id="playlist">
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
