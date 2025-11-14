@@ -104,9 +104,13 @@ header {
 
 .chapter-item.completed::after {
     /* El símbolo de cotejo (checkmark) */
-    content: '✔✔'; 
+    content: '✓✔'; 
     float: right;
     margin-left: 10px;
+    font-style: italic;
+    font-size: large;
+    font-weight: bolder;
+    
 }
 
 /* Opcional: Asegura que el checkmark se oculte si el capítulo está reproduciéndose */
