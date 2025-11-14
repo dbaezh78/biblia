@@ -77,7 +77,7 @@ header {
 }
 
 .chapter-item.playing {
-    background-color: #c8e6c9; /* Color para el capítulo actualmente reproduciendo */
+    background-color: #4c7daf; /* Color para el capítulo actualmente reproduciendo */
     font-weight: bold;
     color: #000;
 }
@@ -98,7 +98,7 @@ header {
 /* Estilo para los capítulos completados */
 .chapter-item.completed {
     /* Opcional: para que se diferencie el texto */
-    color: #6c757d; 
+    color: #c2d1de; 
     font-style: italic;
 }
 
