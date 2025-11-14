@@ -6,9 +6,8 @@ const BASE_URL = '/biblia/libro/';
 // --- CONSTANTES PARA EL ALMACENAMIENTO LOCAL ---
 const LAST_INDEX_KEY = 'bibleLastTrackIndex';
 const LAST_TIME_KEY = 'bibleLastTrackTime';
-const COMPLETED_TRACKS_KEY = 'bibleCompletedTracks'; // Nueva clave para capítulos completados
 
-// Estructura de datos completa 
+// Estructura de datos completa (Se mantiene la que proporcionaste)
 const library = [
     // --- PENTATEUCO ---
     { name: "Génesis", folder: "genesis", chapters: 50 },
@@ -66,12 +65,16 @@ const library = [
     { name: "Zacarías", folder: "zacarias", chapters: 14 },
     { name: "Malaquías", folder: "malaquias", chapters: 3 },
 
-    // --- NUEVO TESTAMENTO ---
+    // --- EVANGELIOS ---
     { name: "Mateo", folder: "mateo", chapters: 28 },
     { name: "Marcos", folder: "marcos", chapters: 16 },
     { name: "Lucas", folder: "lucas", chapters: 24 },
     { name: "Juan", folder: "juan", chapters: 21 },
+    
+    // --- HECHOS ---
     { name: "Hechos", folder: "hechos", chapters: 28 },
+
+    // --- CARTAS DE PABLO ---
     { name: "Romanos", folder: "romanos", chapters: 16 },
     { name: "I Corintios", folder: "1corintios", chapters: 16 },
     { name: "II Corintios", folder: "2corintios", chapters: 13 },
@@ -86,6 +89,8 @@ const library = [
     { name: "Tito", folder: "tito", chapters: 3 },
     { name: "Filemón", folder: "filemon", chapters: 1 },
     { name: "Hebreos", folder: "hebreos", chapters: 13 },
+
+    // --- CARTAS GENERALES ---
     { name: "Santiago", folder: "santiago", chapters: 5 },
     { name: "I Pedro", folder: "1pedro", chapters: 5 },
     { name: "II Pedro", folder: "2pedro", chapters: 3 },
@@ -93,6 +98,8 @@ const library = [
     { name: "II Juan", folder: "2juan", chapters: 1 },
     { name: "III Juan", folder: "3juan", chapters: 1 },
     { name: "Judas", folder: "judas", chapters: 1 },
+
+    // --- APOCALIPSIS ---
     { name: "Apocalipsis", folder: "apocalipsis", chapters: 22 },
 ];
 
@@ -104,35 +111,11 @@ let currentTrackIndex = 0;
 let currentChapterList = []; 
 
 // ----------------------------------------------------
-// --- FUNCIONES DE PERSISTENCIA ---
+// --- FUNCIONES DE PERSISTENCIA (GUARDAR Y CARGAR) ---
 // ----------------------------------------------------
 
-/**
- * Obtiene la lista de índices de capítulos completados del localStorage.
- * @returns {Set<number>} Un Set con los índices completados.
- */
-function getCompletedTracks() {
-    const data = localStorage.getItem(COMPLETED_TRACKS_KEY);
-    return data ? new Set(JSON.parse(data)) : new Set();
-}
-
-/**
- * Marca un capítulo como completado en el localStorage y actualiza el DOM.
- * @param {number} index - El índice plano del capítulo.
- */
-function markTrackAsCompleted(index) {
-    const completedTracks = getCompletedTracks();
-    completedTracks.add(index);
-    localStorage.setItem(COMPLETED_TRACKS_KEY, JSON.stringify(Array.from(completedTracks)));
-    
-    // Actualizar el DOM inmediatamente para mostrar el checkmark
-    const completedItem = document.querySelector(`.chapter-item[data-index="${index}"]`);
-    if (completedItem) {
-        completedItem.classList.add('completed');
-    }
-}
-
 function savePlaybackPosition() {
+    // Solo guarda si hay una fuente cargada y el tiempo es mayor a 1 segundo o si está pausado.
     if (audioPlayer.src && (audioPlayer.currentTime > 1 || audioPlayer.paused)) {
         localStorage.setItem(LAST_INDEX_KEY, currentTrackIndex);
         localStorage.setItem(LAST_TIME_KEY, audioPlayer.currentTime);
@@ -174,6 +157,11 @@ function formatTime(seconds) {
 // --- FUNCIONES CENTRALES DEL REPRODUCTOR ---
 // ---------------------------------------------
 
+/**
+ * Función para reproducir una pista por su índice. 
+ * @param {number} index - El índice del capítulo en currentChapterList.
+ * @param {number} [startTime=0] - El segundo para iniciar la reproducción.
+ */
 function playTrack(index, startTime = 0) {
     if (index >= 0 && index < currentChapterList.length) {
         currentTrackIndex = index;
@@ -187,6 +175,7 @@ function playTrack(index, startTime = 0) {
              updateDisplay(`PAUSADO: ${track.title} (Listo para reanudar)`);
         });
 
+        // Esto asegura que el título se actualice y se muestre:
         updateDisplay(track.title); 
         highlightCurrentTrack();
     } else if (index >= currentChapterList.length) {
@@ -201,14 +190,16 @@ function playTrack(index, startTime = 0) {
     }
 }
 
+/**
+ * Actualiza la información de la pista actual en el reproductor.
+ * @param {string} title - El título de la pista.
+ */
 function updateDisplay(title) {
     currentTrackInfo.textContent = title;
 }
 
 
 function initializePlaylist() {
-    const completedTracks = getCompletedTracks(); // Cargar el estado de completado
-    
     // 1. Crear la lista plana de todos los audios en orden
     library.forEach(book => {
         for (let i = 1; i <= book.chapters; i++) {
@@ -247,12 +238,6 @@ function initializePlaylist() {
             
             if (flatIndex !== -1) {
                 chapterItem.setAttribute('data-index', flatIndex);
-                
-                // Aplicar la clase 'completed' si ya fue terminado
-                if (completedTracks.has(flatIndex)) {
-                    chapterItem.classList.add('completed');
-                }
-                
                 // Al hacer clic, reproducir desde el inicio (tiempo 0)
                 chapterItem.onclick = (event) => playTrack(parseInt(event.target.getAttribute('data-index')), 0); 
             }
@@ -266,17 +251,14 @@ function initializePlaylist() {
 }
 
 function highlightCurrentTrack() {
-    // 1. Quitar el resaltado de reproducción de todos
     document.querySelectorAll('.chapter-item').forEach(item => {
         item.classList.remove('playing');
     });
 
-    // 2. Resaltar el actual si es válido
     const currentItem = document.querySelector(`.chapter-item[data-index="${currentTrackIndex}"]`);
     if (currentItem) {
         currentItem.classList.add('playing');
         
-        // Asegurarse de que el libro actual esté abierto
         const chapterListDiv = currentItem.closest('.chapter-list');
         const titleDiv = chapterListDiv.previousElementSibling;
 
@@ -313,12 +295,6 @@ window.addEventListener('beforeunload', savePlaybackPosition);
 
 // Lógica de Reproducción Secuencial: Al terminar, avanza al siguiente
 audioPlayer.addEventListener('ended', () => {
-    // 1. Marcar el capítulo actual como completado
-    if (currentTrackIndex !== -1) {
-        markTrackAsCompleted(currentTrackIndex);
-    }
-    
-    // 2. Limpiar el tiempo guardado y avanzar
-    localStorage.removeItem(LAST_TIME_KEY);
+    localStorage.removeItem(LAST_TIME_KEY); // Limpiar el tiempo guardado para el capítulo actual
     playTrack(currentTrackIndex + 1);
 });

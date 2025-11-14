@@ -95,3 +95,21 @@ header {
     width: 100px;
     float: left;
 }
+/* Estilo para los capítulos completados */
+.chapter-item.completed {
+    /* Opcional: para que se diferencie el texto */
+    color: #6c757d; 
+    font-style: italic;
+}
+
+.chapter-item.completed::after {
+    /* El símbolo de cotejo (checkmark) */
+    content: '✔✔'; 
+    float: right;
+    margin-left: 10px;
+}
+
+/* Opcional: Asegura que el checkmark se oculte si el capítulo está reproduciéndose */
+.chapter-item.completed.playing::after {
+    content: ''; /* Oculta el checkmark cuando se está reproduciendo */
+}
