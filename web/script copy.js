@@ -1,13 +1,9 @@
-// RUTA RELATIVA: Esto funcionará si la carpeta 'biblia/libro/' se encuentra en la raíz
-// de tu servidor o estructura de archivos, donde el navegador pueda acceder a ella.
 //const BASE_URL = 'https://dbaezh78.github.io/biblia/libro/';
 const BASE_URL = '/biblia/libro/';
 
-// --- CONSTANTES PARA EL ALMACENAMIENTO LOCAL ---
-const LAST_INDEX_KEY = 'bibleLastTrackIndex';
-const LAST_TIME_KEY = 'bibleLastTrackTime';
-
-// Estructura de datos completa (Se mantiene la que proporcionaste)
+// Estructura de datos: Aquí defines los libros y la cantidad de capítulos
+// NOTA: Para este ejemplo, DEBES saber el número de capítulos de antemano.
+// Si no lo sabes, necesitarías un servicio backend para listar los archivos.
 const library = [
     // --- PENTATEUCO ---
     { name: "Génesis", folder: "genesis", chapters: 50 },
@@ -28,11 +24,11 @@ const library = [
     { name: "II Crónicas", folder: "2cronicas", chapters: 36 },
     { name: "Esdras", folder: "esdras", chapters: 10 },
     { name: "Nehemías", folder: "nehemias", chapters: 13 },
-    { name: "Tobías", folder: "tobias", chapters: 14 },
-    { name: "Judit", folder: "judit", chapters: 16 },
-    { name: "Ester", folder: "ester", chapters: 10 },
-    { name: "I Macabeos", folder: "1macabeos", chapters: 16 },
-    { name: "II Macabeos", folder: "2macabeos", chapters: 15 },
+    { name: "Tobías", folder: "tobias", chapters: 14 }, // Deuterocanónico
+    { name: "Judit", folder: "judit", chapters: 16 }, // Deuterocanónico
+    { name: "Ester", folder: "ester", chapters: 10 }, // 10 en el canon católico
+    { name: "I Macabeos", folder: "1macabeos", chapters: 16 }, // Deuterocanónico
+    { name: "II Macabeos", folder: "2macabeos", chapters: 15 }, // Deuterocanónico
 
     // --- SAPIENCIALES ---
     { name: "Job", folder: "job", chapters: 42 },
@@ -40,20 +36,20 @@ const library = [
     { name: "Proverbios", folder: "proverbios", chapters: 31 },
     { name: "Eclesiastés", folder: "eclesiastes", chapters: 12 },
     { name: "Cantar de Cantares", folder: "cantardecantares", chapters: 8 },
-    { name: "Sabiduría", folder: "sabiduria", chapters: 19 },
-    { name: "Eclesiástico", folder: "eclesiastico", chapters: 51 },
+    { name: "Sabiduría", folder: "sabiduria", chapters: 19 }, // Deuterocanónico
+    { name: "Eclesiástico", folder: "eclesiastico", chapters: 51 }, // Sirácida/Eclesiástico (Deuterocanónico)
 
     // --- PROFETAS MAYORES ---
     { name: "Isaías", folder: "isaias", chapters: 66 },
     { name: "Jeremías", folder: "jeremias", chapters: 52 },
     { name: "Lamentaciones", folder: "lamentaciones", chapters: 5 },
-    { name: "Baruc", folder: "baruc", chapters: 6 },
+    { name: "Baruc", folder: "baruc", chapters: 6 }, // Deuterocanónico
     { name: "Ezequiel", folder: "ezequiel", chapters: 48 },
-    { name: "Daniel", folder: "daniel", chapters: 14 },
+    { name: "Daniel", folder: "daniel", chapters: 14 }, // 14 en el canon católico
 
     // --- PROFETAS MENORES ---
     { name: "Oseas", folder: "oseas", chapters: 14 },
-    { name: "Joel", folder: "joel", chapters: 4 },
+    { name: "Joel", folder: "joel", chapters: 4 }, // 4 capítulos si se sigue la división de la Vulgata.
     { name: "Amós", folder: "amos", chapters: 9 },
     { name: "Abdías", folder: "abdias", chapters: 1 },
     { name: "Jonás", folder: "jonas", chapters: 4 },
@@ -101,6 +97,7 @@ const library = [
 
     // --- APOCALIPSIS ---
     { name: "Apocalipsis", folder: "apocalipsis", chapters: 22 },
+    
 ];
 
 const audioPlayer = document.getElementById('audio-player');
@@ -108,101 +105,17 @@ const playlistContainer = document.getElementById('playlist');
 const currentTrackInfo = document.getElementById('current-track-info');
 
 let currentTrackIndex = 0;
-let currentChapterList = []; 
-
-// ----------------------------------------------------
-// --- FUNCIONES DE PERSISTENCIA (GUARDAR Y CARGAR) ---
-// ----------------------------------------------------
-
-function savePlaybackPosition() {
-    // Solo guarda si hay una fuente cargada y el tiempo es mayor a 1 segundo o si está pausado.
-    if (audioPlayer.src && (audioPlayer.currentTime > 1 || audioPlayer.paused)) {
-        localStorage.setItem(LAST_INDEX_KEY, currentTrackIndex);
-        localStorage.setItem(LAST_TIME_KEY, audioPlayer.currentTime);
-    }
-}
-
-function loadPlaybackPosition() {
-    const savedIndex = localStorage.getItem(LAST_INDEX_KEY);
-    const savedTime = localStorage.getItem(LAST_TIME_KEY);
-
-    if (savedIndex !== null && savedTime !== null && currentChapterList.length > 0) {
-        const index = parseInt(savedIndex);
-        const time = parseFloat(savedTime);
-        
-        if (time > 0 && index >= 0 && index < currentChapterList.length) {
-            const track = currentChapterList[index];
-            updateDisplay(`Continuar: ${track.title} (desde ${formatTime(time)})`);
-            
-            playTrack(index, time);
-
-            highlightCurrentTrack();
-        } else if (index >= 0 && index < currentChapterList.length) {
-            updateDisplay(`Último capítulo: ${currentChapterList[index].title}`);
-            currentTrackIndex = index;
-            highlightCurrentTrack();
-        }
-    } else {
-        updateDisplay("Selecciona un capítulo para comenzar.");
-    }
-}
-
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-}
-
-// ---------------------------------------------
-// --- FUNCIONES CENTRALES DEL REPRODUCTOR ---
-// ---------------------------------------------
+let currentChapterList = []; // Lista plana de URIs de los capítulos en orden
 
 /**
- * Función para reproducir una pista por su índice. 
- * @param {number} index - El índice del capítulo en currentChapterList.
- * @param {number} [startTime=0] - El segundo para iniciar la reproducción.
+ * 1. Inicializa la lista aplanada de capítulos (currentChapterList).
+ * 2. Genera el HTML de la playlist colapsable.
  */
-function playTrack(index, startTime = 0) {
-    if (index >= 0 && index < currentChapterList.length) {
-        currentTrackIndex = index;
-        const track = currentChapterList[currentTrackIndex];
-        
-        audioPlayer.src = track.url;
-        audioPlayer.currentTime = startTime;
-
-        audioPlayer.play().catch(error => {
-             console.error("Error al intentar reproducir automáticamente:", error);
-             updateDisplay(`PAUSADO: ${track.title} (Listo para reanudar)`);
-        });
-
-        // Esto asegura que el título se actualice y se muestre:
-        updateDisplay(track.title); 
-        highlightCurrentTrack();
-    } else if (index >= currentChapterList.length) {
-        // Fin de la lista
-        updateDisplay("Fin de la lista.");
-        audioPlayer.pause();
-        audioPlayer.src = ""; 
-        currentTrackIndex = -1; 
-        highlightCurrentTrack(); 
-        localStorage.removeItem(LAST_INDEX_KEY);
-        localStorage.removeItem(LAST_TIME_KEY);
-    }
-}
-
-/**
- * Actualiza la información de la pista actual en el reproductor.
- * @param {string} title - El título de la pista.
- */
-function updateDisplay(title) {
-    currentTrackInfo.textContent = title;
-}
-
-
 function initializePlaylist() {
     // 1. Crear la lista plana de todos los audios en orden
     library.forEach(book => {
         for (let i = 1; i <= book.chapters; i++) {
+            // Formato de capítulo: c01, c02, ..., c10, ...
             const chapterNumber = i < 10 ? `c0${i}` : `c${i}`;
             const url = `${BASE_URL}${book.folder}/${chapterNumber}.mp3`;
             currentChapterList.push({
@@ -232,14 +145,15 @@ function initializePlaylist() {
             chapterItem.className = 'chapter-item';
             chapterItem.textContent = `Capítulo ${i}`;
 
+            // Encontrar el índice en la lista plana (currentChapterList)
+            // Esto es crucial para la reproducción secuencial
             const flatIndex = currentChapterList.findIndex(track => 
                 track.title === `${book.name} - Capítulo ${i}`
             );
             
             if (flatIndex !== -1) {
                 chapterItem.setAttribute('data-index', flatIndex);
-                // Al hacer clic, reproducir desde el inicio (tiempo 0)
-                chapterItem.onclick = (event) => playTrack(parseInt(event.target.getAttribute('data-index')), 0); 
+                chapterItem.onclick = (event) => playTrack(parseInt(event.target.getAttribute('data-index')));
             }
             
             chapterListDiv.appendChild(chapterItem);
@@ -250,15 +164,52 @@ function initializePlaylist() {
     });
 }
 
+/**
+ * Función para reproducir una pista por su índice en la lista plana.
+ * @param {number} index - El índice del capítulo en currentChapterList.
+ */
+function playTrack(index) {
+    if (index >= 0 && index < currentChapterList.length) {
+        currentTrackIndex = index;
+        const track = currentChapterList[currentTrackIndex];
+        
+        audioPlayer.src = track.url;
+        audioPlayer.play();
+        updateDisplay(track.title);
+        highlightCurrentTrack();
+    } else if (index >= currentChapterList.length) {
+        // Fin de la lista
+        updateDisplay("Fin de la lista. Vuelve a empezar o selecciona otro capítulo.");
+        audioPlayer.pause();
+        audioPlayer.src = ""; // Detener la reproducción
+        currentTrackIndex = -1; // Marcar como detenido
+        highlightCurrentTrack(); // Desmarcar todos
+    }
+}
+
+/**
+ * Actualiza la información de la pista actual en el reproductor.
+ * @param {string} title - El título de la pista.
+ */
+function updateDisplay(title) {
+    currentTrackInfo.textContent = title;
+}
+
+/**
+ * Resalta el capítulo que se está reproduciendo actualmente en la playlist.
+ */
 function highlightCurrentTrack() {
+    // 1. Quitar el resaltado de todos
     document.querySelectorAll('.chapter-item').forEach(item => {
         item.classList.remove('playing');
     });
 
+    // 2. Resaltar el actual si es válido
     const currentItem = document.querySelector(`.chapter-item[data-index="${currentTrackIndex}"]`);
     if (currentItem) {
         currentItem.classList.add('playing');
         
+        // Opcional: Asegurarse de que el libro actual esté abierto
         const chapterListDiv = currentItem.closest('.chapter-list');
         const titleDiv = chapterListDiv.previousElementSibling;
 
@@ -268,6 +219,9 @@ function highlightCurrentTrack() {
     }
 }
 
+/**
+ * Alterna la visibilidad de la lista de capítulos.
+ */
 function toggleChapterList(titleDiv, chapterListDiv) {
     const isExpanded = titleDiv.getAttribute('aria-expanded') === 'true';
     if (isExpanded) {
@@ -279,22 +233,15 @@ function toggleChapterList(titleDiv, chapterListDiv) {
     }
 }
 
-// ----------------------------------
-// --- INICIALIZACIÓN Y LISTENERS ---
-// ----------------------------------
-
-// 1. Iniciar la lista de capítulos
-initializePlaylist();
-
-// 2. Intentar cargar la última posición guardada al iniciar la página
-loadPlaybackPosition(); 
-
-// 3. Añadir listeners para guardar la posición
-audioPlayer.addEventListener('pause', savePlaybackPosition); 
-window.addEventListener('beforeunload', savePlaybackPosition); 
-
-// Lógica de Reproducción Secuencial: Al terminar, avanza al siguiente
+// --- Lógica de Reproducción Secuencial ---
 audioPlayer.addEventListener('ended', () => {
-    localStorage.removeItem(LAST_TIME_KEY); // Limpiar el tiempo guardado para el capítulo actual
+    // Cuando el audio termina, avanza al siguiente en la lista plana.
     playTrack(currentTrackIndex + 1);
 });
+
+// Iniciar la aplicación
+initializePlaylist();
+
+// Si quieres que empiece a reproducir el primer audio automáticamente,
+// descomenta la siguiente línea (algunos navegadores pueden bloquear el 'autoplay').
+// playTrack(0);
