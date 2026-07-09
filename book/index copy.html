@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblia de Estudio</title>
+  <style>
+    /* 1. MOTOR DE ESTILOS (Variables manipulables) */
+    :root {
+      --tamano-titulo: 28px;
+      --tamano-capitulo: 36px;
+      --tamano-versiculo: 14px;
+      --tamano-texto: 18px;
+      
+      --color-texto: #1a1a1a;
+      --color-num-versiculo: #cc0000;
+      --color-capitulo: #cc0000;
+      --color-fondo: #ffffff;
+      --color-sidebar: #ffffff;
+      --color-paralelos: #666666;
+    }
+
+    /* Estilos Generales */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Barra Superior / Header */
+    header {
+      background-color: #333;
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 50px;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+
+    .menu-btn {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+
+    /* MENÚ LATERAL (Sidebar) */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px; /* Oculto por defecto */
+      width: 280px;
+      height: 100%;
+      background-color: var(--color-sidebar);
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+      transition: left 0.3s ease;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.open {
+      left: 0; /* Al abrirse se desliza a la vista */
+    }
+
+    /* Encabezado del menú (Imagen e Ilustración como tu captura) */
+    .sidebar-header {
+      background-color: #4a5568;
+      color: white;
+      padding: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Opciones del menú */
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      color: #4a5568;
+      text-decoration: none;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 16px;
+    }
+
+    .sidebar-menu li a:hover {
+      background-color: #f7fafc;
+    }
+
+    /* Fondo oscuro cuando el menú está abierto en móvil */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      z-index: 15;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    /* CONTENEDOR PRINCIPAL DE LA BIBLIA */
+    .main-content {
+      margin-top: 50px;
+      padding: 20px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .libro-titulo {
+      font-size: var(--tamano-titulo);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .capitulo-num {
+      font-size: var(--tamano-capitulo);
+      color: var(--color-capitulo);
+      font-weight: bold;
+      margin-top: 20px;
+      display: block;
+    }
+
+    /* Estructura de Versículos y Paralelos */
+    .texto-sagrado {
+      font-size: var(--tamano-texto);
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .versiculo {
+      position: relative;
+      margin-right: 5px;
+    }
+
+    .num-v {
+      color: var(--color-num-versiculo);
+      font-size: var(--tamano-versiculo);
+      font-weight: bold;
+      vertical-align: super;
+      margin-right: 2px;
+    }
+
+    /* Paralelos (Referencias cruzadas) */
+    .paralelos {
+      font-size: 0.85em;
+      color: var(--color-paralelos);
+      font-style: italic;
+      display: block;
+      margin: 2px 0 8px 0;
+    }
+
+    /* Pie de página (Notas) */
+    .pie-pagina {
+      margin-top: 40px;
+      border-top: 1px solid #ccc;
+      padding-top: 15px;
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="menu-btn" id="openBtn">☰</button>
+    <div style="font-size: 18px; font-weight: bold;">Biblia Pro</div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      La Biblia
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#">📅 Planes de Lectura</a></li>
+      <li><a href="#">✝️ Verso Diario</a></li>
+      <li><a href="#">🔖 Marcadores</a></li>
+      <li><a href="#">📝 Notas</a></li>
+      <li><a href="#">🅰️ Destacados</a></li>
+      <li><a href="#">⚙️ Ajustes</a></li>
+      <li><a href="#">🌙 Día/Noche</a></li>
+      <li><a href="#">🔗 Compartir App</a></li>
+      <li><a href="#">💬 Comentarios</a></li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    <h1 class="libro-titulo">Génesis</h1>
+    
+    <div class="texto-sagrado">
+      <span class="capitulo-num">1</span>
+      
+      <span class="versiculo"><span class="num-v">1</span>En el principio creó Dios los cielos y la tierra.</span>
+      <span class="paralelos">(Jn. 1:1-2; He. 11:3)</span>
+
+      <span class="versiculo"><span class="num-v">2</span>Y la tierra estaba desordenada y vacía, y las tinieblas estaban sobre la faz del abismo, y el Espíritu de Dios se movía sobre la faz de las aguas.</span>
+      
+      <span class="versiculo"><span class="num-v">3</span>Y dijo Dios: Sea la luz; y fue la luz.</span>
+      <span class="paralelos">(2 Co. 4:6)</span>
+    </div>
+
+    <footer class="pie-pagina">
+      <p><strong>Nota 1:1</strong> El término hebreo para "Dios" aquí es <em>Elohim</em>, un nombre plural que denota majestad y grandeza.</p>
+    </footer>
+  </main>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const openBtn = document.getElementById('openBtn');
+
+    // Funciones para abrir y cerrar
+    function openMenu() {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+    }
+
+    function closeMenu() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+
+    openBtn.addEventListener('click', openMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // --- SOPORTE PARA DESPLAZAR CON EL DEDO (TOUCH EVENTS) ---
+    let startX = 0;
+    let currentX = 0;
+
+    // Detectar cuando el dedo toca la pantalla
+    document.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+
+    // Detectar movimiento del dedo
+    document.addEventListener('touchmove', (e) => {
+      currentX = e.touches[0].clientX;
+      
+      // Si el menú está cerrado y arrastramos desde el borde izquierdo hacia la derecha
+      if (!sidebar.classList.contains('open') && startX < 40 && (currentX - startX) > 50) {
+        openMenu();
+      }
+      
+      // Si el menú está abierto y arrastramos hacia la izquierda para cerrarlo
+      if (sidebar.classList.contains('open') && (startX - currentX) > 50) {
+        closeMenu();
+      }
+    });
+  </script>
+
+</body>
+</html>
