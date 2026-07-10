@@ -8,15 +8,16 @@ const panelTitulo = document.getElementById('panelTitulo');
 const panelContenido = document.getElementById('panelContenido');
 const closePanelBtn = document.getElementById('closePanelBtn');
 
-// Elementos del DOM para la Navegación Dinámica
-const selectLibro = document.getElementById('selectLibro');
-const selectCapitulo = document.getElementById('selectCapitulo');
+// Elementos del DOM para la Navegación Dinámica (Virtualizados para compatibilidad)
+let selectLibro = null;
+let selectCapitulo = null;
 
 // Variables de control de estado globales
 let libroActualData = null;
 let capituloActualNum = 1;
 let mapaEnlacesParalelos = null; 
 let idLibroActual = "01_gn";
+let rutaLibroActual = "src/libros/01_gn.json";
 
 // Diccionario unificado con los 73 libros
 const indiceLibrosRutas = {
@@ -96,28 +97,218 @@ const indiceLibrosRutas = {
 };
 
 /* ==========================================================================
-   1. CONTROLADORES DE EVENTOS DE INTERFAZ
+   CATEGORÍA 2: NÚCLEO DE NAVEGACIÓN Y CONFIGURACIÓN DE SELECTORES HORIZONTALES
    ========================================================================== */
-if (selectLibro) {
-  selectLibro.addEventListener('change', (e) => {
-    const rutaSeleccionada = e.target.value;
-    idLibroActual = rutaSeleccionada.split('/').pop().replace('.json', '');
-    cargarLibroYCapitulo(rutaSeleccionada, 1);
+/* ==========================================================================
+   CATEGORÍA 2: NÚCLEO DE NAVEGACIÓN Y CONFIGURACIÓN DE SELECTORES HORIZONTALES
+   ========================================================================== */
+function normalizarTexto(texto) {
+  return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function llenarSelectorLibros() {
+  const listContainer = document.getElementById('libroOptionsList');
+  if (!listContainer) return;
+
+  listContainer.innerHTML = "";
+  Object.keys(indiceLibrosRutas).forEach(key => {
+    const claveLimpia = key.toLowerCase();
+    const libroInfo = indiceLibrosRutas[claveLimpia];
+    if (!libroInfo || !libroInfo.nombre) return;
+
+    const opt = document.createElement('div');
+    opt.className = "custom-option";
+    opt.dataset.value = libroInfo.ruta;
+    opt.dataset.key = claveLimpia;
+    
+    if (claveLimpia === idLibroActual) {
+      opt.classList.add('selected');
+    }
+    
+    opt.innerHTML = `<span>${libroInfo.nombre.toUpperCase()}</span>`;
+
+    opt.addEventListener('click', () => {
+      seleccionarLibro(claveLimpia, libroInfo.ruta);
+    });
+
+    listContainer.appendChild(opt);
   });
 }
 
-if (selectCapitulo) {
-  selectCapitulo.addEventListener('change', (e) => {
-    const numeroCapitulo = parseInt(e.target.value, 10);
-    capituloActualNum = numeroCapitulo;
-    if (libroActualData) {
-      renderizarVersiculos(libroActualData, capituloActualNum);
+function seleccionarLibro(key, ruta) {
+  idLibroActual = key;
+  rutaLibroActual = ruta;
+  capituloActualNum = 1;
+  cerrarTodosDropdowns();
+  cargarLibroYCapitulo(ruta, 1);
+  
+  // Auto-abrir selector de capítulos después de seleccionar un libro
+  setTimeout(() => {
+    const capituloDropdown = document.getElementById('capituloDropdown');
+    const capituloSearch = document.getElementById('capituloSearch');
+    if (capituloDropdown && capituloSearch) {
+      cerrarTodosDropdowns();
+      capituloDropdown.classList.add('open');
+      capituloSearch.value = "";
+      filtrarCapitulos("");
+      capituloSearch.focus();
+    }
+  }, 250);
+}
+
+function seleccionarCapitulo(cap) {
+  capituloActualNum = parseInt(cap, 10);
+  cerrarTodosDropdowns();
+  cargarLibroYCapitulo(rutaLibroActual, capituloActualNum);
+}
+
+function filtrarLibros(query) {
+  const listContainer = document.getElementById('libroOptionsList');
+  if (!listContainer) return;
+
+  const normalizedQuery = normalizarTexto(query);
+  const options = listContainer.querySelectorAll('.custom-option');
+  
+  let primerMatch = null;
+  let count = 0;
+
+  options.forEach(opt => {
+    const key = opt.dataset.key;
+    const libroInfo = indiceLibrosRutas[key];
+    const nombreNormalizado = normalizarTexto(libroInfo.nombre);
+    
+    if (nombreNormalizado.includes(normalizedQuery) || key.includes(normalizedQuery)) {
+      opt.style.display = "flex";
+      opt.classList.remove('highlighted');
+      if (count === 0) {
+        primerMatch = opt;
+        opt.classList.add('highlighted');
+      }
+      count++;
+    } else {
+      opt.style.display = "none";
+      opt.classList.remove('highlighted');
+    }
+  });
+
+  return primerMatch;
+}
+
+function filtrarCapitulos(query) {
+  const gridContainer = document.getElementById('capituloOptionsList');
+  if (!gridContainer) return;
+
+  const options = gridContainer.querySelectorAll('.custom-option-grid-item');
+  let primerMatch = null;
+  let count = 0;
+
+  options.forEach(opt => {
+    const capNum = opt.dataset.value;
+    if (capNum.startsWith(query)) {
+      opt.style.display = "block";
+      opt.classList.remove('highlighted');
+      if (count === 0) {
+        primerMatch = opt;
+        opt.classList.add('highlighted');
+      }
+      count++;
+    } else {
+      opt.style.display = "none";
+      opt.classList.remove('highlighted');
+    }
+  });
+
+  return primerMatch;
+}
+
+function cerrarTodosDropdowns() {
+  document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+}
+
+function configurarNavegacionSuperior() {
+  const libroTrigger = document.getElementById('libroTrigger');
+  const libroDropdown = document.getElementById('libroDropdown');
+  const libroSearch = document.getElementById('libroSearch');
+  
+  const capituloTrigger = document.getElementById('capituloTrigger');
+  const capituloDropdown = document.getElementById('capituloDropdown');
+  const capituloSearch = document.getElementById('capituloSearch');
+
+  if (!libroTrigger || !capituloTrigger) return;
+
+  libroTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = libroDropdown.classList.contains('open');
+    cerrarTodosDropdowns();
+    if (!isOpen) {
+      libroDropdown.classList.add('open');
+      libroSearch.value = "";
+      filtrarLibros("");
+      setTimeout(() => libroSearch.focus(), 50);
+    }
+  });
+
+  libroSearch.addEventListener('input', (e) => {
+    filtrarLibros(e.target.value);
+  });
+
+  capituloTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = capituloDropdown.classList.contains('open');
+    cerrarTodosDropdowns();
+    if (!isOpen) {
+      capituloDropdown.classList.add('open');
+      capituloSearch.value = "";
+      filtrarCapitulos("");
+      setTimeout(() => capituloSearch.focus(), 50);
+    }
+  });
+
+  capituloSearch.addEventListener('input', (e) => {
+    filtrarCapitulos(e.target.value);
+  });
+
+  libroSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const listContainer = document.getElementById('libroOptionsList');
+      const match = listContainer.querySelector('.custom-option.highlighted') || 
+                    Array.from(listContainer.querySelectorAll('.custom-option')).find(el => el.style.display !== 'none');
+      if (match) {
+        seleccionarLibro(match.dataset.key, match.dataset.value);
+      }
+    } else if (e.key === 'Escape') {
+      cerrarTodosDropdowns();
+    }
+  });
+
+  capituloSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const valor = capituloSearch.value.trim();
+      if (valor && libroActualData && libroActualData.capitulos && libroActualData.capitulos[valor]) {
+        seleccionarCapitulo(valor);
+      } else {
+        const gridContainer = document.getElementById('capituloOptionsList');
+        const match = gridContainer.querySelector('.custom-option-grid-item.highlighted') ||
+                      Array.from(gridContainer.querySelectorAll('.custom-option-grid-item')).find(el => el.style.display !== 'none');
+        if (match) {
+          seleccionarCapitulo(match.dataset.value);
+        }
+      }
+    } else if (e.key === 'Escape') {
+      cerrarTodosDropdowns();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-select-container')) {
+      cerrarTodosDropdowns();
     }
   });
 }
 
+
 /* ==========================================================================
-   2. NÚCLEO FETCH DE DATOS
+   3. NÚCLEO FETCH DE DATOS
    ========================================================================== */
 function inicializarApp() {
   fetch('src/js/paralelos.json')
@@ -130,34 +321,102 @@ function inicializarApp() {
 }
 
 function ejecutarCargaInicial() {
-  if (selectLibro) {
-    idLibroActual = selectLibro.value.split('/').pop().replace('.json', '');
-    cargarLibroYCapitulo(selectLibro.value, 1);
-  }
+  cargarLibroYCapitulo(rutaLibroActual, 1);
 }
 
-function cargarLibroYCapitulo(rutaJson, numeroCapitulo) {
+function cargarLibroYCapitulo(rutaJson, capNum) {
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    mainContent.innerHTML = `<div id="loading-view" style="padding: 20px; color: #666; font-style: italic;">Cargando Escrituras...</div>`;
+  }
+
+  const encontrado = Object.keys(indiceLibrosRutas).find(key => indiceLibrosRutas[key].ruta === rutaJson);
+  if (encontrado) {
+    idLibroActual = encontrado;
+    rutaLibroActual = rutaJson;
+    const trigger = document.getElementById('libroTrigger');
+    if (trigger) {
+      trigger.textContent = indiceLibrosRutas[encontrado].nombre.toUpperCase();
+    }
+    
+    document.querySelectorAll('#libroOptionsList .custom-option').forEach(opt => {
+      if (opt.dataset.key === encontrado) {
+        opt.classList.add('selected');
+      } else {
+        opt.classList.remove('selected');
+      }
+    });
+  }
+
   fetch(rutaJson)
-    .then(response => { if (!response.ok) throw new Error(); return response.json(); })
+    .then(res => {
+      if (!res.ok) throw new Error("No disponible");
+      return res.json();
+    })
     .then(data => {
       libroActualData = data;
-      capituloActualNum = numeroCapitulo;
-      actualizarSelectorCapitulos(data.capitulos, numeroCapitulo);
-      renderizarVersiculos(data, numeroCapitulo);
+      capituloActualNum = capNum;
+
+      actualizarSelectorCapitulos(data.capitulos, capNum);
+      renderizarVersiculos(data, capNum);
     })
-    .catch(error => console.error("Error al obtener datos:", error));
+    .catch(err => {
+      console.error("Fallo cargando las escrituras:", err);
+      if (mainContent) {
+        const nombreLibro = encontrado ? indiceLibrosRutas[encontrado].nombre : "este libro";
+        mainContent.innerHTML = `
+          <div class="error-banner">
+            <h3>📖 Libro no disponible</h3>
+            <p>El libro <strong>${nombreLibro}</strong> aún no está cargado en la base de datos local (JSON). Puedes intentar con Génesis, Isaías, Oseas o II Corintios.</p>
+          </div>
+        `;
+      }
+      
+      const capTrigger = document.getElementById('capituloTrigger');
+      if (capTrigger) capTrigger.textContent = "-";
+      const capGrid = document.getElementById('capituloOptionsList');
+      if (capGrid) capGrid.innerHTML = `<div style="grid-column: span 5; color: #aaa; font-size: 0.9em; padding: 10px; text-align: center;">No disponible</div>`;
+    });
 }
 
-function actualizarSelectorCapitulos(capitulosObjeto, capActivo) {
-  if (!selectCapitulo) return;
-  selectCapitulo.innerHTML = ""; 
-  Object.keys(capitulosObjeto).forEach(cap => {
-    const opcion = document.createElement('option');
-    opcion.value = cap;
-    opcion.textContent = `Capítulo ${cap}`;
-    if (parseInt(cap, 10) === capActivo) opcion.selected = true;
-    selectCapitulo.appendChild(opcion);
+function actualizarSelectorCapitulos(capitulosData, capSeleccionado) {
+  const trigger = document.getElementById('capituloTrigger');
+  if (trigger) {
+    trigger.textContent = capSeleccionado;
+  }
+
+  const gridContainer = document.getElementById('capituloOptionsList');
+  if (!gridContainer) return;
+
+  gridContainer.innerHTML = "";
+  Object.keys(capitulosData).forEach(cap => {
+    const item = document.createElement('div');
+    item.className = "custom-option-grid-item";
+    item.dataset.value = cap;
+    item.textContent = cap;
+
+    if (parseInt(cap, 10) === parseInt(capSeleccionado, 10)) {
+      item.classList.add('selected');
+    }
+
+    item.addEventListener('click', () => {
+      seleccionarCapitulo(cap);
+    });
+
+    gridContainer.appendChild(item);
   });
+}
+
+
+
+function compararVersiculos(a, b) {
+  const numA = parseInt(a, 10);
+  const numB = parseInt(b, 10);
+
+  if (numA !== numB) {
+    return numA - numB;
+  }
+  return a.localeCompare(b);
 }
 
 function renderizarVersiculos(libroData, capSeleccionado) {
@@ -169,7 +428,10 @@ function renderizarVersiculos(libroData, capSeleccionado) {
   
   const versiculos = libroData.capitulos[capSeleccionado];
   if (versiculos) {
-    for (const numV in versiculos) {
+    // Ordenar las claves de los versículos de manera inteligente (ej: 5a, 5b entre el 4 y el 7)
+    const clavesOrdenadas = Object.keys(versiculos).sort(compararVersiculos);
+
+    clavesOrdenadas.forEach(numV => {
       const textoVersiculo = versiculos[numV];
       const llaveCoordenada = `${idLibroActual}-c${capSeleccionado}-v${numV}`;
       const tieneParalelos = mapaEnlacesParalelos && mapaEnlacesParalelos[llaveCoordenada];
@@ -183,7 +445,7 @@ function renderizarVersiculos(libroData, capSeleccionado) {
       } else {
         htmlContenido += `<span class="versiculo"><span class="num-v">${numV}</span>${textoVersiculo}</span>`;
       }
-    }
+    });
   }
   htmlContenido += `</div>`;
   contenedorPrincipal.innerHTML = htmlContenido;
@@ -191,7 +453,7 @@ function renderizarVersiculos(libroData, capSeleccionado) {
 }
 
 /* ==========================================================================
-   CATEGORÍA 4: PROCESADOR DE CITAS - DISEÑO HORIZONTAL / VERTICAL MÓVIL
+   CATEGORÍA 4: PROCESADOR DE CITAS - ADAPTABLE CON SCROLL VERTICAL
    ========================================================================== */
 function activarEventosParalelos() {
   const versiculosConParalelo = document.querySelectorAll('.tiene-paralelo');
@@ -242,13 +504,12 @@ function activarEventosParalelos() {
             const citaFormateadaLector = idVersiculoCompleto.replace('_', '-');
             const textoCitaFormateada = `${infoLibro.nombre} ${capNum},${citaFormateadaLector}`;
 
-            // Ajustamos el estilo para que funcione dinámicamente en bloques con ancho del 100% en móviles
             return `
               <div class="bloque-paralelo-link" 
                    data-ruta="${infoLibro.ruta}" 
                    data-libro-id="${libroId}" 
                    data-cap="${capNum}" 
-                   style="flex: 1 1 calc(50% - 10px); min-width: 250px; max-width: 100%; border-left: 3px solid #cc0000; padding: 10px; cursor: pointer; background: #fff; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box;">
+                   style="flex: 1 1 calc(50% - 10px); min-width: 250px; max-width: 100%; border-left: 3px solid #cc0000; padding: 2px; cursor: pointer; background: #fff; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box;">
                 <strong style="color: #cc0000; display: block; margin-bottom: 2px; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   📌 ${textoCitaFormateada}
                 </strong>
@@ -266,14 +527,14 @@ function activarEventosParalelos() {
           const htmlFinal = bloquesHtml.filter(b => b && b.trim() !== '').join('');
           
           if (htmlFinal.trim() === '') {
-            panelContenido.innerHTML = `<p style="color: #888; font-style: italic; padding: 10px;">No se encontraron los textos de las referencias cruzadas.</p>`;
+            panelContenido.innerHTML = `<p style="color: #888; font-style: italic; padding: 2px;">No se encontraron los textos de las referencias cruzadas.</p>`;
           } else {
-            // Detectamos si es pantalla móvil basándonos en el ancho de la ventana
             const esMovil = window.innerWidth <= 600;
             const direccionFlex = esMovil ? 'column' : 'row';
 
+            // Añadimos max-height y overflow-y: auto para habilitar el scroll si hay muchos elementos
             panelContenido.innerHTML = `
-              <div style="display: flex; flex-direction: ${direccionFlex}; flex-wrap: wrap; gap: 10px; width: 100%; padding: 5px; box-sizing: border-box;">
+              <div style="display: flex; flex-direction: ${direccionFlex}; flex-wrap: wrap; gap: 2px; width: 100%; max-height: 300px; overflow-y: auto; padding: 5px; box-sizing: border-box;">
                 ${htmlFinal}
               </div>
             `;
@@ -301,10 +562,8 @@ function asignarEventosViajeReferencia() {
 
       closePanel();
 
-      if (selectLibro) {
-        selectLibro.value = rutaDestino;
-        idLibroActual = libroIdDestino;
-      }
+      idLibroActual = libroIdDestino;
+      rutaLibroActual = rutaDestino;
       cargarLibroYCapitulo(rutaDestino, capDestino);
     });
   });
@@ -340,9 +599,67 @@ function closeMenu() {
 if (openBtn) openBtn.addEventListener('click', openMenu);
 if (overlay) overlay.addEventListener('click', closeMenu);
 
+
+
+function construirNavegacionDinamica() {
+  const contenedorSelector = document.getElementById('selectorBiblico');
+  if (!contenedorSelector) return;
+
+  contenedorSelector.innerHTML = `
+    <!-- Selector de Libro -->
+    <div class="custom-select-container" id="libroContainer">
+      <div class="custom-select-trigger" id="libroTrigger">GÉNESIS</div>
+      <div class="custom-dropdown" id="libroDropdown">
+        <input type="text" class="custom-search-input" id="libroSearch" placeholder="Buscar libro..." autocomplete="off">
+        <div class="custom-options-list" id="libroOptionsList"></div>
+      </div>
+    </div>
+
+    <!-- Selector de Capítulo -->
+    <div class="custom-select-container" id="capituloContainer">
+      <div class="custom-select-trigger cap-trigger" id="capituloTrigger">1</div>
+      <div class="custom-dropdown cap-dropdown" id="capituloDropdown">
+        <input type="text" class="custom-search-input" id="capituloSearch" placeholder="Capítulo..." autocomplete="off">
+        <div class="custom-options-grid" id="capituloOptionsList"></div>
+      </div>
+    </div>
+  `;
+}
+
+
 /* ==========================================================================
-   5. INICIALIZACIÓN
+   5. INICIALIZACIÓN CORREGIDA
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
-  inicializarApp();
+  // A. Construir visualmente la barra limpia (Libro y número rojo) desde el JS
+  construirNavegacionDinamica();
+
+  // B. Renderizar dinámicamente los 73 libros en el selector que se acaba de crear
+  llenarSelectorLibros();
+
+  // C. Configurar los eventos de escucha para Libro y Capítulo
+  configurarNavegacionSuperior();
+
+  // D. Carga original de referencias cruzadas y arranque de la App
+  fetch('src/js/paralelos.json')
+    .then(res => res.json())
+    .then(data => {
+      mapaEnlacesParalelos = data;
+      
+      const rutaInicial = "src/libros/01_gn.json";
+      idLibroActual = "01_gn";
+      rutaLibroActual = rutaInicial;
+      
+      cargarLibroYCapitulo(rutaInicial, 1);
+    })
+    .catch(err => {
+      console.error("Error al cargar paralelos de inicio:", err);
+      // Fallback de seguridad si falla el JSON de paralelos
+      const rutaInicial = "src/libros/01_gn.json";
+      idLibroActual = "01_gn";
+      rutaLibroActual = rutaInicial;
+      cargarLibroYCapitulo(rutaInicial, 1);
+    });
 });
+
+/*    5. INICIALIZACIÓN CORREGIDA */

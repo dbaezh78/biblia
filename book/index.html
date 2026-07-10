@@ -12,14 +12,7 @@
   <header>
     <button class="menu-btn" id="openBtn">☰</button>
     
-    <div class="selector-biblico" style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
-      <select id="selectLibro" style="background: transparent; color: white; border: none; font-size: 1.1em; font-weight: bold; cursor: pointer; outline: none; text-transform: uppercase;">
-        <option value="src/libros/01_gn.json" style="color: black;" selected>GÉNESIS</option>
-        </select>
-      
-      <select id="selectCapitulo" style="background: transparent; color: #ff8c8c; border: none; font-size: 1.1em; font-weight: bold; cursor: pointer; outline: none;">
-        </select>
-    </div>
+    <div class="selector-biblico" id="selectorBiblico"></div>
   </header>
 
   <div class="overlay" id="overlay"></div>
@@ -45,8 +38,8 @@
 
   <div class="panel-paralelos" id="panelParalelos">
     <div class="panel-header">
-      <span class="panel-title" id="panelTitulo">📚 Paralelos</span>
-      <button class="close-btn" id="closePanelBtn">✕</button>
+      <span class="panel-title" id="panelTitulo">📚 Referencias Cruzadas</span>
+      <button class="close-btn" id="closePanelBtn">&times;</button>
     </div>
     <div class="panel-content" id="panelContenido">
       </div>
