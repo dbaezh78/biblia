@@ -99,9 +99,6 @@ const indiceLibrosRutas = {
 /* ==========================================================================
    CATEGORÍA 2: NÚCLEO DE NAVEGACIÓN Y CONFIGURACIÓN DE SELECTORES HORIZONTALES
    ========================================================================== */
-/* ==========================================================================
-   CATEGORÍA 2: NÚCLEO DE NAVEGACIÓN Y CONFIGURACIÓN DE SELECTORES HORIZONTALES
-   ========================================================================== */
 function normalizarTexto(texto) {
   return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -407,8 +404,6 @@ function actualizarSelectorCapitulos(capitulosData, capSeleccionado) {
   });
 }
 
-
-
 function compararVersiculos(a, b) {
   const numA = parseInt(a, 10);
   const numB = parseInt(b, 10);
@@ -545,7 +540,6 @@ function activarEventosParalelos() {
     });
   });
 }
-
 
 
 
