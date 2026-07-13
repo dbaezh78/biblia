@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblia de Estudio Pro</title>
+  <link rel="icon" href="src/img/ico.ico" type="image/x-icon">
+  <link rel="stylesheet" href="src/css/cssgral.css">
+</head>
+<body>
+
+  <header>
+    <button class="menu-btn" id="openBtn">☰</button>
+    
+    <div class="selector-biblico" id="selectorBiblico"></div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">La Biblia</div>
+    <ul class="sidebar-menu">
+      <li><a href="#">📅 Planes de Lectura</a></li>
+      <li><a href="#">✝️ Verso Diario</a></li>
+      <li><a href="#">🔖 Marcadores</a></li>
+      <li><a href="#">📝 Notas</a></li>
+      <li><a href="#">🅰️ Destacados</a></li>
+      <li><a href="#">⚙️ Ajustes</a></li>
+      <li><a href="#">🌙 Día/Noche</a></li>
+      <li><a href="#">🔗 Compartir App</a></li>
+      <li><a href="#">💬 Comentarios</a></li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    <div id="loading-view" style="padding: 20px; color: #666; font-style: italic;">Cargando Escrituras...</div>
+  </main>
+
+  <div class="panel-paralelos" id="panelParalelos">
+    <div class="panel-header">
+      <span class="panel-title" id="panelTitulo">📚 Referencias Cruzadas</span>
+      <button class="close-btn" id="closePanelBtn">&times;</button>
+    </div>
+    <div class="panel-content" id="panelContenido">
+      </div>
+  </div>
+
+  <script src="src/js/jsgral.js"></script>
+</body>
+</html>

@@ -139,15 +139,6 @@ function seleccionarLibro(key, ruta) {
   cerrarTodosDropdowns();
   cargarLibroYCapitulo(ruta, 1);
   
-  // Guardar estado en localStorage
-  try {
-    localStorage.setItem('ultimoLibroKey', key);
-    localStorage.setItem('ultimoLibroRuta', ruta);
-    localStorage.setItem('ultimoCapitulo', '1');
-  } catch (e) {
-    console.error("Error al guardar estado de libro en localStorage:", e);
-  }
-  
   // Auto-abrir selector de capítulos después de seleccionar un libro
   setTimeout(() => {
     const capituloDropdown = document.getElementById('capituloDropdown');
@@ -166,13 +157,6 @@ function seleccionarCapitulo(cap) {
   capituloActualNum = parseInt(cap, 10);
   cerrarTodosDropdowns();
   cargarLibroYCapitulo(rutaLibroActual, capituloActualNum);
-  
-  // Guardar estado en localStorage
-  try {
-    localStorage.setItem('ultimoCapitulo', cap.toString());
-  } catch (e) {
-    console.error("Error al guardar estado de capítulo en localStorage:", e);
-  }
 }
 
 function filtrarLibros(query) {
@@ -575,15 +559,6 @@ function asignarEventosViajeReferencia() {
       idLibroActual = libroIdDestino;
       rutaLibroActual = rutaDestino;
       cargarLibroYCapitulo(rutaDestino, capDestino);
-      
-      // Guardar estado en localStorage al viajar por referencias cruzadas
-      try {
-        localStorage.setItem('ultimoLibroKey', libroIdDestino);
-        localStorage.setItem('ultimoLibroRuta', rutaDestino);
-        localStorage.setItem('ultimoCapitulo', capDestino.toString());
-      } catch (e) {
-        console.error("Error al guardar estado por viaje de paralelo:", e);
-      }
     });
   });
 }
@@ -646,36 +621,6 @@ function construirNavegacionDinamica() {
 }
 
 
-function obtenerEstadoInicial() {
-  let estado = {
-    key: "01_gn",
-    ruta: "src/libros/01_gn.json",
-    capitulo: 1
-  };
-
-  try {
-    const savedKey = localStorage.getItem('ultimoLibroKey');
-    const savedRuta = localStorage.getItem('ultimoLibroRuta');
-    const savedCap = localStorage.getItem('ultimoCapitulo');
-
-    // Validamos que el libro guardado exista en nuestro diccionario antes de usarlo
-    if (savedKey && savedRuta && indiceLibrosRutas[savedKey]) {
-      estado.key = savedKey;
-      estado.ruta = savedRuta;
-      if (savedCap) {
-        const parsedCap = parseInt(savedCap, 10);
-        if (!isNaN(parsedCap) && parsedCap > 0) {
-          estado.capitulo = parsedCap;
-        }
-      }
-    }
-  } catch (e) {
-    console.error("Error leyendo desde localStorage:", e);
-  }
-
-  return estado;
-}
-
 /* ==========================================================================
    5. INICIALIZACIÓN CORREGIDA
    ========================================================================== */
@@ -689,24 +634,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // C. Configurar los eventos de escucha para Libro y Capítulo
   configurarNavegacionSuperior();
 
-  // D. Carga original de referencias cruzadas y arranque de la App con persistencia segura
+  // D. Carga original de referencias cruzadas y arranque de la App
   fetch('src/js/paralelos.json')
     .then(res => res.json())
     .then(data => {
       mapaEnlacesParalelos = data;
       
-      const estado = obtenerEstadoInicial();
-      idLibroActual = estado.key;
-      rutaLibroActual = estado.ruta;
-      cargarLibroYCapitulo(estado.ruta, estado.capitulo);
+      const rutaInicial = "src/libros/01_gn.json";
+      idLibroActual = "01_gn";
+      rutaLibroActual = rutaInicial;
+      
+      cargarLibroYCapitulo(rutaInicial, 1);
     })
     .catch(err => {
       console.error("Error al cargar paralelos de inicio:", err);
-      
-      const estado = obtenerEstadoInicial();
-      idLibroActual = estado.key;
-      rutaLibroActual = estado.ruta;
-      cargarLibroYCapitulo(estado.ruta, estado.capitulo);
+      // Fallback de seguridad si falla el JSON de paralelos
+      const rutaInicial = "src/libros/01_gn.json";
+      idLibroActual = "01_gn";
+      rutaLibroActual = rutaInicial;
+      cargarLibroYCapitulo(rutaInicial, 1);
     });
 });
 
