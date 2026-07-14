@@ -147,17 +147,37 @@
     // Aplicar sombreado y subrayado en el nuevo capítulo
     aplicarAnotacionesAlCapituloActual();
 
-    // Comprobar si hay un scroll pendiente a un versículo específico
+    // Comprobar si hay un scroll pendiente a un versículo específico (o múltiples separados por punto)
     if (window.scrollToVerseAfterRender) {
-      const vTargetNum = window.scrollToVerseAfterRender;
+      const vTargetRaw = window.scrollToVerseAfterRender;
       window.scrollToVerseAfterRender = null;
       
       setTimeout(() => {
-        const vEl = document.querySelector(`.versiculo[data-vnum="${vTargetNum}"]`);
-        if (vEl) {
-          vEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          vEl.classList.add('seleccionado-actual');
-          setTimeout(() => vEl.classList.remove('seleccionado-actual'), 3000);
+        const vNums = vTargetRaw.toString().includes('.') ? vTargetRaw.toString().split('.') : [vTargetRaw.toString()];
+        const primerVNum = vNums[0];
+        
+        // Scroll al primer versículo de la lista
+        const vElPrimer = document.querySelector(`.versiculo[data-vnum="${primerVNum}"]`);
+        if (vElPrimer) {
+          vElPrimer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Resaltar todos los versículos especificados por 3 segundos
+        const elVersiculosResaltados = [];
+        vNums.forEach(vNum => {
+          const vEl = document.querySelector(`.versiculo[data-vnum="${vNum}"]`);
+          if (vEl) {
+            vEl.classList.add('seleccionado-actual');
+            elVersiculosResaltados.push(vEl);
+          }
+        });
+
+        if (elVersiculosResaltados.length > 0) {
+          setTimeout(() => {
+            elVersiculosResaltados.forEach(vEl => {
+              vEl.classList.remove('seleccionado-actual');
+            });
+          }, 3000);
         }
       }, 500);
     }
@@ -367,7 +387,31 @@
       if (partes.length < 3) return Promise.resolve('');
       const libroIdDest = partes[0];
       const capNumDest = partes[1].replace('c', '');
-      const idVersiculoCompleto = partes[2].replace('v', ''); 
+      
+      let idVersiculoCompleto = "";
+      let versesToFetch = [];
+      let citaFormateadaLector = "";
+
+      if (partes.length === 4) {
+        // Rango, ej. v26-27
+        const startV = parseInt(partes[2].replace('v', ''), 10);
+        const endV = parseInt(partes[3], 10);
+        idVersiculoCompleto = partes[2].replace('v', '');
+        citaFormateadaLector = `${startV}-${endV}`;
+        for (let i = startV; i <= endV; i++) {
+          versesToFetch.push(i.toString());
+        }
+      } else {
+        // Normal o con puntos, ej. v6.9
+        idVersiculoCompleto = partes[2].replace('v', '');
+        citaFormateadaLector = idVersiculoCompleto;
+        if (idVersiculoCompleto.includes('.')) {
+          versesToFetch = idVersiculoCompleto.split('.');
+        } else {
+          versesToFetch = [idVersiculoCompleto];
+        }
+      }
+
       const infoLibro = window.indiceLibrosRutas[libroIdDest];
       if (!infoLibro) return Promise.resolve('');
 
@@ -375,9 +419,17 @@
         .then(res => res.ok ? res.json() : null)
         .then(libroJson => {
           if (!libroJson || !libroJson.capitulos || !libroJson.capitulos[capNumDest]) return '';
-          let textoOriginal = libroJson.capitulos[capNumDest][idVersiculoCompleto] || "";
+          
+          let textoOriginal = "";
+          textoOriginal = versesToFetch.map(vn => {
+            if (vn.includes('_')) {
+              const rangeParts = vn.split('_');
+              return libroJson.capitulos[capNumDest][rangeParts[0]] || "";
+            }
+            return libroJson.capitulos[capNumDest][vn] || "";
+          }).filter(Boolean).join(' ');
+
           let vistaPreviaTexto = textoOriginal.length > 40 ? textoOriginal.substring(0, 40).trim() + "..." : textoOriginal || "(No disponible)";
-          const citaFormateadaLector = idVersiculoCompleto.replace('_', '-');
           const textoCitaFormateada = `${infoLibro.nombre} ${capNumDest},${citaFormateadaLector}`;
 
           return `
@@ -385,7 +437,7 @@
                  data-ruta="${infoLibro.ruta}" 
                  data-libro-id="${libroIdDest}" 
                  data-cap="${capNumDest}" 
-                 data-verse="${idVersiculoCompleto}" 
+                 data-verse="${versesToFetch.join('.')}" 
                  style="flex: 1 1 calc(50% - 10px); min-width: 250px; max-width: 100%; border-left: 3px solid #cc0000; padding: 4px; cursor: pointer; background: #fff; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box; margin-bottom: 4px;">
               <strong style="color: #cc0000; display: block; margin-bottom: 2px; font-size: 0.9em;">📌 ${textoCitaFormateada}</strong>
               <span style="font-style: italic; color: #4a5568; font-size: 0.85em; display: block; line-height: 1.3;">"${vistaPreviaTexto}"</span>

@@ -45,10 +45,10 @@ var indiceLibrosRutas = {
   "22_jb": { nombre: "Job", ruta: "src/libros/22_jb.json" },
   "23_sal": { nombre: "Salmos", ruta: "src/libros/23_sal.json" },
   "24_pr": { nombre: "Proverbios", ruta: "src/libros/24_pr.json" },
-  "25_ecl": { nombre: "Eclesiastés", ruta: "src/libros/25_qo.json" },   //  Qo Eclesiastés (Qohélet)
+  "25_qo": { nombre: "Eclesiastés", ruta: "src/libros/25_qo.json" },   //  Qo Eclesiastés (Qohélet)
   "26_cant": { nombre: "Cantar de Cantares", ruta: "src/libros/26_cant.json" },
   "27_sab": { nombre: "Sabiduría", ruta: "src/libros/27_sb.json" },
-  "28_ecl": { nombre: "Eclesiástico", ruta: "src/libros/28_si.json" },    // Si Eclesiástico (Sirácida)
+  "28_si": { nombre: "Eclesiástico", ruta: "src/libros/28_si.json" },    // Si Eclesiástico (Sirácida)
   "29_is": { nombre: "Isaías", ruta: "src/libros/29_is.json" },
   "30_jr": { nombre: "Jeremías", ruta: "src/libros/30_jr.json" },
   "31_lam": { nombre: "Lamentaciones", ruta: "src/libros/31_lam.json" },
@@ -59,7 +59,7 @@ var indiceLibrosRutas = {
   "36_jl": { nombre: "Joel", ruta: "src/libros/36_jl.json" },
   "37_am": { nombre: "Amós", ruta: "src/libros/37_am.json" },
   "38_ab": { nombre: "Abdías", ruta: "src/libros/38_ab.json" },
-  "39_jn": { nombre: "Jonás", ruta: "src/libros/39_jn.json" },
+  "39_jon": { nombre: "Jonás", ruta: "src/libros/39_jon.json" },
   "40_mi": { nombre: "Miqueas", ruta: "src/libros/40_mi.json" },
   "41_na": { nombre: "Nahún", ruta: "src/libros/41_na.json" },
   "42_ha": { nombre: "Habacuc", ruta: "src/libros/42_ha.json" },
@@ -70,7 +70,7 @@ var indiceLibrosRutas = {
   "47_mt": { nombre: "Mateo", ruta: "src/libros/47_mt.json" },
   "48_mc": { nombre: "Marcos", ruta: "src/libros/48_mc.json" },
   "49_lc": { nombre: "Lucas", ruta: "src/libros/49_lc.json" },
-  "50_ju": { nombre: "Juan", ruta: "src/libros/50_jn.json" },
+  "50_jn": { nombre: "Juan", ruta: "src/libros/50_jn.json" },
   "51_hch": { nombre: "Hechos", ruta: "src/libros/51_hch.json" },
   "52_rm": { nombre: "Romanos", ruta: "src/libros/52_rm.json" },
   "53_1co": { nombre: "I Corintios", ruta: "src/libros/53_1co.json" },
@@ -446,6 +446,9 @@ function renderizarVersiculos(libroData, capSeleccionado) {
       const textoVersiculo = versiculos[numV];
       const llaveCoordenada = `${idLibroActual}-c${capSeleccionado}-v${numV}`;
       const tieneParalelos = mapaEnlacesParalelos && mapaEnlacesParalelos[llaveCoordenada];
+      if (llaveCoordenada === "27_sab-c7-v26") {
+        console.log("Diag - rendering Sab 7:26. tieneParalelos:", tieneParalelos, "mapaEnlacesParalelos:", mapaEnlacesParalelos);
+      }
       
       if (tieneParalelos) {
         const destinosString = mapaEnlacesParalelos[llaveCoordenada].join(',');
@@ -488,7 +491,30 @@ function activarEventosParalelos() {
 
         const libroId = partes[0];
         const capNum = partes[1].replace('c', '');
-        const idVersiculoCompleto = partes[2].replace('v', ''); 
+        
+        let idVersiculoCompleto = "";
+        let versesToFetch = [];
+        let citaFormateadaLector = "";
+
+        if (partes.length === 4) {
+          // Rango, ej. v26-27
+          const startV = parseInt(partes[2].replace('v', ''), 10);
+          const endV = parseInt(partes[3], 10);
+          idVersiculoCompleto = partes[2].replace('v', '');
+          citaFormateadaLector = `${startV}-${endV}`;
+          for (let i = startV; i <= endV; i++) {
+            versesToFetch.push(i.toString());
+          }
+        } else {
+          // Normal o con puntos, ej. v6.9
+          idVersiculoCompleto = partes[2].replace('v', '');
+          citaFormateadaLector = idVersiculoCompleto;
+          if (idVersiculoCompleto.includes('.')) {
+            versesToFetch = idVersiculoCompleto.split('.');
+          } else {
+            versesToFetch = [idVersiculoCompleto];
+          }
+        }
 
         const infoLibro = indiceLibrosRutas[libroId];
         if (!infoLibro) return Promise.resolve('');
@@ -498,12 +524,14 @@ function activarEventosParalelos() {
           .then(libroJson => {
             if (!libroJson || !libroJson.capitulos || !libroJson.capitulos[capNum]) return '';
 
-            let textoOriginal = libroJson.capitulos[capNum][idVersiculoCompleto] || "";
-
-            if (!textoOriginal && idVersiculoCompleto.includes('_')) {
-              const primerNumero = idVersiculoCompleto.split('_')[0];
-              textoOriginal = libroJson.capitulos[capNum][primerNumero] || "";
-            }
+            let textoOriginal = "";
+            textoOriginal = versesToFetch.map(vn => {
+              if (vn.includes('_')) {
+                const rangeParts = vn.split('_');
+                return libroJson.capitulos[capNum][rangeParts[0]] || "";
+              }
+              return libroJson.capitulos[capNum][vn] || "";
+            }).filter(Boolean).join(' ');
 
             let vistaPreviaTexto = "";
             if (textoOriginal.length > 40) {
@@ -512,7 +540,6 @@ function activarEventosParalelos() {
               vistaPreviaTexto = textoOriginal || "(Texto no disponible)";
             }
 
-            const citaFormateadaLector = idVersiculoCompleto.replace('_', '-');
             const textoCitaFormateada = `${infoLibro.nombre} ${capNum},${citaFormateadaLector}`;
 
             return `
@@ -520,7 +547,7 @@ function activarEventosParalelos() {
                    data-ruta="${infoLibro.ruta}" 
                    data-libro-id="${libroId}" 
                    data-cap="${capNum}" 
-                   data-verse="${idVersiculoCompleto}" 
+                   data-verse="${versesToFetch.join('.')}" 
                    style="flex: 1 1 calc(50% - 10px); min-width: 250px; max-width: 100%; border-left: 3px solid #cc0000; padding: 2px; cursor: pointer; background: #fff; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box;">
                 <strong style="color: #cc0000; display: block; margin-bottom: 2px; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   📌 ${textoCitaFormateada}
@@ -706,22 +733,76 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch('src/js/paralelos.json')
     .then(res => res.json())
     .then(data => {
-      // Hacer los enlaces de paralelos bidireccionales dinámicamente
+      // 1. Unificar claves origen que contengan puntos (.) copiándolas a claves individuales
+      Object.keys(data).forEach(origen => {
+        if (origen.includes('.')) {
+          const partesOrig = origen.split('-v');
+          if (partesOrig.length === 2) {
+            const prefijo = partesOrig[0];
+            const vNums = partesOrig[1].split('.');
+            const destinos = data[origen] || [];
+            
+            vNums.forEach(vNum => {
+              const claveIndiv = `${prefijo}-v${vNum}`;
+              if (!data[claveIndiv]) {
+                data[claveIndiv] = [];
+              }
+              destinos.forEach(dest => {
+                if (!data[claveIndiv].includes(dest)) {
+                  data[claveIndiv].push(dest);
+                }
+              });
+            });
+          }
+        }
+      });
+
+      // 2. Hacer enlaces bidireccionales dinámicos y descomprimir destinos con puntos (.) o rangos (-)
       Object.keys(data).forEach(origen => {
         const destinos = data[origen];
         if (Array.isArray(destinos)) {
           destinos.forEach(destino => {
-            if (!data[destino]) {
-              data[destino] = [];
-            }
-            if (!data[destino].includes(origen)) {
-              data[destino].push(origen);
+            const partesDest = destino.split('-');
+            
+            if (destino.includes('.')) {
+              const partesV = destino.split('-v');
+              if (partesV.length === 2) {
+                const prefijo = partesV[0];
+                const vNums = partesV[1].split('.');
+                
+                vNums.forEach(vNum => {
+                  const claveIndiv = `${prefijo}-v${vNum}`;
+                  if (!data[claveIndiv]) {
+                    data[claveIndiv] = [];
+                  }
+                  if (!data[claveIndiv].includes(origen)) {
+                    data[claveIndiv].push(origen);
+                  }
+                });
+              }
+            } else if (partesDest.length === 4) {
+              // Rango de versículos, ej. 27_sab-c7-v26-27 -> mapear solo al primero
+              const clavePrimerVersiculo = `${partesDest[0]}-${partesDest[1]}-${partesDest[2]}`;
+              if (!data[clavePrimerVersiculo]) {
+                data[clavePrimerVersiculo] = [];
+              }
+              if (!data[clavePrimerVersiculo].includes(origen)) {
+                data[clavePrimerVersiculo].push(origen);
+              }
+            } else {
+              if (!data[destino]) {
+                data[destino] = [];
+              }
+              if (!data[destino].includes(origen)) {
+                data[destino].push(origen);
+              }
             }
           });
         }
       });
 
       mapaEnlacesParalelos = data;
+      console.log("Diag - mapaEnlacesParalelos loaded. 27_sab-c7-v26:", data["27_sab-c7-v26"]);
       
       const estado = obtenerEstadoInicial();
       idLibroActual = estado.key;
