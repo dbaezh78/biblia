@@ -6,6 +6,8 @@
   --tamano-capitulo: 36px;
   --tamano-versiculo: 14px;
   --tamano-texto: 18px;
+  --fuente-texto: 'Aptos', sans-serif;
+  --interlineado-texto: 1.7;
   
   --color-texto: #1a1a1a;
   --color-num-versiculo: #cc0000;
@@ -148,8 +150,9 @@ header {
 }
 
 .texto-sagrado {
+  font-family: var(--fuente-texto);
   font-size: var(--tamano-texto);
-  line-height: 1.7;
+  line-height: var(--interlineado-texto);
   text-align: justify;
 }
 
@@ -589,4 +592,1071 @@ header {
 .error-banner p {
   margin: 0;
   font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   5. PANEL DE AJUSTES (SETTINGS PANEL)
+   ========================================================================== */
+.panel-ajustes {
+  position: fixed;
+  bottom: -450px; /* Oculto inicialmente abajo */
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  background: var(--color-sidebar, #ffffff);
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+  transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Glassmorphism support if background is white */
+@supports (backdrop-filter: blur(20px)) {
+  .panel-ajustes {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+  }
+}
+
+.panel-ajustes.open {
+  bottom: 0; /* Sube y se muestra */
+}
+
+/* En pantallas medianas/grandes, lo mostramos como un modal centrado elegante */
+@media (min-width: 600px) {
+  .panel-ajustes {
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%) scale(0.95);
+    width: 460px;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, top 0.3s ease;
+  }
+
+  @supports (backdrop-filter: blur(20px)) {
+    .panel-ajustes {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  }
+  
+  .panel-ajustes.open {
+    bottom: auto;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.ajustes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 12px;
+}
+
+.ajustes-titulo {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-texto, #1a1a1a);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.ajustes-close-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--color-texto, #666);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.ajustes-close-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ajustes-seccion {
+  margin-bottom: 20px;
+}
+
+.ajustes-seccion-titulo {
+  font-size: 0.85rem;
+  /*text-transform: uppercase;    Este no lo quiero*/
+  letter-spacing: 0.06em;
+  color: #718096;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-family: cursive;
+}
+
+/* Controladores deslizantes (Sliders) */
+.ajustes-control-fila {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ajustes-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  outline: none;
+  transition: background 0.2s;
+}
+
+.ajustes-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-num-versiculo, #cc0000);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.ajustes-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.ajustes-valor-lbl {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--color-texto, #1a1a1a);
+  min-width: 50px;
+  text-align: right;
+}
+
+/* Selector desplegable de Fuente */
+.ajustes-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.ajustes-select:focus {
+  border-color: var(--color-num-versiculo, #cc0000);
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+}
+
+/* Switch Toggle para Ajustes */
+.ajustes-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.ajustes-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ajustes-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 24px;
+}
+
+.ajustes-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.ajustes-switch input:checked + .ajustes-switch-slider {
+  background-color: var(--color-num-versiculo, #cc0000);
+}
+
+.ajustes-switch input:checked + .ajustes-switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* Modo: Un versículo por línea */
+body.versiculos-separados .texto-sagrado .versiculo {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+/* ==========================================================================
+   6. MODO OSCURO / NOCHE (DARK MODE)
+   ========================================================================== */
+body.modo-oscuro {
+  --color-texto: #e2e8f0;             /* Gris claro */
+  --color-num-versiculo: #ff4d4d;      /* Rojo brillante/claro */
+  --color-capitulo: #ff4d4d;
+  --color-fondo: #121212;             /* Fondo oscuro */
+  --color-sidebar: #1e1e1e;           /* Sidebar oscura */
+  --color-paralelos-texto: #a0aec0;   /* Texto secundario claro */
+}
+
+/* Adaptación del botón del menú y cabecera */
+body.modo-oscuro header {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Ajustes del selector bíblico superior en modo oscuro */
+body.modo-oscuro .selector-biblico {
+  background-color: var(--color-sidebar, #1e1e1e) !important;
+}
+
+body.modo-oscuro .custom-select-trigger {
+  color: #ffffff;
+}
+
+body.modo-oscuro .custom-select-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Adaptación del menú lateral en modo oscuro */
+body.modo-oscuro .sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.modo-oscuro .sidebar-header {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.modo-oscuro .sidebar-menu li a {
+  color: #cbd5e0;
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+body.modo-oscuro .sidebar-menu li a:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Adaptación del panel de paralelos */
+body.modo-oscuro .panel-paralelos {
+  background-color: #1e1e1e;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.modo-oscuro .panel-header {
+  background-color: #1a1a1a;
+  color: #cbd5e0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.modo-oscuro .panel-body {
+  color: var(--color-paralelos-texto);
+}
+
+/* Adaptación de las tarjetas de referencias cruzadas */
+body.modo-oscuro .bloque-paralelo-link {
+  background: #2d3748 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+}
+
+body.modo-oscuro .bloque-paralelo-link span {
+  color: #cbd5e0 !important;
+}
+
+/* Adaptación del panel de ajustes */
+body.modo-oscuro .panel-ajustes {
+  background: var(--color-sidebar, #1e1e1e);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  body.modo-oscuro .panel-ajustes {
+    background: rgba(30, 30, 30, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+body.modo-oscuro .ajustes-titulo {
+  color: var(--color-texto);
+}
+
+body.modo-oscuro .ajustes-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-texto);
+}
+
+body.modo-oscuro .ajustes-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+body.modo-oscuro .ajustes-select {
+  background: #2d3748;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--color-texto);
+}
+
+body.modo-oscuro .ajustes-select option {
+  background: #1e1e1e;
+  color: var(--color-texto);
+}
+
+body.modo-oscuro .ajustes-slider {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.modo-oscuro .ajustes-switch-slider {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   7. NAVEGACIÓN FLOTANTE (TOUCH SWIPE Y HOVER DE ZONAS)
+   ========================================================================== */
+/* Zonas de detección en los bordes de la pantalla (PC) */
+.nav-zona-detect {
+  position: fixed;
+  top: 50px; /* Debajo del header */
+  bottom: 0;
+  width: 80px; /* Zona de proximidad más amplia y clicable */
+  z-index: 8;
+  background: transparent;
+  pointer-events: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+@media (hover: hover) {
+  .nav-zona-detect {
+    pointer-events: auto; /* Activar solo en dispositivos con ratón */
+  }
+}
+
+.nav-zona-detect.prev {
+  left: 0;
+}
+
+.nav-zona-detect.next {
+  right: 0;
+}
+
+/* Sombra gradiente al pasar el mouse por los extremos */
+.nav-zona-detect.prev:hover {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.04), transparent);
+}
+
+.nav-zona-detect.next:hover {
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.04), transparent);
+}
+
+/* Sombra gradiente en Modo Oscuro */
+body.modo-oscuro .nav-zona-detect.prev:hover {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.02), transparent);
+}
+
+body.modo-oscuro .nav-zona-detect.next:hover {
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.02), transparent);
+}
+
+/* Botones flotantes (señales visuales) */
+.nav-btn-flotante {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, color 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.nav-btn-flotante.prev {
+  left: 15px;
+}
+
+.nav-btn-flotante.next {
+  right: 15px;
+}
+
+/* Estado visible al pasar el mouse por la zona de detección */
+.nav-btn-flotante.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+
+.nav-btn-flotante:hover {
+  background-color: var(--color-num-versiculo, #cc0000);
+  color: #ffffff;
+  border-color: transparent;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(204, 0, 0, 0.2);
+}
+
+/* Estilos para el Modo Oscuro */
+body.modo-oscuro .nav-btn-flotante {
+  background: rgba(30, 30, 30, 0.75);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.modo-oscuro .nav-btn-flotante:hover {
+  background-color: var(--color-num-versiculo, #ff4d4d);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* ==========================================================================
+   8. ANOTACIONES Y HIGHLIGHTS (SOBREADO, SUBRAYADO, NOTAS Y MARCADORES)
+   ========================================================================== */
+/* Estilos de Destacados (Colores de Sombreado) */
+.v-texto {
+  border-radius: 3px;
+  padding: 1px 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-color 0.2s;
+}
+
+.v-texto.destacado-azul { background-color: rgba(56, 189, 248, 0.3) !important; }
+.v-texto.destacado-amarillo { background-color: rgba(253, 224, 71, 0.4) !important; }
+.v-texto.destacado-rosado { background-color: rgba(244, 114, 182, 0.3) !important; }
+.v-texto.destacado-verde { background-color: rgba(74, 222, 128, 0.3) !important; }
+.v-texto.destacado-naranja { background-color: rgba(251, 146, 60, 0.3) !important; }
+.v-texto.destacado-rojo { background-color: rgba(248, 113, 113, 0.3) !important; }
+.v-texto.destacado-morado { background-color: rgba(192, 132, 252, 0.3) !important; }
+
+/* Subrayado */
+.v-texto.subrayado-linea {
+  border-bottom: 2px dashed #333333;
+  padding-bottom: 1px;
+}
+body.modo-oscuro .v-texto.subrayado-linea {
+  border-bottom-color: #cbd5e0;
+}
+
+/* Versículo seleccionado en lectura */
+.versiculo.seleccionado-actual {
+  outline: 2px solid var(--color-num-versiculo, #cc0000);
+  outline-offset: 2px;
+  background-color: rgba(204, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* 9. PANEL DE ACCIÓN DEL VERSÍCULO (ACTION SHEET) */
+.panel-accion-versiculo {
+  position: fixed;
+  bottom: -450px; /* Oculto inicialmente abajo */
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  background: var(--color-sidebar, #ffffff);
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+  transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+@supports (backdrop-filter: blur(20px)) {
+  .panel-accion-versiculo {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+  }
+}
+
+.panel-accion-versiculo.open {
+  bottom: 0;
+}
+
+@media (min-width: 600px) {
+  .panel-accion-versiculo {
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%) scale(0.95);
+    width: 480px;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, top 0.3s ease;
+  }
+  @supports (backdrop-filter: blur(20px)) {
+    .panel-accion-versiculo {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  }
+  .panel-accion-versiculo.open {
+    bottom: auto;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Cabecera del panel de acción */
+.accion-v-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 10px;
+}
+
+.accion-v-referencia {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--color-texto, #1a1a1a);
+  margin: 0;
+}
+
+.accion-v-texto {
+  font-size: 0.85rem;
+  color: #718096;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+  margin-top: 3px;
+}
+
+/* Fila de Burbujas de Colores */
+.accion-v-colores-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.accion-v-color-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+}
+
+.accion-v-color-dot:hover {
+  transform: scale(1.15);
+}
+
+.accion-v-color-dot.selected {
+  border-color: #3182ce;
+  transform: scale(1.1);
+}
+body.modo-oscuro .accion-v-color-dot.selected {
+  border-color: #ffffff;
+}
+
+/* Botón de limpiar color */
+.accion-v-clear-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #edf2f7;
+  border: 1px solid rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.accion-v-clear-dot:hover {
+  transform: scale(1.1);
+  background: #e2e8f0;
+}
+body.modo-oscuro .accion-v-clear-dot {
+  background: #2d3748;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Fila de botones de acciones principales */
+.accion-v-botones-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.accion-v-btn {
+  padding: 8px 4px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  background: #fff;
+  color: #4a5568;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.accion-v-btn:hover {
+  background: #f7fafc;
+  color: var(--color-num-versiculo, #cc0000);
+  border-color: rgba(204, 0, 0, 0.2);
+}
+
+.accion-v-btn.active {
+  background: rgba(204, 0, 0, 0.05);
+  border-color: var(--color-num-versiculo, #cc0000);
+  color: var(--color-num-versiculo, #cc0000);
+  font-weight: bold;
+}
+
+body.modo-oscuro .accion-v-btn {
+  background: #2d3748;
+  border-color: rgba(255,255,255,0.08);
+  color: #cbd5e0;
+}
+body.modo-oscuro .accion-v-btn:hover {
+  background: #1a202c;
+  color: var(--color-num-versiculo, #ff4d4d);
+}
+body.modo-oscuro .accion-v-btn.active {
+  background: rgba(255, 77, 77, 0.08);
+  border-color: var(--color-num-versiculo, #ff4d4d);
+  color: var(--color-num-versiculo, #ff4d4d);
+}
+
+/* Área de comentarios/notas */
+.accion-v-nota-contenedor {
+  display: none; /* Se muestra con js */
+  margin-top: 10px;
+}
+
+.accion-v-nota-input {
+  width: 100%;
+  height: 80px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.9rem;
+  resize: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: #fff;
+  color: #333;
+}
+.accion-v-nota-input:focus {
+  border-color: var(--color-num-versiculo, #cc0000);
+  box-shadow: 0 0 0 2px rgba(204,0,0,0.1);
+}
+
+body.modo-oscuro .accion-v-nota-input {
+  background: #2d3748;
+  border-color: rgba(255,255,255,0.12);
+  color: #fff;
+}
+body.modo-oscuro .accion-v-nota-input:focus {
+  border-color: var(--color-num-versiculo, #ff4d4d);
+  box-shadow: 0 0 0 2px rgba(255,77,77,0.15);
+}
+
+/* 10. ESTILOS PARA GOOGLE LOGIN EN SIDEBAR */
+.perfil-usuario-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.google-login-btn {
+  background: #ffffff;
+  color: #4a5568;
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.google-login-btn:hover {
+  background: #f7fafc;
+}
+
+.user-profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  object-fit: cover;
+}
+
+.user-profile-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 130px;
+}
+
+.user-profile-name {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.google-logout-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  font-size: 0.7rem;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.google-logout-btn:hover {
+  color: #fff;
+}
+
+/* 11. VENTANA MODAL DE ANOTACIONES (MARCADORES, NOTAS, DESTACADOS) */
+.modal-anotaciones {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.modal-anotaciones.open {
+  display: flex;
+}
+
+.modal-anotaciones-content {
+  background: var(--color-sidebar, #ffffff);
+  width: 100%;
+  max-width: 600px;
+  height: 80vh;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.modal-anotaciones-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-sidebar, #ffffff);
+}
+
+.modal-anotaciones-titulo {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-texto, #1a1a1a);
+  margin: 0;
+}
+
+.modal-anotaciones-close {
+  background: rgba(0,0,0,0.05);
+  border: none;
+  font-size: 1.4rem;
+  color: var(--color-texto, #666);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-anotaciones-busqueda {
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.modal-anotaciones-input-buscar {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  background: #fff;
+  color: #333;
+}
+body.modo-oscuro .modal-anotaciones-input-buscar {
+  background: #2d3748;
+  border-color: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.modal-anotaciones-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Tarjeta de ítem de anotación */
+.item-anotacion-card {
+  padding: 14px;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.item-anotacion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.item-anotacion-ref {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--color-num-versiculo, #cc0000);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.item-anotacion-fecha {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  font-weight: normal;
+}
+
+.item-anotacion-texto {
+  font-size: 0.85rem;
+  color: var(--color-texto, #4a5568);
+  font-style: italic;
+  margin-bottom: 6px;
+  border-left: 2px solid #cbd5e0;
+  padding-left: 8px;
+}
+
+.item-anotacion-nota {
+  font-size: 0.9rem;
+  color: var(--color-texto, #1a1a1a);
+  background: #f7fafc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1.5px dashed rgba(0,0,0,0.05);
+}
+
+body.modo-oscuro .item-anotacion-card {
+  background: #2d3748;
+  border-color: rgba(255,255,255,0.05);
+}
+body.modo-oscuro .item-anotacion-texto {
+  border-left-color: #4a5568;
+}
+body.modo-oscuro .item-anotacion-nota {
+  background: #1a202c;
+  border-color: rgba(255,255,255,0.05);
+}
+
+.item-anotacion-vacio {
+  text-align: center;
+  color: #a0aec0;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Sincronización y colores en modo oscuro general para modales */
+body.modo-oscuro .modal-anotaciones-content {
+  background: #1e1e1e;
+}
+body.modo-oscuro .modal-anotaciones-header {
+  background: #1e1e1e;
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+body.modo-oscuro .modal-anotaciones-close {
+  background: rgba(255,255,255,0.08);
+}
+
+/* Ajustes de Modo Oscuro para el panel de acción de versículos */
+body.modo-oscuro .panel-accion-versiculo {
+  background: var(--color-sidebar, #1e1e1e);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+@supports (backdrop-filter: blur(20px)) {
+  body.modo-oscuro .panel-accion-versiculo {
+    background: rgba(30, 30, 30, 0.85);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+}
+body.modo-oscuro .accion-v-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+body.modo-oscuro .accion-v-referencia {
+  color: #fff;
+}
+
+/* Botón de más para opciones del versículo */
+.btn-mas-versiculo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--color-num-versiculo, #cc0000);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  vertical-align: middle;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: transform 0.2s, background-color 0.2s;
+  pointer-events: auto;
+}
+.btn-mas-versiculo:hover {
+  transform: scale(1.15);
+  background-color: #990000;
+}
+body.modo-oscuro .btn-mas-versiculo {
+  background-color: var(--color-num-versiculo, #ff4d4d);
+}
+body.modo-oscuro .btn-mas-versiculo:hover {
+  background-color: #ff3333;
+}
+
+/* Quick action buttons on card list items */
+.item-anotacion-meta-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.item-anotacion-acciones {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.item-accion-btn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.item-accion-btn:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  transform: scale(1.1);
+}
+
+.item-accion-btn.btn-item-borrar:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+body.modo-oscuro .item-accion-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+body.modo-oscuro .item-accion-btn.btn-item-borrar:hover {
+  background-color: rgba(239, 68, 68, 0.2);
 }

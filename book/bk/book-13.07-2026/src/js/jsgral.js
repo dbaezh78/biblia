@@ -13,14 +13,14 @@ let selectLibro = null;
 let selectCapitulo = null;
 
 // Variables de control de estado globales
-var libroActualData = null;
-var capituloActualNum = 1;
-var mapaEnlacesParalelos = null; 
-var idLibroActual = "01_gn";
-var rutaLibroActual = "src/libros/01_gn.json";
+let libroActualData = null;
+let capituloActualNum = 1;
+let mapaEnlacesParalelos = null; 
+let idLibroActual = "01_gn";
+let rutaLibroActual = "src/libros/01_gn.json";
 
 // Diccionario unificado con los 73 libros
-var indiceLibrosRutas = {
+const indiceLibrosRutas = {
   "01_gn": { nombre: "Génesis", ruta: "src/libros/01_gn.json" },
   "02_ex": { nombre: "Éxodo", ruta: "src/libros/02_ex.json" },
   "03_lv": { nombre: "Levítico", ruta: "src/libros/03_lv.json" },
@@ -34,7 +34,7 @@ var indiceLibrosRutas = {
   "11_1r": { nombre: "I Reyes", ruta: "src/libros/11_1r.json" },
   "12_2r": { nombre: "II Reyes", ruta: "src/libros/12_2r.json" },
   "13_1cr": { nombre: "I Crónicas", ruta: "src/libros/13_1cr.json" },
-  "14_2cr": { nombre: "II Crónicas", ruta: "src/libros/14_2cr.json" },
+  "14_2cr": { fontNombre: "II Crónicas", ruta: "src/libros/14_2cr.json" },
   "15_esd": { nombre: "Esdras", ruta: "src/libros/15_esd.json" },
   "16_nh": { nombre: "Nehemías", ruta: "src/libros/16_nh.json" },
   "17_tb": { nombre: "Tobías", ruta: "src/libros/17_tb.json" },
@@ -45,10 +45,10 @@ var indiceLibrosRutas = {
   "22_jb": { nombre: "Job", ruta: "src/libros/22_jb.json" },
   "23_sal": { nombre: "Salmos", ruta: "src/libros/23_sal.json" },
   "24_pr": { nombre: "Proverbios", ruta: "src/libros/24_pr.json" },
-  "25_ecl": { nombre: "Eclesiastés", ruta: "src/libros/25_qo.json" },   //  Qo Eclesiastés (Qohélet)
+  "25_ecl": { nombre: "Eclesiastés", ruta: "src/libros/25_ecl.json" },
   "26_cant": { nombre: "Cantar de Cantares", ruta: "src/libros/26_cant.json" },
-  "27_sab": { nombre: "Sabiduría", ruta: "src/libros/27_sb.json" },
-  "28_ecl": { nombre: "Eclesiástico", ruta: "src/libros/28_si.json" },    // Si Eclesiástico (Sirácida)
+  "27_sab": { nombre: "Sabiduría", ruta: "src/libros/27_sab.json" },
+  "28_ecl": { nombre: "Eclesiástico", ruta: "src/libros/28_ecl.json" },
   "29_is": { nombre: "Isaías", ruta: "src/libros/29_is.json" },
   "30_jr": { nombre: "Jeremías", ruta: "src/libros/30_jr.json" },
   "31_lam": { nombre: "Lamentaciones", ruta: "src/libros/31_lam.json" },
@@ -70,7 +70,7 @@ var indiceLibrosRutas = {
   "47_mt": { nombre: "Mateo", ruta: "src/libros/47_mt.json" },
   "48_mc": { nombre: "Marcos", ruta: "src/libros/48_mc.json" },
   "49_lc": { nombre: "Lucas", ruta: "src/libros/49_lc.json" },
-  "50_ju": { nombre: "Juan", ruta: "src/libros/50_jn.json" },
+  "50_ju": { nombre: "Juan", ruta: "src/libros/50_ju.json" },
   "51_hch": { nombre: "Hechos", ruta: "src/libros/51_hch.json" },
   "52_rm": { nombre: "Romanos", ruta: "src/libros/52_rm.json" },
   "53_1co": { nombre: "I Corintios", ruta: "src/libros/53_1co.json" },
@@ -139,15 +139,6 @@ function seleccionarLibro(key, ruta) {
   cerrarTodosDropdowns();
   cargarLibroYCapitulo(ruta, 1);
   
-  // Guardar estado en localStorage
-  try {
-    localStorage.setItem('ultimoLibroKey', key);
-    localStorage.setItem('ultimoLibroRuta', ruta);
-    localStorage.setItem('ultimoCapitulo', '1');
-  } catch (e) {
-    console.error("Error al guardar estado de libro en localStorage:", e);
-  }
-  
   // Auto-abrir selector de capítulos después de seleccionar un libro
   setTimeout(() => {
     const capituloDropdown = document.getElementById('capituloDropdown');
@@ -166,13 +157,6 @@ function seleccionarCapitulo(cap) {
   capituloActualNum = parseInt(cap, 10);
   cerrarTodosDropdowns();
   cargarLibroYCapitulo(rutaLibroActual, capituloActualNum);
-  
-  // Guardar estado en localStorage
-  try {
-    localStorage.setItem('ultimoCapitulo', cap.toString());
-  } catch (e) {
-    console.error("Error al guardar estado de capítulo en localStorage:", e);
-  }
 }
 
 function filtrarLibros(query) {
@@ -520,7 +504,6 @@ function activarEventosParalelos() {
                    data-ruta="${infoLibro.ruta}" 
                    data-libro-id="${libroId}" 
                    data-cap="${capNum}" 
-                   data-verse="${idVersiculoCompleto}" 
                    style="flex: 1 1 calc(50% - 10px); min-width: 250px; max-width: 100%; border-left: 3px solid #cc0000; padding: 2px; cursor: pointer; background: #fff; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box;">
                 <strong style="color: #cc0000; display: block; margin-bottom: 2px; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   📌 ${textoCitaFormateada}
@@ -570,33 +553,12 @@ function asignarEventosViajeReferencia() {
       const rutaDestino = bloque.getAttribute('data-ruta');
       const libroIdDestino = bloque.getAttribute('data-libro-id');
       const capDestino = parseInt(bloque.getAttribute('data-cap'), 10);
-      const verseDestino = bloque.getAttribute('data-verse');
-
-      // Extraer el primer número de versículo si es un rango
-      let verseScrollTarget = verseDestino;
-      if (verseDestino && verseDestino.includes('_')) {
-        verseScrollTarget = verseDestino.split('_')[0];
-      }
 
       closePanel();
-
-      // Configurar scroll y resaltado temporal de 3 segundos
-      if (verseScrollTarget) {
-        window.scrollToVerseAfterRender = verseScrollTarget;
-      }
 
       idLibroActual = libroIdDestino;
       rutaLibroActual = rutaDestino;
       cargarLibroYCapitulo(rutaDestino, capDestino);
-      
-      // Guardar estado en localStorage al viajar por referencias cruzadas
-      try {
-        localStorage.setItem('ultimoLibroKey', libroIdDestino);
-        localStorage.setItem('ultimoLibroRuta', rutaDestino);
-        localStorage.setItem('ultimoCapitulo', capDestino.toString());
-      } catch (e) {
-        console.error("Error al guardar estado por viaje de paralelo:", e);
-      }
     });
   });
 }
@@ -659,36 +621,6 @@ function construirNavegacionDinamica() {
 }
 
 
-function obtenerEstadoInicial() {
-  let estado = {
-    key: "01_gn",
-    ruta: "src/libros/01_gn.json",
-    capitulo: 1
-  };
-
-  try {
-    const savedKey = localStorage.getItem('ultimoLibroKey');
-    const savedRuta = localStorage.getItem('ultimoLibroRuta');
-    const savedCap = localStorage.getItem('ultimoCapitulo');
-
-    // Validamos que el libro guardado exista en nuestro diccionario antes de usarlo
-    if (savedKey && savedRuta && indiceLibrosRutas[savedKey]) {
-      estado.key = savedKey;
-      estado.ruta = savedRuta;
-      if (savedCap) {
-        const parsedCap = parseInt(savedCap, 10);
-        if (!isNaN(parsedCap) && parsedCap > 0) {
-          estado.capitulo = parsedCap;
-        }
-      }
-    }
-  } catch (e) {
-    console.error("Error leyendo desde localStorage:", e);
-  }
-
-  return estado;
-}
-
 /* ==========================================================================
    5. INICIALIZACIÓN CORREGIDA
    ========================================================================== */
@@ -702,39 +634,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // C. Configurar los eventos de escucha para Libro y Capítulo
   configurarNavegacionSuperior();
 
-  // D. Carga original de referencias cruzadas y arranque de la App con persistencia segura y bidireccionalidad
+  // D. Carga original de referencias cruzadas y arranque de la App
   fetch('src/js/paralelos.json')
     .then(res => res.json())
     .then(data => {
-      // Hacer los enlaces de paralelos bidireccionales dinámicamente
-      Object.keys(data).forEach(origen => {
-        const destinos = data[origen];
-        if (Array.isArray(destinos)) {
-          destinos.forEach(destino => {
-            if (!data[destino]) {
-              data[destino] = [];
-            }
-            if (!data[destino].includes(origen)) {
-              data[destino].push(origen);
-            }
-          });
-        }
-      });
-
       mapaEnlacesParalelos = data;
       
-      const estado = obtenerEstadoInicial();
-      idLibroActual = estado.key;
-      rutaLibroActual = estado.ruta;
-      cargarLibroYCapitulo(estado.ruta, estado.capitulo);
+      const rutaInicial = "src/libros/01_gn.json";
+      idLibroActual = "01_gn";
+      rutaLibroActual = rutaInicial;
+      
+      cargarLibroYCapitulo(rutaInicial, 1);
     })
     .catch(err => {
       console.error("Error al cargar paralelos de inicio:", err);
-      
-      const estado = obtenerEstadoInicial();
-      idLibroActual = estado.key;
-      rutaLibroActual = estado.ruta;
-      cargarLibroYCapitulo(estado.ruta, estado.capitulo);
+      // Fallback de seguridad si falla el JSON de paralelos
+      const rutaInicial = "src/libros/01_gn.json";
+      idLibroActual = "01_gn";
+      rutaLibroActual = rutaInicial;
+      cargarLibroYCapitulo(rutaInicial, 1);
     });
 });
 

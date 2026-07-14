@@ -13,14 +13,14 @@ let selectLibro = null;
 let selectCapitulo = null;
 
 // Variables de control de estado globales
-var libroActualData = null;
-var capituloActualNum = 1;
-var mapaEnlacesParalelos = null; 
-var idLibroActual = "01_gn";
-var rutaLibroActual = "src/libros/01_gn.json";
+let libroActualData = null;
+let capituloActualNum = 1;
+let mapaEnlacesParalelos = null; 
+let idLibroActual = "01_gn";
+let rutaLibroActual = "src/libros/01_gn.json";
 
 // Diccionario unificado con los 73 libros
-var indiceLibrosRutas = {
+const indiceLibrosRutas = {
   "01_gn": { nombre: "Génesis", ruta: "src/libros/01_gn.json" },
   "02_ex": { nombre: "Éxodo", ruta: "src/libros/02_ex.json" },
   "03_lv": { nombre: "Levítico", ruta: "src/libros/03_lv.json" },
@@ -520,7 +520,6 @@ function activarEventosParalelos() {
                    data-ruta="${infoLibro.ruta}" 
                    data-libro-id="${libroId}" 
                    data-cap="${capNum}" 
-                   data-verse="${idVersiculoCompleto}" 
                    style="flex: 1 1 calc(50% - 10px); min-width: 250px; max-width: 100%; border-left: 3px solid #cc0000; padding: 2px; cursor: pointer; background: #fff; border-radius: 0 6px 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); box-sizing: border-box;">
                 <strong style="color: #cc0000; display: block; margin-bottom: 2px; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   📌 ${textoCitaFormateada}
@@ -570,20 +569,8 @@ function asignarEventosViajeReferencia() {
       const rutaDestino = bloque.getAttribute('data-ruta');
       const libroIdDestino = bloque.getAttribute('data-libro-id');
       const capDestino = parseInt(bloque.getAttribute('data-cap'), 10);
-      const verseDestino = bloque.getAttribute('data-verse');
-
-      // Extraer el primer número de versículo si es un rango
-      let verseScrollTarget = verseDestino;
-      if (verseDestino && verseDestino.includes('_')) {
-        verseScrollTarget = verseDestino.split('_')[0];
-      }
 
       closePanel();
-
-      // Configurar scroll y resaltado temporal de 3 segundos
-      if (verseScrollTarget) {
-        window.scrollToVerseAfterRender = verseScrollTarget;
-      }
 
       idLibroActual = libroIdDestino;
       rutaLibroActual = rutaDestino;
@@ -702,25 +689,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // C. Configurar los eventos de escucha para Libro y Capítulo
   configurarNavegacionSuperior();
 
-  // D. Carga original de referencias cruzadas y arranque de la App con persistencia segura y bidireccionalidad
+  // D. Carga original de referencias cruzadas y arranque de la App con persistencia segura
   fetch('src/js/paralelos.json')
     .then(res => res.json())
     .then(data => {
-      // Hacer los enlaces de paralelos bidireccionales dinámicamente
-      Object.keys(data).forEach(origen => {
-        const destinos = data[origen];
-        if (Array.isArray(destinos)) {
-          destinos.forEach(destino => {
-            if (!data[destino]) {
-              data[destino] = [];
-            }
-            if (!data[destino].includes(origen)) {
-              data[destino].push(origen);
-            }
-          });
-        }
-      });
-
       mapaEnlacesParalelos = data;
       
       const estado = obtenerEstadoInicial();
