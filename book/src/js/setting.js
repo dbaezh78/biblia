@@ -8,6 +8,7 @@
 (function () {
   // Mapas de fuentes tipográficas solicitadas (10 fuentes)
   const mapasFuentes = {
+    'sans-serif': "sans-serif",
     'arial': "'Arial', sans-serif",
     'aptos': "'Aptos', sans-serif",
     'cavolini': "'Cavolini', sans-serif",
@@ -93,25 +94,10 @@
         </div>
         
         <div class="ajustes-seccion">
-          <div class="ajustes-seccion-titulo">Tamaño del Texto</div>
-          <div class="ajustes-control-fila">
-            <input type="range" id="sliderTamano" class="ajustes-slider" min="14" max="28" step="1" value="${config.tamano}">
-            <span class="ajustes-valor-lbl" id="lblTamano">${config.tamano}px</span>
-          </div>
-        </div>
-        
-        <div class="ajustes-seccion">
-          <div class="ajustes-seccion-titulo">Espacio Interlineal</div>
-          <div class="ajustes-control-fila">
-            <input type="range" id="sliderInterlineado" class="ajustes-slider" min="1.2" max="2.2" step="0.1" value="${config.interlineado}">
-            <span class="ajustes-valor-lbl" id="lblInterlineado">${config.interlineado}</span>
-          </div>
-        </div>
-        
-        <div class="ajustes-seccion">
           <div class="ajustes-seccion-titulo">Tipografía</div>
           <div class="ajustes-control-fila">
             <select id="selectFuente" class="ajustes-select">
+              <option value="sans-serif" ${config.fuente === 'sans-serif' ? 'selected' : ''} style="font-family: sans-serif;">Sans-serif</option>
               <option value="arial" ${config.fuente === 'arial' ? 'selected' : ''} style="font-family: 'Arial', sans-serif;">Arial (Body CS)</option>
               <option value="aptos" ${config.fuente === 'aptos' ? 'selected' : ''} style="font-family: 'Aptos', sans-serif;">Aptos (Body)</option>
               <option value="cavolini" ${config.fuente === 'cavolini' ? 'selected' : ''} style="font-family: 'Cavolini', sans-serif;">Cavolini</option>
@@ -126,6 +112,22 @@
           </div>
         </div>
 
+        <div class="ajustes-seccion">
+          <div class="ajustes-seccion-titulo">Tamaño del Texto</div>
+          <div class="ajustes-control-fila">
+            <input type="range" id="sliderTamano" class="ajustes-slider" min="14" max="50" step="1" value="${config.tamano}">
+            <span class="ajustes-valor-lbl" id="lblTamano">${config.tamano}px</span>
+          </div>
+        </div>
+        
+        <div class="ajustes-seccion">
+          <div class="ajustes-seccion-titulo">Espacio Interlineal</div>
+          <div class="ajustes-control-fila">
+            <input type="range" id="sliderInterlineado" class="ajustes-slider" min="1.2" max="2.2" step="0.1" value="${config.interlineado}">
+            <span class="ajustes-valor-lbl" id="lblInterlineado">${config.interlineado}</span>
+          </div>
+        </div>
+        
         <div class="ajustes-seccion">
           <div class="ajustes-seccion-titulo">Formato de Lectura</div>
           <div class="ajustes-control-fila" style="justify-content: space-between; align-items: center;">
@@ -195,6 +197,7 @@
     const capSiguiente = window.capituloActualNum + 1;
     
     if (window.libroActualData.capitulos && window.libroActualData.capitulos[capSiguiente]) {
+      window.navDirection = 'next';
       if (typeof window.seleccionarCapitulo === 'function') {
         window.seleccionarCapitulo(capSiguiente);
       }
@@ -204,6 +207,7 @@
       const currentIndex = claves.indexOf(window.idLibroActual);
       if (currentIndex !== -1 && currentIndex + 1 < claves.length) {
         const nextBookKey = claves[currentIndex + 1];
+        window.navDirection = 'next';
         if (typeof window.seleccionarLibro === 'function') {
           window.seleccionarLibro(nextBookKey, window.indiceLibrosRutas[nextBookKey].ruta);
         }
@@ -218,6 +222,7 @@
     const capAnterior = window.capituloActualNum - 1;
     
     if (capAnterior >= 1) {
+      window.navDirection = 'prev';
       if (typeof window.seleccionarCapitulo === 'function') {
         window.seleccionarCapitulo(capAnterior);
       }
@@ -229,6 +234,7 @@
         const prevBookKey = claves[currentIndex - 1];
         const prevBookRuta = window.indiceLibrosRutas[prevBookKey].ruta;
         
+        window.navDirection = 'prev';
         fetch(prevBookRuta)
           .then(res => res.json())
           .then(data => {
@@ -337,37 +343,9 @@
     });
   }
 
-  // 10. Configurar gestos táctiles para móviles
+  // 10. Configurar gestos táctiles para móviles (desactivado en favor del nuevo swiper premium de arrastre)
   function configurarGestosDesplazamiento() {
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    document.addEventListener('touchstart', function (e) {
-      if (!panelesCerrados()) return;
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartY = e.changedTouches[0].screenY;
-    }, { passive: true });
-
-    document.addEventListener('touchend', function (e) {
-      if (!panelesCerrados()) return;
-
-      const touchEndX = e.changedTouches[0].screenX;
-      const touchEndY = e.changedTouches[0].screenY;
-
-      const diffX = touchEndX - touchStartX;
-      const diffY = touchEndY - touchStartY;
-
-      // Desplazamiento horizontal claro sin mucha desviación vertical
-      if (Math.abs(diffX) > 80 && Math.abs(diffY) < 50) {
-        if (diffX > 0) {
-          // Desplazar a la derecha (izquierda -> derecha) -> Capítulo Anterior
-          capituloAnterior();
-        } else {
-          // Desplazar a la izquierda (derecha -> izquierda) -> Siguiente Capítulo
-          capituloSiguiente();
-        }
-      }
-    }, { passive: true });
+    // Desactivado para evitar conflictos con el swiper continuo en jsgral.js
   }
 
   // 11. Configurar controladores de eventos tradicionales

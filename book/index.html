@@ -11,8 +11,8 @@
 
   <header>
     <button class="menu-btn" id="openBtn">☰</button>
-    
     <div class="selector-biblico" id="selectorBiblico"></div>
+    <button class="search-btn" id="searchBtn" title="Buscar en la Biblia">🔍</button>
   </header>
 
   <div class="overlay" id="overlay"></div>
@@ -51,6 +51,41 @@
     </div>
     <div class="panel-content" id="panelContenido">
       </div>
+  </div>
+
+  <!-- Modal de Búsqueda Global -->
+  <div class="modal-search" id="modalSearch">
+    <div class="modal-search-content">
+      <div class="modal-search-header">
+        <h3 class="modal-search-titulo">🔍 Buscar en las Escrituras</h3>
+        <button class="modal-search-close" id="closeSearchBtn" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-search-busqueda">
+        <div class="search-input-container">
+          <input type="text" class="modal-search-input-buscar" id="globalSearchInput" placeholder="Escribe para buscar... (ej. fe, amor, Jesús)" autocomplete="off">
+          <button class="modal-search-btn-ejecutar" id="executeSearchBtn">Buscar</button>
+        </div>
+        <div class="search-scope-container">
+          <label class="search-radio-label">
+            <input type="radio" name="searchScope" value="current" checked>
+            <span>Libro Actual</span>
+          </label>
+          <label class="search-radio-label">
+            <input type="radio" name="searchScope" value="all">
+            <span>Toda la Biblia</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-search-progreso" id="searchProgressContainer" style="display: none;">
+        <div class="search-progreso-barra">
+          <div class="search-progreso-fill" id="searchProgressFill"></div>
+        </div>
+        <span class="search-progreso-texto" id="searchProgressText">Buscando... 0%</span>
+      </div>
+      <div class="modal-search-body" id="modalSearchBody">
+        <div class="search-vacio-msg" id="searchEmptyMsg">Escribe una palabra clave y presiona Buscar.</div>
+      </div>
+    </div>
   </div>
 
   <!-- Firebase SDK Compat -->
