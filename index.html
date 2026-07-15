@@ -1,31 +1,102 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon"        href="src/img/ico.ico" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor Bíblico</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblia de Estudio Pro</title>
+  <link rel="icon" href="src/img/ico.ico" type="image/x-icon">
+  <link rel="stylesheet" href="src/css/cssgral.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
 </head>
 <body>
 
-    <header>
-        <img class="ima" src="src/img/bibliaima.png" alt="">
-        <h1>Biblia de Jerusalen</h1>
-        <p>Libros y Capítulos</p>
-    </header>
+  <header>
+    <button class="menu-btn" id="openBtn">☰</button>
+    <div class="selector-biblico" id="selectorBiblico"></div>
+    <button class="search-btn" id="searchBtn" title="Buscar en la Biblia"><span class="material-symbols-outlined">search</span></button>
+  </header>
 
-    <div id="audio-player-container">
-        <audio id="audio-player" controls autoplay></audio>
+  <div class="overlay" id="overlay"></div>
 
-        <div id="now-playing">
-            Reproduciendo: <span id="current-track-info">Ninguno</span>
-        </div>
-
-        <div id="playlist">
-            </div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-titulo">La Biblia</div>
+      <div class="perfil-usuario-container" id="perfilUsuarioCont">
+        <button class="google-login-btn" id="googleLoginBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right:8px; vertical-align: middle;"><path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115Z"/><path fill="#4285F4" d="M16.04 15.345c-1.127.756-2.536 1.2-4.04 1.2a5.09 5.09 0 0 1-4.827-3.44l-4.103 3.174A10.09 10.09 0 0 0 12 24c2.936 0 5.618-1.01 7.645-2.755l-3.605-5.9Z"/><path fill="#34A853" d="M12 16.545c-2.7 0-4.99-1.8-5.78-4.236L2.117 15.48A10.09 10.09 0 0 0 12 24c3.055 0 5.782-1.145 7.91-3l-3.87-4.455Z"/><path fill="#FBBC05" d="M23.52 12.273c0-.818-.073-1.609-.209-2.373H12v4.582h6.455a5.54 5.54 0 0 1-2.41 3.636l3.87 4.455c2.264-2.09 3.605-5.164 3.605-8.3Z"/></svg>
+          Ingresar con Google
+        </button>
+      </div>
     </div>
+    <ul class="sidebar-menu">
+      <li><a href="#">📅 Planes de Lectura</a></li>
+      <li><a href="#">✝️ Verso Diario</a></li>
+      <li><a href="#" id="menuMarcadoresBtn">🔖 Marcadores</a></li>
+      <li><a href="#" id="menuNotasBtn">📝 Notas</a></li>
+      <li><a href="#" id="menuDestacadosBtn">🅰️ Destacados</a></li>
+      <li><a href="#" id="menuAjustesBtn">⚙️ Ajustes</a></li>
+      <li><a href="#" id="menuTemaBtn">🌙 Día/Noche</a></li>
+      <li><a href="#">🔗 Compartir App</a></li>
+      <li><a href="#">💬 Comentarios</a></li>
+    </ul>
+  </nav>
 
-    <script src="script.js"></script>
+  <main class="main-content">
+    <div id="loading-view" style="padding: 20px; color: #666; font-style: italic;">Cargando Escrituras...</div>
+  </main>
+
+  <div class="panel-paralelos" id="panelParalelos">
+    <div class="panel-header">
+      <span class="panel-title" id="panelTitulo">📚 Ver Paralelos</span>
+      <button class="close-btn" id="closePanelBtn">&times;</button>
+    </div>
+    <div class="panel-content" id="panelContenido">
+      </div>
+  </div>
+
+  <!-- Modal de Búsqueda Global -->
+  <div class="modal-search" id="modalSearch">
+    <div class="modal-search-content">
+      <div class="modal-search-header">
+        <h3 class="modal-search-titulo"><span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 6px;">search</span>Buscar en las Escrituras</h3>
+        <button class="modal-search-close" id="closeSearchBtn" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-search-busqueda">
+        <div class="search-input-container">
+          <input type="text" class="modal-search-input-buscar" id="globalSearchInput" placeholder="Escribe para buscar... (ej. fe, amor, Jesús)" autocomplete="off">
+          <button class="modal-search-btn-ejecutar" id="executeSearchBtn">Buscar</button>
+        </div>
+        <div class="search-scope-container">
+          <label class="search-radio-label">
+            <input type="radio" name="searchScope" value="current" checked>
+            <span>Libro Actual</span>
+          </label>
+          <label class="search-radio-label">
+            <input type="radio" name="searchScope" value="all">
+            <span>Toda la Biblia</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-search-progreso" id="searchProgressContainer" style="display: none;">
+        <div class="search-progreso-barra">
+          <div class="search-progreso-fill" id="searchProgressFill"></div>
+        </div>
+        <span class="search-progreso-texto" id="searchProgressText">Buscando... 0%</span>
+      </div>
+      <div class="modal-search-body" id="modalSearchBody">
+        <div class="search-vacio-msg" id="searchEmptyMsg">Escribe una palabra clave y presiona Buscar.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script src="src/js/jsgral.js"></script>
+  <script src="src/js/setting.js"></script>
+  <script src="src/js/googlefirebase.js"></script>
+  <script src="src/js/annotation.js"></script>
 </body>
 </html>
