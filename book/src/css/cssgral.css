@@ -462,11 +462,11 @@ header {
 }
 
 .custom-select-trigger {
-  font-family: 'Cinzel', 'Georgia', serif;
+  font-family: var(--fuente-texto);
   font-style: italic;
   font-size: 1.45rem;
   font-weight: normal;
-  color: #2b6cb0 !important; /* Azul de la captura */
+  color: var(--color-num-versiculo, #cc0000);
   cursor: pointer;
   padding: 4px 4px;
   border-radius: 6px;
@@ -489,7 +489,8 @@ header {
 }
 
 .custom-select-trigger.cap-trigger {
-  color: #2b6cb0 !important;
+  color: var(--color-num-versiculo, #cc0000);
+
 }
 
 .custom-select-trigger::after {
@@ -499,7 +500,7 @@ header {
 .custom-select-trigger.cap-trigger::after {
   content: '▾' !important;
   font-size: 0.85rem;
-  color: #2b6cb0 !important;
+  color: transparent;
   opacity: 0.8;
   margin-left: 4px;
   font-style: normal;
