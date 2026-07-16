@@ -23,10 +23,10 @@
 
   // Valores por defecto
   const DEFAULTS = {
-    tamano: 18,
+    tamano: 25,
     interlineado: 1.7,
-    fuente: 'aptos',
-    separarVersiculos: false,
+    fuente: 'mv-boli',
+    separarVersiculos: true,
     ocultarTitulo: true, // Oculto por defecto
     tema: 'light' // 'light' para Día, 'dark' para Noche
   };
