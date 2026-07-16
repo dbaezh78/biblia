@@ -45,10 +45,10 @@ var indiceLibrosRutas = {
   "22_jb": { nombre: "Job", ruta: "src/libros/22_jb.json" },
   "23_sal": { nombre: "Salmos", ruta: "src/libros/23_sal.json" },
   "24_pr": { nombre: "Proverbios", ruta: "src/libros/24_pr.json" },
-  "25_qo": { nombre: "Eclesiastés", ruta: "src/libros/25_qo.json" },   //  Qo Eclesiastés (Qohélet)
+  "25_qo": { nombre: "Eclesiastés(Qo)", ruta: "src/libros/25_qo.json" },   //  Qo Eclesiastés (Qohélet)
   "26_cant": { nombre: "Cantar", ruta: "src/libros/26_cant.json" },
   "27_sab": { nombre: "Sabiduría", ruta: "src/libros/27_sb.json" },
-  "28_si": { nombre: "Eclesiástico", ruta: "src/libros/28_si.json" },    // Si Eclesiástico (Sirácida)
+  "28_si": { nombre: "Eclesiástico(Si)", ruta: "src/libros/28_si.json" },    // Si Eclesiástico (Sirácida)
   "29_is": { nombre: "Isaías", ruta: "src/libros/29_is.json" },
   "30_jr": { nombre: "Jeremías", ruta: "src/libros/30_jr.json" },
   "31_lam": { nombre: "Lamentaciones", ruta: "src/libros/31_lam.json" },
