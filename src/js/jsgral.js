@@ -668,6 +668,10 @@ function configurarEventosSwiper(slider) {
         const prevCap = capituloActualNum - 1;
         if (prevCap >= 1) {
           capituloActualNum--;
+          window.capituloActualNum = capituloActualNum;
+          try {
+            localStorage.setItem('ultimoCapitulo', capituloActualNum.toString());
+          } catch (e) {}
           actualizarSelectorCapitulos(libroActualData.capitulos, capituloActualNum);
           renderizarVersiculos(libroActualData, capituloActualNum);
         } else {
@@ -676,14 +680,46 @@ function configurarEventosSwiper(slider) {
           const currentIndex = claves.indexOf(window.idLibroActual);
           if (currentIndex !== -1 && currentIndex - 1 >= 0) {
             const prevBookKey = claves[currentIndex - 1];
+            const prevBookRuta = window.indiceLibrosRutas[prevBookKey].ruta;
+            
+            idLibroActual = prevBookKey;
             window.idLibroActual = prevBookKey;
-            window.rutaLibroActual = window.indiceLibrosRutas[prevBookKey].ruta;
-            fetch(window.rutaLibroActual)
+            rutaLibroActual = prevBookRuta;
+            window.rutaLibroActual = prevBookRuta;
+            
+            actualizarHistorialLibro(prevBookKey);
+            llenarSelectorLibros();
+            
+            const trigger = document.getElementById('libroTrigger');
+            if (trigger) {
+              trigger.textContent = window.indiceLibrosRutas[prevBookKey].nombre.toUpperCase();
+            }
+            
+            document.querySelectorAll('#libroOptionsList .custom-option').forEach(opt => {
+              if (opt.dataset.key === prevBookKey) {
+                opt.classList.add('selected');
+              } else {
+                opt.classList.remove('selected');
+              }
+            });
+
+            fetch(prevBookRuta)
               .then(res => res.json())
               .then(data => {
                 libroActualData = data;
+                window.libroActualData = data;
                 const chapters = Object.keys(data.capitulos).map(c => parseInt(c, 10));
                 capituloActualNum = Math.max(...chapters);
+                window.capituloActualNum = capituloActualNum;
+                
+                try {
+                  localStorage.setItem('ultimoLibroKey', prevBookKey);
+                  localStorage.setItem('ultimoLibroRuta', prevBookRuta);
+                  localStorage.setItem('ultimoCapitulo', capituloActualNum.toString());
+                } catch (e) {
+                  console.error("Error al guardar estado en localStorage:", e);
+                }
+                
                 actualizarSelectorCapitulos(data.capitulos, capituloActualNum);
                 renderizarVersiculos(data, capituloActualNum);
               });
@@ -697,6 +733,10 @@ function configurarEventosSwiper(slider) {
         const nextCap = capituloActualNum + 1;
         if (libroActualData.capitulos && libroActualData.capitulos[nextCap]) {
           capituloActualNum++;
+          window.capituloActualNum = capituloActualNum;
+          try {
+            localStorage.setItem('ultimoCapitulo', capituloActualNum.toString());
+          } catch (e) {}
           actualizarSelectorCapitulos(libroActualData.capitulos, capituloActualNum);
           renderizarVersiculos(libroActualData, capituloActualNum);
         } else {
@@ -705,13 +745,44 @@ function configurarEventosSwiper(slider) {
           const currentIndex = claves.indexOf(window.idLibroActual);
           if (currentIndex !== -1 && currentIndex + 1 < claves.length) {
             const nextBookKey = claves[currentIndex + 1];
+            const nextBookRuta = window.indiceLibrosRutas[nextBookKey].ruta;
+            
+            idLibroActual = nextBookKey;
             window.idLibroActual = nextBookKey;
-            window.rutaLibroActual = window.indiceLibrosRutas[nextBookKey].ruta;
-            fetch(window.rutaLibroActual)
+            rutaLibroActual = nextBookRuta;
+            window.rutaLibroActual = nextBookRuta;
+            capituloActualNum = 1;
+            window.capituloActualNum = 1;
+            
+            try {
+              localStorage.setItem('ultimoLibroKey', nextBookKey);
+              localStorage.setItem('ultimoLibroRuta', nextBookRuta);
+              localStorage.setItem('ultimoCapitulo', '1');
+            } catch (e) {
+              console.error("Error al guardar estado en localStorage:", e);
+            }
+            
+            actualizarHistorialLibro(nextBookKey);
+            llenarSelectorLibros();
+            
+            const trigger = document.getElementById('libroTrigger');
+            if (trigger) {
+              trigger.textContent = window.indiceLibrosRutas[nextBookKey].nombre.toUpperCase();
+            }
+            
+            document.querySelectorAll('#libroOptionsList .custom-option').forEach(opt => {
+              if (opt.dataset.key === nextBookKey) {
+                opt.classList.add('selected');
+              } else {
+                opt.classList.remove('selected');
+              }
+            });
+
+            fetch(nextBookRuta)
               .then(res => res.json())
               .then(data => {
                 libroActualData = data;
-                capituloActualNum = 1;
+                window.libroActualData = data;
                 actualizarSelectorCapitulos(data.capitulos, 1);
                 renderizarVersiculos(data, 1);
               });
