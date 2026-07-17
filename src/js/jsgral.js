@@ -1527,5 +1527,58 @@ document.addEventListener('DOMContentLoaded', () => {
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
+
+    // Lógica de instalación PWA
+    let deferredPrompt = null;
+    const installContainer = document.getElementById('menuInstallContainer');
+    const installBtn = document.getElementById('menuInstallBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevenir el banner por defecto del navegador
+      e.preventDefault();
+      // Guardar el evento para dispararlo después
+      deferredPrompt = e;
+      // Mostrar el botón en el menú lateral
+      if (installContainer) {
+        installContainer.style.display = 'block';
+      }
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!deferredPrompt) return;
+        
+        // Mostrar el prompt de instalación nativo
+        deferredPrompt.prompt();
+        
+        // Esperar la respuesta del usuario
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('El usuario aceptó la instalación de la PWA');
+          } else {
+            console.log('El usuario canceló la instalación de la PWA');
+          }
+          // Limpiar el prompt guardado
+          deferredPrompt = null;
+          if (installContainer) {
+            installContainer.style.display = 'none';
+          }
+          
+          // Cerrar menú lateral
+          if (typeof window.closeMenu === 'function') {
+            window.closeMenu();
+          }
+        });
+      });
+    }
+
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('La aplicación fue instalada con éxito');
+      if (installContainer) {
+        installContainer.style.display = 'none';
+      }
+      deferredPrompt = null;
+    });
   });
 })();
