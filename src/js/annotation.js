@@ -1320,6 +1320,7 @@
     const btnMarcadores = document.getElementById('menuMarcadoresBtn');
     const btnNotas = document.getElementById('menuNotasBtn');
     const btnDestacados = document.getElementById('menuDestacadosBtn');
+    const btnCompartirApp = document.getElementById('menuCompartirAppBtn');
 
     if (btnMarcadores) {
       btnMarcadores.addEventListener('click', (e) => {
@@ -1340,6 +1341,43 @@
       btnDestacados.addEventListener('click', (e) => {
         e.preventDefault();
         mostrarAnotacionesDeTipo('destacados');
+      });
+    }
+
+    if (btnCompartirApp) {
+      btnCompartirApp.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Cerrar menú lateral si está abierto
+        if (typeof window.closeMenu === 'function') {
+          window.closeMenu();
+        } else {
+          const sidebar = document.getElementById('sidebar');
+          const overlay = document.getElementById('overlay');
+          if (sidebar) sidebar.classList.remove('open');
+          if (overlay) overlay.classList.remove('show');
+        }
+
+        const shareData = {
+          title: 'Biblia de Estudio Pro',
+          text: 'Te comparto la Biblia de Estudio Pro para leer y estudiar las Escrituras.',
+          url: 'https://biblia.resucito.do/'
+        };
+
+        if (navigator.share) {
+          navigator.share(shareData)
+            .catch((err) => {
+              console.log('Error al compartir:', err);
+            });
+        } else {
+          navigator.clipboard.writeText(shareData.text + " " + shareData.url)
+            .then(() => {
+              alert('Enlace y mensaje de la app copiados al portapapeles.');
+            })
+            .catch((err) => {
+              console.error('Error al copiar:', err);
+            });
+        }
       });
     }
   }

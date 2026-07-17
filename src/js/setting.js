@@ -28,7 +28,9 @@
     fuente: 'mv-boli',
     separarVersiculos: true,
     ocultarTitulo: true, // Oculto por defecto
-    tema: 'light' // 'light' para Día, 'dark' para Noche
+    tema: 'light', // 'light' para Día, 'dark' para Noche
+    colorSeleccion: '#afafaf', // Valor por defecto
+    colorHoverParalelo: '#cc0000' // Valor por defecto (rojo)
   };
 
   // Estado actual de la configuración
@@ -38,7 +40,9 @@
     fuente: DEFAULTS.fuente,
     separarVersiculos: DEFAULTS.separarVersiculos,
     ocultarTitulo: DEFAULTS.ocultarTitulo,
-    tema: DEFAULTS.tema
+    tema: DEFAULTS.tema,
+    colorSeleccion: DEFAULTS.colorSeleccion,
+    colorHoverParalelo: DEFAULTS.colorHoverParalelo
   };
 
   // 1. Cargar ajustes guardados en localStorage al iniciar
@@ -50,6 +54,8 @@
       const separarVersiculosGuardado = localStorage.getItem('biblia_setting_separar_versiculos');
       const ocultarTituloGuardado = localStorage.getItem('biblia_setting_ocultar_titulo');
       const temaGuardado = localStorage.getItem('biblia_setting_tema');
+      const colorSeleccionGuardado = localStorage.getItem('biblia_setting_color_seleccion');
+      const colorHoverParaleloGuardado = localStorage.getItem('biblia_setting_color_hover_paralelo');
 
       if (tamanoGuardado) config.tamano = parseInt(tamanoGuardado, 10);
       if (interlineadoGuardado) config.interlineado = parseFloat(interlineadoGuardado);
@@ -63,6 +69,8 @@
       }
       
       if (temaGuardado) config.tema = temaGuardado;
+      if (colorSeleccionGuardado) config.colorSeleccion = colorSeleccionGuardado;
+      if (colorHoverParaleloGuardado) config.colorHoverParalelo = colorHoverParaleloGuardado;
     } catch (e) {
       console.error("Error al acceder a localStorage:", e);
     }
@@ -76,6 +84,8 @@
     
     const fuenteCSS = mapasFuentes[config.fuente] || mapasFuentes['aptos'];
     root.style.setProperty('--fuente-texto', fuenteCSS);
+    root.style.setProperty('--color-seleccion-actual', `${config.colorSeleccion}70`);
+    root.style.setProperty('--color-hover-paralelo', `${config.colorHoverParalelo}0d`);
 
     // Aplicar la clase para el formato de un versículo por línea
     if (config.separarVersiculos) {
@@ -126,6 +136,20 @@
               <option value="segoe-print" ${config.fuente === 'segoe-print' ? 'selected' : ''} style="font-family: 'Segoe Print', cursive, sans-serif;">Segoe Print</option>
               <option value="viner-hand" ${config.fuente === 'viner-hand' ? 'selected' : ''} style="font-family: 'Viner Hand ITC', cursive, serif;">Viner Hand ITC</option>
             </select>
+          </div>
+        </div>
+
+        <div class="ajustes-seccion">
+          <div class="ajustes-seccion-titulo">Personalizar color</div>
+          
+          <div class="ajustes-control-fila" style="justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.95rem; color: var(--color-texto, #1a1a1a);">Color de Selección</span>
+            <input type="color" id="pickerColorSeleccion" value="${config.colorSeleccion}" style="border: none; width: 45px; height: 30px; border-radius: 6px; cursor: pointer; padding: 0; background: transparent;">
+          </div>
+          
+          <div class="ajustes-control-fila" style="justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.95rem; color: var(--color-texto, #1a1a1a);">Color de paralelos</span>
+            <input type="color" id="pickerColorHoverParalelo" value="${config.colorHoverParalelo}" style="border: none; width: 45px; height: 30px; border-radius: 6px; cursor: pointer; padding: 0; background: transparent;">
           </div>
         </div>
 
@@ -386,6 +410,8 @@
     const lblInterlineado = document.getElementById('lblInterlineado');
 
     const selectFuente = document.getElementById('selectFuente');
+    const pickerColorSeleccion = document.getElementById('pickerColorSeleccion');
+    const pickerColorHoverParalelo = document.getElementById('pickerColorHoverParalelo');
     const chkSepararVersiculos = document.getElementById('chkSepararVersiculos');
     const chkOcultarTitulo = document.getElementById('chkOcultarTitulo');
 
@@ -477,6 +503,36 @@
 
         try {
           localStorage.setItem('biblia_setting_fuente', fontKey);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    // Evento Color de Selección Personalizado
+    if (pickerColorSeleccion) {
+      pickerColorSeleccion.addEventListener('input', function (e) {
+        const val = e.target.value;
+        config.colorSeleccion = val;
+        aplicarAjustesEnCSS();
+
+        try {
+          localStorage.setItem('biblia_setting_color_seleccion', val);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    // Evento Color Hover Paralelo Personalizado
+    if (pickerColorHoverParalelo) {
+      pickerColorHoverParalelo.addEventListener('input', function (e) {
+        const val = e.target.value;
+        config.colorHoverParalelo = val;
+        aplicarAjustesEnCSS();
+
+        try {
+          localStorage.setItem('biblia_setting_color_hover_paralelo', val);
         } catch (err) {
           console.error(err);
         }

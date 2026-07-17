@@ -116,8 +116,8 @@ function actualizarHistorialLibro(nuevoLibroKey) {
   historial = historial.filter(k => k !== nuevoLibroKey);
   historial.unshift(nuevoLibroKey);
   
-  // Guardar los 2 últimos
-  historial = historial.slice(0, 2);
+  // Guardar los 4 últimos para pantallas de PC/tablet
+  historial = historial.slice(0, 4);
   
   try {
     localStorage.setItem('historialLibros', JSON.stringify(historial));
@@ -138,12 +138,19 @@ function llenarSelectorLibros() {
       if (raw) historial = JSON.parse(raw);
     } catch (e) {}
 
-    // Valores por defecto (Mateo y Lucas) si no hay historial aún
+    // Valores por defecto (Mateo, Lucas, Juan y Génesis) si no hay historial aún
     if (!Array.isArray(historial) || historial.length === 0) {
-      historial = ['47_mt', '49_lc'];
-    } else if (historial.length === 1) {
-      const defaultComun = historial[0] === '47_mt' ? '49_lc' : '47_mt';
-      historial.push(defaultComun);
+      historial = ['47_mt', '49_lc', '50_jn', '01_gn'];
+    } else {
+      // Completar hasta 4 elementos con valores por defecto no duplicados
+      const defaults = ['47_mt', '49_lc', '50_jn', '01_gn'];
+      for (const d of defaults) {
+        if (historial.length >= 4) break;
+        if (!historial.includes(d)) {
+          historial.push(d);
+        }
+      }
+      historial = historial.slice(0, 4);
     }
 
     historial.forEach(key => {

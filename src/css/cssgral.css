@@ -241,7 +241,7 @@ header {
 }
 
 .tiene-paralelo:hover {
-  background-color: rgba(204, 0, 0, 0.05);
+  background-color: var(--color-hover-paralelo, rgba(204, 0, 0, 0.05)) !important;
 }
 
 .badge-paralelo {
@@ -689,7 +689,7 @@ body.modo-oscuro .custom-option.selected {
   justify-content: center;
   align-items: center;
   aspect-ratio: 1.6 / 1;
-  border-radius: 10px;
+  /*border-radius: 10px;    NO QUIERO ESTO*/
   font-size: 1.15rem;
   font-weight: bold;
   cursor: pointer;
@@ -1261,9 +1261,8 @@ body.modo-oscuro .v-texto.subrayado-linea {
 }
 
 /* Versículo seleccionado en lectura */
-.versiculo.seleccionado-actual {
-  background-color: #afafaf70;
-  border-radius: 4px;
+.versiculo.seleccionado-actual .v-texto {
+  background-color: var(--color-seleccion-actual, #afafaf70) !important;
 }
 
 /* 9. PANEL DE ACCIÓN DEL VERSÍCULO (ACTION SHEET) */
@@ -2269,9 +2268,23 @@ body.modo-oscuro #libroDropdown, body.modo-oscuro #capituloDropdown {
 /* Historial de libros alineado a la misma cuadrícula */
 .custom-book-history-row {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  grid-template-columns: repeat(2, 1fr) !important;
   gap: 10px !important;
   width: 100% !important;
+}
+
+/* Ocultar botones a partir del tercero en móvil */
+@media (max-width: 599px) {
+  .custom-history-btn:nth-child(n+3) {
+    display: none !important;
+  }
+}
+
+/* Mostrar 4 columnas en pantallas medianas y grandes */
+@media (min-width: 600px) {
+  .custom-book-history-row {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
 }
 
 /* Soporte para ocultar título del libro y aprovechar espacio */
