@@ -3055,3 +3055,8 @@ body.modo-oscuro .custom-select-option {
 body.modo-oscuro .custom-select-option:hover {
   background-color: #1a202c;
 }
+
+.welcome {
+  font-size: larger !important;
+  text-align: justify;
+}

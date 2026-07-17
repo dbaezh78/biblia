@@ -29,8 +29,8 @@
     separarVersiculos: true,
     ocultarTitulo: true, // Oculto por defecto
     tema: 'light', // 'light' para Día, 'dark' para Noche
-    colorSeleccion: '#afafaf', // Valor por defecto
-    colorHoverParalelo: '#cc0000' // Valor por defecto (rojo)
+    colorSeleccion: '#72de54', // Valor por defecto
+    colorHoverParalelo: '#30c6f8' // Valor por defecto (rojo)
   };
 
   // Estado actual de la configuración
