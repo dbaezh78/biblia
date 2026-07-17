@@ -391,9 +391,63 @@
     });
   }
 
-  // 10. Configurar gestos táctiles para móviles (desactivado en favor del nuevo swiper premium de arrastre)
+  // 10. Configurar gestos táctiles para móviles (ajuste de tamaño de letra mediante pellizco multitáctil)
   function configurarGestosDesplazamiento() {
-    // Desactivado para evitar conflictos con el swiper continuo en jsgral.js
+    let touchStartDist = 0;
+    let touchStartFontSize = 25;
+    let isPinching = false;
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        // Es un gesto de pellizco, prevenimos el zoom nativo del navegador
+        e.preventDefault();
+        touchStartDist = getTouchDistance(e.touches);
+        touchStartFontSize = config.tamano;
+        isPinching = true;
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && isPinching) {
+        e.preventDefault(); // Bloquear el zoom por defecto del viewport
+        const currentDist = getTouchDistance(e.touches);
+        if (touchStartDist > 0) {
+          const ratio = currentDist / touchStartDist;
+          let newSize = Math.round(touchStartFontSize * ratio);
+          
+          // Mantener la letra dentro de los límites del slider (14px - 50px)
+          newSize = Math.max(14, Math.min(50, newSize));
+          
+          if (newSize !== config.tamano) {
+            config.tamano = newSize;
+            aplicarAjustesEnCSS();
+            
+            // Sincronizar el slider visual en el panel si está abierto
+            const slider = document.getElementById('sliderTamano');
+            const lbl = document.getElementById('lblTamano');
+            if (slider) slider.value = newSize;
+            if (lbl) lbl.textContent = `${newSize}px`;
+          }
+        }
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+      if (isPinching && e.touches.length < 2) {
+        isPinching = false;
+        try {
+          localStorage.setItem('biblia_setting_tamano', config.tamano.toString());
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    });
   }
 
   // 11. Configurar controladores de eventos tradicionales

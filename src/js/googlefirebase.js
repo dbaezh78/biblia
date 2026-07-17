@@ -92,24 +92,24 @@ function iniciarSesionGoogle() {
   
   const provider = new firebase.auth.GoogleAuthProvider();
   
-  // Utilizar signInWithPopup para mejor flujo en escritorio y signInWithRedirect como respaldo en móviles
-  const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
-  if (esMovil) {
-    auth.signInWithRedirect(provider).catch(err => {
-      console.error("Error al iniciar redirección con Google:", err);
-      alert("Error al iniciar sesión: " + err.message);
-    });
-  } else {
-    auth.signInWithPopup(provider)
-      .then(result => {
-        console.log("Sesión iniciada con éxito para:", result.user.displayName);
-      })
-      .catch(err => {
-        console.error("Error al iniciar sesión con Google:", err);
+  // Intentar primero con Popup (más confiable para PWA y evitar bloqueos de cookies de terceros al redirigir en navegadores móviles)
+  auth.signInWithPopup(provider)
+    .then(result => {
+      console.log("Sesión iniciada con éxito por Popup para:", result.user.displayName);
+    })
+    .catch(err => {
+      console.warn("Popup bloqueado o fallido en este entorno, reintentando con Redirect:", err);
+      
+      // Fallback a Redirección si el popup fue bloqueado, cerrado, o no es soportado por el navegador
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/operation-not-supported-in-this-environment') {
+        auth.signInWithRedirect(provider).catch(redirectErr => {
+          console.error("Error al iniciar redirección con Google:", redirectErr);
+          alert("Error de autenticación por redirección: " + redirectErr.message);
+        });
+      } else {
         alert("Error de autenticación: " + err.message);
-      });
-  }
+      }
+    });
 }
 
 // 5. Cerrar sesión en Firebase
