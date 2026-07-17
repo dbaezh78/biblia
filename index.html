@@ -20,7 +20,7 @@
 
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-titulo">La Biblia</div>
+      <div class="sidebar-titulo">Biblia de Jerusalén</div>
       <div class="perfil-usuario-container" id="perfilUsuarioCont">
         <button class="google-login-btn" id="googleLoginBtn">
           <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right:8px; vertical-align: middle;"><path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115Z"/><path fill="#4285F4" d="M16.04 15.345c-1.127.756-2.536 1.2-4.04 1.2a5.09 5.09 0 0 1-4.827-3.44l-4.103 3.174A10.09 10.09 0 0 0 12 24c2.936 0 5.618-1.01 7.645-2.755l-3.605-5.9Z"/><path fill="#34A853" d="M12 16.545c-2.7 0-4.99-1.8-5.78-4.236L2.117 15.48A10.09 10.09 0 0 0 12 24c3.055 0 5.782-1.145 7.91-3l-3.87-4.455Z"/><path fill="#FBBC05" d="M23.52 12.273c0-.818-.073-1.609-.209-2.373H12v4.582h6.455a5.54 5.54 0 0 1-2.41 3.636l3.87 4.455c2.264-2.09 3.605-5.164 3.605-8.3Z"/></svg>
@@ -29,15 +29,44 @@
       </div>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#">📅 Planes de Lectura</a></li>
-      <li><a href="#">✝️ Verso Diario</a></li>
+      <li><a href="#">Escrutad las Escrituras, ellas hablan de mi.</a></li>
+      <li class="diario-menu-item" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf2f7;">
+        <a href="#" id="menuVersiculoDiarioBtn" style="flex-grow: 1; border-bottom: none; padding: 15px 10px 15px 20px;">✝️ Versículo Diario</a>
+        <button id="menuCalendarioBtn" title="Calendario de Versículos Diarios" style="background: transparent; border: none; font-size: 1.25rem; padding: 15px 20px 15px 10px; cursor: pointer; color: #4a5568; display: flex; align-items: center; justify-content: center; height: 100%; transition: all 0.2s;">📅</button>
+      </li>
+      <li class="diario-menu-item" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf2f7;">
+        <a href="#" id="menuEscrutacioBtn" style="flex-grow: 1; border-bottom: none; padding: 15px 10px 15px 20px;">🔍 Escrutacio</a>
+        <button id="menuEscrutacioCalendarioBtn" title="Calendario de Escrutacios" style="background: transparent; border: none; font-size: 1.25rem; padding: 15px 20px 15px 10px; cursor: pointer; color: #4a5568; display: flex; align-items: center; justify-content: center; height: 100%; transition: all 0.2s;">📅</button>
+      </li>
       <li><a href="#" id="menuMarcadoresBtn">🔖 Marcadores</a></li>
       <li><a href="#" id="menuNotasBtn">📝 Notas</a></li>
       <li><a href="#" id="menuDestacadosBtn">🅰️ Destacados</a></li>
       <li><a href="#" id="menuAjustesBtn">⚙️ Ajustes</a></li>
       <li><a href="#" id="menuTemaBtn">🌙 Día/Noche</a></li>
       <li><a href="#" id="menuCompartirAppBtn">🔗 Compartir App</a></li>
-      <li><a href="#">💬 Comentarios</a></li>
+      <li><a href="https://www.facebook.com/groups/bibliajerusalen/posts/3239946059728992" target="_blank" rel="noopener noreferrer" id="menuComentariosBtn">💬 Comentarios</a></li>
+      <li class="submenu-container">
+        <a href="#" id="btnOtrosRecursos" class="submenu-trigger">
+          <span>🛠️ Otros Recursos</span>
+          <span class="submenu-arrow">▼</span>
+        </a>
+        <ul class="sidebar-submenu" id="submenuOtrosRecursos" style="display: none; list-style: none; padding: 0; margin: 0;">
+          <li><a href="https://resucito.do/" target="_blank" rel="noopener noreferrer" class="submenu-item">🎵 Libro de Canto</a></li>
+          <li><a href="https://salterios.resucito.do/" target="_blank" rel="noopener noreferrer" class="submenu-item">🕒 Liturgia de las horas</a></li>
+          <li><a href="https://ev.resucito.do/" target="_blank" rel="noopener noreferrer" class="submenu-item">📖 Evangelio del día</a></li>
+        </ul>
+      </li>
+      <li class="submenu-container">
+        <a href="#" id="btnRedesSociales" class="submenu-trigger">
+          <span>📱 Redes Sociales</span>
+          <span class="submenu-arrow">▼</span>
+        </a>
+        <ul class="sidebar-submenu" id="submenuRedesSociales" style="display: none; list-style: none; padding: 0; margin: 0;">
+          <li><a href="https://www.youtube.com/@CristoJesusReydereyes" target="_blank" rel="noopener noreferrer" class="submenu-item">🎥 YouTube</a></li>
+          <li><a href="https://www.facebook.com/groups/231463280577300/" target="_blank" rel="noopener noreferrer" class="submenu-item">👥 FB: Biblia de Jerusalén</a></li>
+          <li><a href="https://www.facebook.com/groups/721999947892692" target="_blank" rel="noopener noreferrer" class="submenu-item">👥 FB: Evangelio del día</a></li>
+        </ul>
+      </li>
     </ul>
   </nav>
 
@@ -85,6 +114,118 @@
       </div>
       <div class="modal-search-body" id="modalSearchBody">
         <div class="search-vacio-msg" id="searchEmptyMsg">Escribe una palabra clave y presiona Buscar.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Calendario de Versículos Diarios -->
+  <div class="modal-calendario" id="modalCalendario">
+    <div class="modal-calendario-content">
+      <div class="modal-calendario-header">
+        <h3 class="modal-calendario-titulo">
+          <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 6px;">calendar_month</span>
+          Versículos Diarios
+        </h3>
+        <button class="modal-calendario-close" id="closeCalendarioBtn" aria-label="Cerrar">&times;</button>
+      </div>
+      
+      <div class="modal-calendario-filtros">
+        <select id="selectCalendarioMes" class="select-calendario-control"></select>
+        <select id="selectCalendarioAnio" class="select-calendario-control"></select>
+      </div>
+      
+      <div class="modal-calendario-dias-header">
+        <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+      </div>
+      
+      <div class="modal-calendario-grid" id="calendarioGrid"></div>
+      
+      <div class="modal-calendario-detalle" id="calendarioDetalle">
+        <div class="detalle-vacio-msg" id="detalleVacioMsg">Selecciona un día marcado en el calendario para ver el versículo.</div>
+        <div class="detalle-contenido" id="detalleContenido" style="display: none;">
+          <h4 class="detalle-referencia" id="detalleReferencia">Libro 1:1</h4>
+          <p class="detalle-texto" id="detalleTexto">"Texto del versículo..."</p>
+          <button class="detalle-btn-ir" id="detalleBtnIr">Ir al Versículo 📖</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Escrutacio -->
+  <div class="modal-escrutacio" id="modalEscrutacio" style="display: none;">
+    <div class="modal-escrutacio-content">
+      <div class="modal-escrutacio-header">
+        <h3 class="modal-escrutacio-titulo">
+          <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 6px;">search_insights</span>
+          Escrutacio Bíblico
+        </h3>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="modal-escrutacio-btn-calendario" id="btnToggleEscrutacioHistorial" title="Ver Historial de Escrutacios">📅</button>
+          <button class="modal-escrutacio-close" id="closeEscrutacioBtn" aria-label="Cerrar">&times;</button>
+        </div>
+      </div>
+      
+      <!-- Panel de Historial (Calendario) - Inicialmente Oculto -->
+      <div class="escrutacio-historial-contenedor" id="escrutacioHistorialCont" style="display: none;">
+        <div class="escrutacio-historial-filtros">
+          <select id="selectEscrutacioHistorialMes" class="select-escrutacio-control"></select>
+          <select id="selectEscrutacioHistorialAnio" class="select-escrutacio-control"></select>
+        </div>
+        <div class="escrutacio-historial-dias-header">
+          <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+        </div>
+        <div class="escrutacio-historial-grid" id="escrutacioHistorialGrid"></div>
+        <div class="escrutacio-historial-lista" id="escrutacioHistorialLista">
+          <div class="lista-vacio-msg">Selecciona un día del calendario para ver sus escrutacios.</div>
+        </div>
+      </div>
+
+      <!-- Selector de Pasaje de Origen -->
+      <div class="escrutacio-selector-pasaje" id="escrutacioSelectorPasaje" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+        <h4 id="btnToggleSelectorPasaje" style="margin: 0; font-size: 0.95rem; color: #3182ce; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          <span style="display: flex; align-items: center; font-weight: bold;">
+            <!-- SVG Libro abierto con lápiz (como la imagen provista) -->
+            <svg viewBox="0 0 512 512" width="22" height="22" style="margin-right: 8px; fill: currentColor;">
+              <path d="M464,64H304a48.05,48.05,0,0,0-48,48v336a48.05,48.05,0,0,0,48-48H464a16,16,0,0,0,16-16V80A16,16,0,0,0,464,64ZM448,352H304a16,16,0,0,1,0-32H448a16,16,0,0,1,0,32Zm0-80H304a16,16,0,0,1,0-32H448a16,16,0,0,1,0,32Zm0-80H304a16,16,0,0,1,0-32H448a16,16,0,0,1,0,32Z" />
+              <path d="M208,64H48A16,16,0,0,0,32,80V384a16,16,0,0,0,16,16H208a48.05,48.05,0,0,0,48,48V112A48.05,48.05,0,0,0,208,64ZM64,160h96a16,16,0,0,1,0,32H64a16,16,0,0,1,0-32Zm0,80h96a16,16,0,0,1,0,32H64a16,16,0,0,1,0-32Zm96,112H64a16,16,0,0,1,0-32h96a16,16,0,0,1,0,32Z" />
+              <path d="M373.6,260.4a16.1,16.1,0,0,0-22.6,0l-128,128a16.1,16.1,0,0,0-4.3,8.3l-16,80a16.1,16.1,0,0,0,18.9,18.9l80-16a16.1,16.1,0,0,0,8.3-4.3l128-128a16,16,0,0,0,0-22.6ZM225.1,438.9l-38.3,7.7,7.7-38.3,96-96,30.6,30.6Z" />
+            </svg>
+            Escrutar nuevo pasaje
+          </span>
+          <span id="selectorPasajeArrow" style="font-size: 0.85em; transition: transform 0.2s;">▼</span>
+        </h4>
+        
+        <div id="escrutacioSelectorPasajeBody" style="margin-top: 12px; transition: all 0.3s ease;">
+          <!-- Fila 1: Libro (100% de ancho) -->
+          <div class="custom-select-container" style="position: relative; margin-bottom: 10px; width: 100%;">
+            <input type="text" id="inputEscrutacioBuscarLibro" class="select-escrutacio-control" placeholder="🔍 Seleccionar Libro..." autocomplete="off" style="width: 100%;">
+            <div id="listEscrutacioLibroCustom" class="custom-select-options" style="display: none;"></div>
+            <input type="hidden" id="selectEscrutacioLibro" value="">
+          </div>
+          
+          <!-- Fila 2: Capítulo, Versículo Inicio y Fin en una sola línea (ocupando 100% en total) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; box-sizing: border-box;">
+            <input type="text" id="selectEscrutacioCapitulo" list="listCapitulos" class="select-escrutacio-control" placeholder="Capítulo" style="width: 100%; text-align: center; box-sizing: border-box; padding: 8px 6px;">
+            <input type="text" id="selectEscrutacioVerInicio" list="listVersiculos" class="select-escrutacio-control" placeholder="Ver. Del" style="width: 100%; text-align: center; box-sizing: border-box; padding: 8px 6px;">
+            <input type="text" id="selectEscrutacioVerFin" list="listVersiculos" class="select-escrutacio-control" placeholder="Al" style="width: 100%; text-align: center; box-sizing: border-box; padding: 8px 6px;">
+          </div>
+          
+          <button class="escrutacio-btn-iniciar" id="btnIniciarEscrutacio" style="margin-top: 15px; width: 100%;">Escrutar Pasaje 🔍</button>
+        </div>
+        
+        <datalist id="listCapitulos"></datalist>
+        <datalist id="listVersiculos"></datalist>
+      </div>
+
+      <!-- Visor de Resultados -->
+      <div class="escrutacio-resultados" id="escrutacioResultados">
+        <div class="escrutacio-vacio-msg" id="escrutacioVacioMsg">Selecciona un pasaje y presiona Escrutar.</div>
+        <div class="escrutacio-visor-arbol" id="escrutacioVisorArbol" style="display: none;">
+          <h4 class="escrutacio-titulo-resultado" id="escrutacioTituloResultado">Génesis 5:1-5</h4>
+          <div class="escrutacio-arbol-contenedor" id="escrutacioArbolContenedor">
+            <!-- Árbol de resultados se renderiza aquí -->
+          </div>
+        </div>
       </div>
     </div>
   </div>

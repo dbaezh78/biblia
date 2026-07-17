@@ -6,12 +6,12 @@
 
 // 1. Configuración de Firebase (Reemplazar con tus credenciales de consola de Firebase)
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyDj2R0hMVvda9NCNzgd5fxy84VVebJ19qQ",
+  authDomain: "biblia-de-jerusalen-digital.firebaseapp.com",
+  projectId: "biblia-de-jerusalen-digital",
+  storageBucket: "biblia-de-jerusalen-digital.firebasestorage.app",
+  messagingSenderId: "409423607422",
+  appId: "1:409423607422:web:bd071c3514f7c437880a2f"
 };
 
 // Variables globales de servicio
@@ -19,7 +19,10 @@ let auth = null;
 let db = null;
 let firebaseConfigured = false;
 
+// Initialize Firebase
 // 2. Intentar inicializar Firebase
+
+/*const app = initializeApp(firebaseConfig);*/
 try {
   if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);

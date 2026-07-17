@@ -9,6 +9,14 @@
   let anotaciones = {};
   let seleccionados = []; // Guardará la lista de versículos seleccionados actualmente (objetos de datos)
 
+  // Base de datos local de versículos diarios (clave: YYYY-MM-DD)
+  let versiculosDiarios = {};
+  let fechaSeleccionadaCalendario = null;
+
+  // Base de datos local de escrutacios (clave: YYYY-MM-DD, valor: array de objetos)
+  let escrutacios = {};
+  let fechaSeleccionadaEscrutacio = null;
+
   // 1. Inicialización y Carga de LocalStorage
   function cargarAnotacionesLocales() {
     try {
@@ -106,8 +114,1126 @@
     const user = e.detail;
     if (user) {
       sincronizarConFirebase(user);
+      sincronizarVersiculosDiariosConFirebase(user);
+      sincronizarEscrutaciosConFirebase(user);
     }
   });
+
+  // --- Lógica del Versículo Diario y Calendario Histórico ---
+
+  function obtenerFirestoreVersiculosColeccion() {
+    if (!window.firebaseAuth || !window.firebaseAuth.currentUser || !window.firebaseAuth.db) {
+      return null;
+    }
+    const uid = window.firebaseAuth.currentUser.uid;
+    return window.firebaseAuth.db.collection('users').doc(uid).collection('versiculos_diarios');
+  }
+
+  function subirVersiculoDiarioFirestore(registro) {
+    const col = obtenerFirestoreVersiculosColeccion();
+    if (!col) return;
+    
+    col.doc(registro.fecha).set(registro)
+      .then(() => console.log("Versículo diario sincronizado en la nube:", registro.fecha))
+      .catch(err => console.error("Error al sincronizar versículo diario con Firebase:", err));
+  }
+
+  function cargarVersiculosDiariosLocales() {
+    try {
+      const datosGuardados = localStorage.getItem('biblia_versiculos_diarios');
+      if (datosGuardados) {
+        versiculosDiarios = JSON.parse(datosGuardados);
+      }
+    } catch (e) {
+      console.error("Error al cargar versículos diarios de LocalStorage:", e);
+    }
+  }
+
+  function guardarVersiculosDiariosLocales() {
+    try {
+      localStorage.setItem('biblia_versiculos_diarios', JSON.stringify(versiculosDiarios));
+    } catch (e) {
+      console.error("Error al guardar versículos diarios en LocalStorage:", e);
+    }
+  }
+
+  function sincronizarVersiculosDiariosConFirebase(user) {
+    if (!user) return;
+    
+    const col = obtenerFirestoreVersiculosColeccion();
+    if (!col) return;
+    
+    col.get()
+      .then(snapshot => {
+        let cambiosLocales = false;
+        
+        snapshot.forEach(doc => {
+          const registroNube = doc.data();
+          const registroLocal = versiculosDiarios[registroNube.fecha];
+          
+          if (!registroLocal) {
+            versiculosDiarios[registroNube.fecha] = registroNube;
+            cambiosLocales = true;
+          } else {
+            if (JSON.stringify(registroLocal) !== JSON.stringify(registroNube)) {
+              versiculosDiarios[registroNube.fecha] = registroNube;
+              cambiosLocales = true;
+            }
+          }
+        });
+        
+        // Subir elementos creados localmente que no existen en la nube
+        Object.keys(versiculosDiarios).forEach(fecha => {
+          const docExiste = snapshot.docs.some(d => d.id === fecha);
+          if (!docExiste) {
+            subirVersiculoDiarioFirestore(versiculosDiarios[fecha]);
+          }
+        });
+        
+        if (cambiosLocales) {
+          guardarVersiculosDiariosLocales();
+          actualizarRejillaCalendario();
+        }
+        console.log("Sincronización de versículos diarios con Firebase completada con éxito.");
+      })
+      .catch(err => {
+        console.error("Error al descargar versículos de Firestore:", err);
+      });
+  }
+
+  function obtenerFechaLocalHoy() {
+    const d = new Date();
+    const anio = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${anio}-${mes}-${dia}`;
+  }
+
+  function irAVersiculo(libroId, ruta, capitulo, versiculo) {
+    window.scrollToVerseAfterRender = versiculo;
+    if (typeof window.cargarLibroYCapitulo === 'function') {
+      window.cargarLibroYCapitulo(ruta, capitulo);
+    }
+  }
+
+  function mostrarVersiculoDiarioHoy() {
+    const hoy = obtenerFechaLocalHoy();
+    const registro = versiculosDiarios[hoy];
+    
+    if (registro) {
+      irAVersiculo(registro.libroId, registro.ruta, registro.capitulo, registro.versiculo);
+      if (typeof window.closeMenu === 'function') window.closeMenu();
+    } else {
+      generarNuevoVersiculoDiario(hoy);
+    }
+  }
+
+  function generarNuevoVersiculoDiario(fechaStr) {
+    if (!window.indiceLibrosRutas) {
+      console.error("Índice de libros no cargado.");
+      return;
+    }
+    
+    const keys = Object.keys(window.indiceLibrosRutas);
+    if (keys.length === 0) return;
+    
+    const randomBookKey = keys[Math.floor(Math.random() * keys.length)];
+    const randomBook = window.indiceLibrosRutas[randomBookKey];
+    
+    fetch(randomBook.ruta)
+      .then(res => {
+        if (!res.ok) throw new Error("No disponible");
+        return res.json();
+      })
+      .then(data => {
+        const chapters = Object.keys(data.capitulos);
+        if (chapters.length === 0) throw new Error("Sin capítulos");
+        
+        const randomCap = chapters[Math.floor(Math.random() * chapters.length)];
+        const verses = Object.keys(data.capitulos[randomCap]);
+        if (verses.length === 0) throw new Error("Sin versículos");
+        
+        const randomVer = verses[Math.floor(Math.random() * verses.length)];
+        const text = data.capitulos[randomCap][randomVer];
+        
+        const nuevoRegistro = {
+          fecha: fechaStr,
+          libroId: randomBookKey,
+          libroNombre: randomBook.nombre,
+          capitulo: parseInt(randomCap, 10),
+          versiculo: parseInt(randomVer, 10),
+          texto: text,
+          ruta: randomBook.ruta
+        };
+        
+        versiculosDiarios[fechaStr] = nuevoRegistro;
+        guardarVersiculosDiariosLocales();
+        subirVersiculoDiarioFirestore(nuevoRegistro);
+        irAVersiculo(nuevoRegistro.libroId, nuevoRegistro.ruta, nuevoRegistro.capitulo, nuevoRegistro.versiculo);
+        if (typeof window.closeMenu === 'function') window.closeMenu();
+      })
+      .catch(err => {
+        console.error("Error al generar versículo diario aleatorio:", err);
+        alert("Hubo un problema al generar el versículo diario. Redirigiendo a Génesis.");
+        irAVersiculo("01_gn", "src/libros/01_gn.json", 1, 1);
+      });
+  }
+
+  const mesesNombres = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+
+  function inicializarSelectoresCalendario() {
+    const selectMes = document.getElementById('selectCalendarioMes');
+    const selectAnio = document.getElementById('selectCalendarioAnio');
+    if (!selectMes || !selectAnio) return;
+    
+    if (selectMes.children.length === 0) {
+      mesesNombres.forEach((mes, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = mes;
+        selectMes.appendChild(opt);
+      });
+    }
+    
+    if (selectAnio.children.length === 0) {
+      const anioActual = new Date().getFullYear();
+      for (let a = anioActual; a >= anioActual - 2; a--) {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        selectAnio.appendChild(opt);
+      }
+    }
+    
+    const hoy = new Date();
+    selectMes.value = hoy.getMonth();
+    selectAnio.value = hoy.getFullYear();
+    
+    selectMes.removeEventListener('change', actualizarRejillaCalendario);
+    selectAnio.removeEventListener('change', actualizarRejillaCalendario);
+    selectMes.addEventListener('change', actualizarRejillaCalendario);
+    selectAnio.addEventListener('change', actualizarRejillaCalendario);
+  }
+
+  function actualizarRejillaCalendario() {
+    const grid = document.getElementById('calendarioGrid');
+    const selectMes = document.getElementById('selectCalendarioMes');
+    const selectAnio = document.getElementById('selectCalendarioAnio');
+    if (!grid || !selectMes || !selectAnio) return;
+    
+    const mes = parseInt(selectMes.value, 10);
+    const anio = parseInt(selectAnio.value, 10);
+    
+    grid.innerHTML = "";
+    
+    const primerDia = new Date(anio, mes, 1).getDay();
+    const totalDias = new Date(anio, mes + 1, 0).getDate();
+    
+    for (let i = 0; i < primerDia; i++) {
+      const celda = document.createElement('div');
+      celda.className = "calendario-dia-celda vacia";
+      grid.appendChild(celda);
+    }
+    
+    const hoyLocal = obtenerFechaLocalHoy();
+    
+    for (let dia = 1; dia <= totalDias; dia++) {
+      const celda = document.createElement('div');
+      celda.className = "calendario-dia-celda";
+      celda.textContent = dia;
+      
+      const mesStr = String(mes + 1).padStart(2, '0');
+      const diaStr = String(dia).padStart(2, '0');
+      const fechaStr = `${anio}-${mesStr}-${diaStr}`;
+      
+      if (fechaStr === hoyLocal) {
+        celda.classList.add('hoy');
+      }
+      
+      if (versiculosDiarios[fechaStr]) {
+        celda.classList.add('con-registro');
+      }
+      
+      celda.addEventListener('click', () => {
+        document.querySelectorAll('.calendario-dia-celda.seleccionada').forEach(c => {
+          c.classList.remove('seleccionada');
+        });
+        
+        celda.classList.add('seleccionada');
+        fechaSeleccionadaCalendario = fechaStr;
+        mostrarDetalleDia(fechaStr);
+      });
+      
+      grid.appendChild(celda);
+    }
+  }
+
+  function mostrarDetalleDia(fechaStr) {
+    const vacioMsg = document.getElementById('detalleVacioMsg');
+    const contenido = document.getElementById('detalleContenido');
+    const ref = document.getElementById('detalleReferencia');
+    const texto = document.getElementById('detalleTexto');
+    const btnIr = document.getElementById('detalleBtnIr');
+    
+    if (!vacioMsg || !contenido || !ref || !texto || !btnIr) return;
+    
+    const registro = versiculosDiarios[fechaStr];
+    if (registro) {
+      vacioMsg.style.display = 'none';
+      contenido.style.display = 'block';
+      ref.textContent = `${registro.libroNombre} ${registro.capitulo}:${registro.versiculo}`;
+      texto.textContent = `"${registro.texto}"`;
+      
+      btnIr.onclick = () => {
+        irAVersiculo(registro.libroId, registro.ruta, registro.capitulo, registro.versiculo);
+        cerrarCalendarioModal();
+      };
+    } else {
+      vacioMsg.style.display = 'block';
+      vacioMsg.textContent = `No hay ningún versículo diario registrado para el ${formatearFechaLimpia(fechaStr)}.`;
+      contenido.style.display = 'none';
+    }
+  }
+
+  function formatearFechaLimpia(fechaStr) {
+    const parts = fechaStr.split('-');
+    if (parts.length !== 3) return fechaStr;
+    const anio = parts[0];
+    const mesIdx = parseInt(parts[1], 10) - 1;
+    const dia = parseInt(parts[2], 10);
+    return `${dia} de ${mesesNombres[mesIdx]}, ${anio}`;
+  }
+
+  function abrirCalendarioModal() {
+    const modal = document.getElementById('modalCalendario');
+    if (modal) {
+      modal.classList.add('open');
+      inicializarSelectoresCalendario();
+      actualizarRejillaCalendario();
+      
+      const vacioMsg = document.getElementById('detalleVacioMsg');
+      const contenido = document.getElementById('detalleContenido');
+      if (vacioMsg && contenido) {
+        vacioMsg.style.display = 'block';
+        vacioMsg.textContent = "Selecciona un día marcado en el calendario para ver el versículo.";
+        contenido.style.display = 'none';
+      }
+      
+      if (typeof window.closeMenu === 'function') window.closeMenu();
+    }
+  }
+
+  function cerrarCalendarioModal() {
+    const modal = document.getElementById('modalCalendario');
+    if (modal) modal.classList.remove('open');
+  }
+
+  // ==========================================
+  // LÓGICA DE ESCRUTACIO Y PARALELOS RECURSIVOS
+  // ==========================================
+  
+  function cargarEscrutaciosLocales() {
+    try {
+      const datosGuardados = localStorage.getItem('biblia_escrutacios');
+      if (datosGuardados) {
+        escrutacios = JSON.parse(datosGuardados);
+      }
+    } catch (e) {
+      console.error("Error al cargar escrutacios de LocalStorage:", e);
+    }
+  }
+
+  function guardarEscrutaciosLocales() {
+    try {
+      localStorage.setItem('biblia_escrutacios', JSON.stringify(escrutacios));
+    } catch (e) {
+      console.error("Error al guardar escrutacios en LocalStorage:", e);
+    }
+  }
+
+  function obtenerFirestoreEscrutaciosColeccion() {
+    if (!window.firebaseAuth || !window.firebaseAuth.currentUser || !window.firebaseAuth.db) {
+      return null;
+    }
+    const uid = window.firebaseAuth.currentUser.uid;
+    return window.firebaseAuth.db.collection('users').doc(uid).collection('escrutacios');
+  }
+
+  function subirEscrutacioFirestore(escrutacio) {
+    const col = obtenerFirestoreEscrutaciosColeccion();
+    if (!col) return;
+    
+    col.doc(escrutacio.id).set(escrutacio)
+      .then(() => console.log("Escrutacio sincronizado en la nube:", escrutacio.id))
+      .catch(err => console.error("Error al sincronizar escrutacio con Firebase:", err));
+  }
+
+  function sincronizarEscrutaciosConFirebase(user) {
+    if (!user) return;
+    
+    const col = obtenerFirestoreEscrutaciosColeccion();
+    if (!col) return;
+    
+    col.get()
+      .then(snapshot => {
+        let cambiosLocales = false;
+        
+        snapshot.forEach(doc => {
+          const escCloud = doc.data();
+          const fecha = escCloud.fecha;
+          
+          if (!escrutacios[fecha]) {
+            escrutacios[fecha] = [];
+          }
+          
+          const existeLocal = escrutacios[fecha].some(e => e.id === escCloud.id);
+          if (!existeLocal) {
+            escrutacios[fecha].push(escCloud);
+            cambiosLocales = true;
+          } else {
+            const idx = escrutacios[fecha].findIndex(e => e.id === escCloud.id);
+            if (JSON.stringify(escrutacios[fecha][idx]) !== JSON.stringify(escCloud)) {
+              escrutacios[fecha][idx] = escCloud;
+              cambiosLocales = true;
+            }
+          }
+        });
+        
+        Object.keys(escrutacios).forEach(fecha => {
+          escrutacios[fecha].forEach(escLocal => {
+            const docExiste = snapshot.docs.some(d => d.id === escLocal.id);
+            if (!docExiste) {
+              subirEscrutacioFirestore(escLocal);
+            }
+          });
+        });
+        
+        if (cambiosLocales) {
+          guardarEscrutaciosLocales();
+          actualizarRejillaCalendarioEscrutacio();
+        }
+        console.log("Sincronización de escrutacios con Firebase completada con éxito.");
+      })
+      .catch(err => {
+        console.error("Error al descargar escrutacios de Firestore:", err);
+      });
+  }
+
+  const cacheEscrutacioLibros = {};
+
+  function obtenerTextoVersiculo(libroId, cap, ver, callback) {
+    const info = window.indiceLibrosRutas[libroId];
+    if (!info) {
+      callback("Texto no disponible");
+      return;
+    }
+    
+    if (cacheEscrutacioLibros[libroId]) {
+      const data = cacheEscrutacioLibros[libroId];
+      const txt = data.capitulos[cap] && data.capitulos[cap][ver] ? data.capitulos[cap][ver] : "Texto no disponible";
+      callback(txt);
+    } else {
+      fetch(info.ruta)
+        .then(res => res.json())
+        .then(data => {
+          cacheEscrutacioLibros[libroId] = data;
+          const txt = data.capitulos[cap] && data.capitulos[cap][ver] ? data.capitulos[cap][ver] : "Texto no disponible";
+          callback(txt);
+        })
+        .catch(err => {
+          console.error(err);
+          callback("Texto no disponible");
+        });
+    }
+  }
+
+  function filtrarLibrosEscrutacio() {
+    const input = document.getElementById('inputEscrutacioBuscarLibro');
+    const listOptions = document.getElementById('listEscrutacioLibroCustom');
+    if (!input || !listOptions) return;
+    
+    const query = input.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    listOptions.style.display = "block";
+    
+    const options = listOptions.querySelectorAll('.custom-select-option');
+    options.forEach(opt => {
+      const txt = opt.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (txt.includes(query)) {
+        opt.style.display = "block";
+      } else {
+        opt.style.display = "none";
+      }
+    });
+  }
+
+  function seleccionarLibroCustom(key) {
+    const inputBuscar = document.getElementById('inputEscrutacioBuscarLibro');
+    const listOptions = document.getElementById('listEscrutacioLibroCustom');
+    const hiddenLibro = document.getElementById('selectEscrutacioLibro');
+    if (!inputBuscar || !listOptions || !hiddenLibro) return;
+    
+    const nombre = window.indiceLibrosRutas[key].nombre;
+    inputBuscar.value = nombre;
+    hiddenLibro.value = key;
+    listOptions.style.display = "none";
+    
+    alSeleccionarLibroEscrutacio();
+  }
+
+  function inicializarSelectoresEscrutacio() {
+    const inputBuscar = document.getElementById('inputEscrutacioBuscarLibro');
+    const listOptions = document.getElementById('listEscrutacioLibroCustom');
+    const hiddenLibro = document.getElementById('selectEscrutacioLibro');
+    if (!inputBuscar || !listOptions || !hiddenLibro) return;
+    
+    inputBuscar.value = "";
+    hiddenLibro.value = "";
+    listOptions.innerHTML = "";
+    listOptions.style.display = "none";
+    
+    const keys = Object.keys(window.indiceLibrosRutas || {}).sort();
+    
+    keys.forEach(key => {
+      const opt = document.createElement('div');
+      opt.className = "custom-select-option";
+      opt.setAttribute('data-value', key);
+      opt.textContent = window.indiceLibrosRutas[key].nombre;
+      
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        seleccionarLibroCustom(key);
+      });
+      listOptions.appendChild(opt);
+    });
+    
+    const selectCap = document.getElementById('selectEscrutacioCapitulo');
+    if (selectCap) {
+      selectCap.value = "";
+      selectCap.removeEventListener('change', alSeleccionarCapituloEscrutacio);
+      selectCap.addEventListener('change', alSeleccionarCapituloEscrutacio);
+      selectCap.removeEventListener('input', alSeleccionarCapituloEscrutacio);
+      selectCap.addEventListener('input', alSeleccionarCapituloEscrutacio);
+      
+      // Al enfocar el capítulo, limpiar para que se desplieguen todos los números sin filtro del datalist
+      selectCap.addEventListener('focus', () => {
+        selectCap.value = "";
+        alSeleccionarCapituloEscrutacio();
+      });
+    }
+    
+    const verInicio = document.getElementById('selectEscrutacioVerInicio');
+    const verFin = document.getElementById('selectEscrutacioVerFin');
+    if (verInicio) {
+      verInicio.value = "";
+      verInicio.addEventListener('focus', () => {
+        verInicio.value = "";
+      });
+    }
+    if (verFin) {
+      verFin.value = "";
+      verFin.addEventListener('focus', () => {
+        verFin.value = "";
+      });
+    }
+    
+    if (keys.length > 0) {
+      seleccionarLibroCustom(keys[0]);
+    }
+  }
+
+  function alSeleccionarLibroEscrutacio() {
+    const selectLibro = document.getElementById('selectEscrutacioLibro');
+    const listCapitulos = document.getElementById('listCapitulos');
+    const selectCap = document.getElementById('selectEscrutacioCapitulo');
+    if (!selectLibro || !listCapitulos || !selectCap) return;
+    
+    const libroId = selectLibro.value;
+    const info = window.indiceLibrosRutas[libroId];
+    if (!info) return;
+    
+    if (cacheEscrutacioLibros[libroId]) {
+      rellenarCapitulos(cacheEscrutacioLibros[libroId]);
+    } else {
+      fetch(info.ruta)
+        .then(res => res.json())
+        .then(data => {
+          cacheEscrutacioLibros[libroId] = data;
+          rellenarCapitulos(data);
+        })
+        .catch(err => console.error("Error al cargar libro en Escrutacio:", err));
+    }
+    
+    function rellenarCapitulos(data) {
+      listCapitulos.innerHTML = "";
+      const chapters = Object.keys(data.capitulos).sort((a,b) => parseInt(a,10) - parseInt(b,10));
+      chapters.forEach(cap => {
+        const opt = document.createElement('option');
+        opt.value = cap;
+        listCapitulos.appendChild(opt);
+      });
+      
+      // Sin valor por defecto
+      selectCap.value = "";
+      
+      alSeleccionarCapituloEscrutacio();
+    }
+  }
+
+  function alSeleccionarCapituloEscrutacio() {
+    const selectLibro = document.getElementById('selectEscrutacioLibro');
+    const selectCap = document.getElementById('selectEscrutacioCapitulo');
+    const listVersiculos = document.getElementById('listVersiculos');
+    const verInicio = document.getElementById('selectEscrutacioVerInicio');
+    const verFin = document.getElementById('selectEscrutacioVerFin');
+    if (!selectLibro || !selectCap || !listVersiculos || !verInicio || !verFin) return;
+    
+    const libroId = selectLibro.value;
+    const cap = selectCap.value.trim();
+    
+    if (!cap) {
+      listVersiculos.innerHTML = "";
+      verInicio.value = "";
+      verFin.value = "";
+      return;
+    }
+    
+    const data = cacheEscrutacioLibros[libroId];
+    if (data && data.capitulos && data.capitulos[cap]) {
+      const verses = Object.keys(data.capitulos[cap]).sort((a,b) => parseInt(a,10) - parseInt(b,10));
+      
+      listVersiculos.innerHTML = "";
+      verses.forEach(ver => {
+        const opt = document.createElement('option');
+        opt.value = ver;
+        listVersiculos.appendChild(opt);
+      });
+      
+      // Dejar en blanco los versículos para que el usuario los seleccione o escriba
+      verInicio.value = "";
+      verFin.value = "";
+    } else {
+      listVersiculos.innerHTML = "";
+      verInicio.value = "";
+      verFin.value = "";
+    }
+  }
+
+  function validarYClamparEscrutacioInputs() {
+    const selectLibro = document.getElementById('selectEscrutacioLibro');
+    const capInput = document.getElementById('selectEscrutacioCapitulo');
+    const verInicioInput = document.getElementById('selectEscrutacioVerInicio');
+    const verFinInput = document.getElementById('selectEscrutacioVerFin');
+    
+    if (!selectLibro || !capInput || !verInicioInput || !verFinInput) return null;
+    
+    const libroId = selectLibro.value;
+    const data = cacheEscrutacioLibros[libroId];
+    if (!data) return null;
+    
+    const chapters = Object.keys(data.capitulos);
+    const totalChapters = chapters.length;
+    
+    let cap = parseInt(capInput.value, 10);
+    if (isNaN(cap) || cap < 1) {
+      alert("Por favor selecciona o escribe un capítulo válido.");
+      return null;
+    }
+    if (cap > totalChapters) cap = totalChapters;
+    capInput.value = cap;
+    
+    // Validar versículos
+    const verses = Object.keys(data.capitulos[cap] || {});
+    const totalVerses = verses.length;
+    if (totalVerses === 0) {
+      alert("Este capítulo no contiene versículos.");
+      return null;
+    }
+    
+    let verInicio = parseInt(verInicioInput.value, 10);
+    if (isNaN(verInicio) || verInicio < 1) verInicio = 1;
+    if (verInicio > totalVerses) verInicio = totalVerses;
+    verInicioInput.value = verInicio;
+    
+    let verFin = parseInt(verFinInput.value, 10);
+    if (isNaN(verFin) || verFin < 1) verFin = totalVerses;
+    if (verFin > totalVerses) verFin = totalVerses;
+    if (verFin < verInicio) verFin = verInicio;
+    verFinInput.value = verFin;
+    
+    return { libroId, cap, verInicio, verFin };
+  }
+
+  function formatearCitaCoordenada(coorObj) {
+    const info = window.indiceLibrosRutas[coorObj.libroId];
+    if (!info) return coorObj.libroId;
+    const citaVer = coorObj.verInicio === coorObj.verFin 
+      ? coorObj.verInicio 
+      : `${coorObj.verInicio}-${coorObj.verFin}`;
+    return `${info.nombre} ${coorObj.cap}:${citaVer}`;
+  }
+
+  function crearNodoArbol(libroId, cap, verNum, nivel) {
+    const coorStr = `${libroId}-c${cap}-v${verNum}`;
+    const coorObj = { libroId, cap, verInicio: verNum, verFin: verNum };
+    const citaFormateada = formatearCitaCoordenada(coorObj);
+    
+    const li = document.createElement('li');
+    li.className = "escrutacio-arbol-nodo";
+    li.setAttribute('data-coord', coorStr);
+    li.setAttribute('data-nivel', nivel);
+    
+    const paralelos = window.mapaEnlacesParalelos && window.mapaEnlacesParalelos[coorStr];
+    const tieneHijos = paralelos && paralelos.length > 0 && nivel < 10;
+    
+    const divCont = document.createElement('div');
+    divCont.className = "escrutacio-nodo-contenido";
+    
+    if (tieneHijos) {
+      const btnToggle = document.createElement('button');
+      btnToggle.className = "escrutacio-nodo-toggle";
+      btnToggle.textContent = "▶";
+      btnToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleNodoArbol(li, paralelos, nivel + 1);
+      });
+      divCont.appendChild(btnToggle);
+    } else {
+      const bullet = document.createElement('span');
+      bullet.style.width = "18px";
+      bullet.style.display = "inline-block";
+      divCont.appendChild(bullet);
+    }
+    
+    const divDatos = document.createElement('div');
+    divDatos.className = "escrutacio-nodo-datos";
+    
+    const spanCita = document.createElement('span');
+    spanCita.className = "escrutacio-nodo-cita";
+    spanCita.textContent = citaFormateada;
+    divDatos.appendChild(spanCita);
+    
+    const spanTexto = document.createElement('span');
+    spanTexto.className = "escrutacio-nodo-texto";
+    spanTexto.textContent = "Cargando texto...";
+    divDatos.appendChild(spanTexto);
+    
+    divCont.appendChild(divDatos);
+    
+    obtenerTextoVersiculo(libroId, cap, verNum, (texto) => {
+      spanTexto.textContent = `"${texto}"`;
+    });
+    
+    const btnIr = document.createElement('button');
+    btnIr.className = "escrutacio-nodo-btn-ir";
+    btnIr.textContent = "Ir 📖";
+    btnIr.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const infoLibro = window.indiceLibrosRutas[libroId];
+      if (infoLibro) {
+        irAVersiculo(libroId, infoLibro.ruta, cap, verNum);
+        cerrarEscrutacioModal();
+      }
+    });
+    divCont.appendChild(btnIr);
+    
+    li.appendChild(divCont);
+    
+    if (tieneHijos) {
+      const subUl = document.createElement('ul');
+      subUl.className = "escrutacio-arbol-sub";
+      li.appendChild(subUl);
+    }
+    
+    return li;
+  }
+
+  function toggleNodoArbol(li, paralelos, siguienteNivel) {
+    const btnToggle = li.querySelector('.escrutacio-nodo-toggle');
+    const subUl = li.querySelector('.escrutacio-arbol-sub');
+    if (!subUl || !btnToggle) return;
+    
+    const estaAbierto = subUl.classList.contains('open');
+    if (estaAbierto) {
+      subUl.classList.remove('open');
+      btnToggle.classList.remove('expanded');
+    } else {
+      subUl.classList.add('open');
+      btnToggle.classList.add('expanded');
+      
+      if (subUl.children.length === 0) {
+        paralelos.forEach(coorDestino => {
+          const partes = coorDestino.trim().split('-');
+          if (partes.length < 3) return;
+          
+          const libroIdDest = partes[0];
+          const capNumDest = parseInt(partes[1].replace('c', ''), 10);
+          
+          const verPart = partes[2].replace('v', '');
+          let verNum = parseInt(verPart, 10);
+          
+          const hijoLi = crearNodoArbol(libroIdDest, capNumDest, verNum, siguienteNivel);
+          if (hijoLi) subUl.appendChild(hijoLi);
+        });
+      }
+    }
+  }
+
+  function renderizarArbolEscrutacio(libroId, cap, verInicio, verFin) {
+    const contenedor = document.getElementById('escrutacioArbolContenedor');
+    const divisor = document.getElementById('escrutacioVisorArbol');
+    const vacioMsg = document.getElementById('escrutacioVacioMsg');
+    const titulo = document.getElementById('escrutacioTituloResultado');
+    
+    if (!contenedor || !divisor || !vacioMsg || !titulo) return;
+    
+    const info = window.indiceLibrosRutas[libroId];
+    if (!info) return;
+    
+    const cNum = parseInt(cap, 10);
+    const vIni = parseInt(verInicio, 10);
+    const vFin = parseInt(verFin, 10);
+    
+    if (cacheEscrutacioLibros[libroId]) {
+      ejecutarRenderizado();
+    } else {
+      fetch(info.ruta)
+        .then(res => res.json())
+        .then(data => {
+          cacheEscrutacioLibros[libroId] = data;
+          ejecutarRenderizado();
+        })
+        .catch(err => console.error("Error al cargar libro al renderizar árbol:", err));
+    }
+    
+    function ejecutarRenderizado() {
+      vacioMsg.style.display = 'none';
+      divisor.style.display = 'block';
+      
+      const citaTexto = `${info.nombre} ${cNum}:${vIni === vFin ? vIni : vIni + '-' + vFin}`;
+      titulo.textContent = citaTexto;
+      
+      contenedor.innerHTML = "";
+      
+      const ul = document.createElement('ul');
+      ul.className = "escrutacio-arbol-contenedor";
+      
+      for (let v = vIni; v <= vFin; v++) {
+        const li = crearNodoArbol(libroId, cNum, v, 1);
+        if (li) ul.appendChild(li);
+      }
+      
+      contenedor.appendChild(ul);
+      
+      setTimeout(() => {
+        divisor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 150);
+    }
+  }
+
+  // Calendario del Historial de Escrutacio
+  function inicializarSelectoresEscrutacioHistorial() {
+    const selectMes = document.getElementById('selectEscrutacioHistorialMes');
+    const selectAnio = document.getElementById('selectEscrutacioHistorialAnio');
+    if (!selectMes || !selectAnio) return;
+    
+    selectMes.innerHTML = "";
+    mesesNombres.forEach((mes, idx) => {
+      const opt = document.createElement('option');
+      opt.value = idx;
+      opt.textContent = mes;
+      selectMes.appendChild(opt);
+    });
+    
+    selectAnio.innerHTML = "";
+    const anioActual = new Date().getFullYear();
+    for (let a = anioActual - 5; a <= anioActual + 2; a++) {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      selectAnio.appendChild(opt);
+    }
+    
+    fechaSeleccionadaEscrutacio = new Date();
+    selectMes.value = fechaSeleccionadaEscrutacio.getMonth();
+    selectAnio.value = fechaSeleccionadaEscrutacio.getFullYear();
+    
+    selectMes.removeEventListener('change', actualizarRejillaCalendarioEscrutacio);
+    selectAnio.removeEventListener('change', actualizarRejillaCalendarioEscrutacio);
+    selectMes.addEventListener('change', () => {
+      fechaSeleccionadaEscrutacio.setMonth(parseInt(selectMes.value, 10));
+      actualizarRejillaCalendarioEscrutacio();
+    });
+    selectAnio.addEventListener('change', () => {
+      fechaSeleccionadaEscrutacio.setFullYear(parseInt(selectAnio.value, 10));
+      actualizarRejillaCalendarioEscrutacio();
+    });
+  }
+
+  function actualizarRejillaCalendarioEscrutacio() {
+    const grid = document.getElementById('escrutacioHistorialGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    
+    const mes = fechaSeleccionadaEscrutacio.getMonth();
+    const anio = fechaSeleccionadaEscrutacio.getFullYear();
+    
+    const primerDia = new Date(anio, mes, 1).getDay();
+    const totalDias = new Date(anio, mes + 1, 0).getDate();
+    
+    const hoyStr = obtenerFechaLocalHoy();
+    
+    for (let i = 0; i < primerDia; i++) {
+      const celdaVacia = document.createElement('span');
+      grid.appendChild(celdaVacia);
+    }
+    
+    for (let d = 1; d <= totalDias; d++) {
+      const celda = document.createElement('span');
+      celda.textContent = d;
+      
+      const mesStr = (mes + 1).toString().padStart(2, '0');
+      const diaStr = d.toString().padStart(2, '0');
+      const fechaStr = `${anio}-${mesStr}-${diaStr}`;
+      
+      if (fechaStr === hoyStr) {
+        celda.classList.add('hoy');
+      }
+      
+      if (escrutacios[fechaStr] && escrutacios[fechaStr].length > 0) {
+        celda.classList.add('con-registro');
+      }
+      
+      celda.addEventListener('click', () => {
+        const prevSel = grid.querySelector('.seleccionada');
+        if (prevSel) prevSel.classList.remove('seleccionada');
+        
+        celda.classList.add('seleccionada');
+        mostrarListaEscrutaciosDia(fechaStr);
+      });
+      
+      grid.appendChild(celda);
+    }
+  }
+
+  function mostrarListaEscrutaciosDia(fechaStr) {
+    const contenedorLista = document.getElementById('escrutacioHistorialLista');
+    if (!contenedorLista) return;
+    
+    contenedorLista.innerHTML = "";
+    
+    const items = escrutacios[fechaStr] || [];
+    if (items.length === 0) {
+      contenedorLista.innerHTML = `<div class="lista-vacio-msg">No hay escrutacios el ${formatearFechaEscrutacioLimpia(fechaStr)}.</div>`;
+      return;
+    }
+    
+    items.forEach(esc => {
+      const divItem = document.createElement('div');
+      divItem.className = "escrutacio-historial-item";
+      
+      const spanTexto = document.createElement('span');
+      spanTexto.style.fontWeight = "bold";
+      
+      let citaTexto = esc.libroNombre;
+      if (esc.capInicio !== undefined && esc.capFin !== undefined) {
+        if (parseInt(esc.capInicio, 10) === parseInt(esc.capFin, 10)) {
+          citaTexto += ` ${esc.capInicio}:${esc.verInicio === esc.verFin ? esc.verInicio : esc.verInicio + '-' + esc.verFin}`;
+        } else {
+          citaTexto += ` ${esc.capInicio}:${esc.verInicio} al ${esc.capFin}:${esc.verFin}`;
+        }
+      } else {
+        citaTexto += ` ${esc.capitulo}:${esc.verInicio === esc.verFin ? esc.verInicio : esc.verInicio + '-' + esc.verFin}`;
+      }
+      spanTexto.textContent = citaTexto;
+      
+      const spanHora = document.createElement('span');
+      spanHora.style.fontSize = "0.75em";
+      spanHora.style.color = "#a0aec0";
+      const hora = new Date(parseInt(esc.timestamp, 10)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      spanHora.textContent = hora;
+      
+      divItem.appendChild(spanTexto);
+      divItem.appendChild(spanHora);
+      
+      divItem.addEventListener('click', () => {
+        const cap = esc.capitulo !== undefined ? esc.capitulo : (esc.capInicio !== undefined ? esc.capInicio : 1);
+        renderizarArbolEscrutacio(esc.libroId, cap, esc.verInicio, esc.verFin);
+      });
+      
+      contenedorLista.appendChild(divItem);
+    });
+
+    setTimeout(() => {
+      contenedorLista.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
+
+  function formatearFechaEscrutacioLimpia(fechaStr) {
+    const parts = fechaStr.split('-');
+    if (parts.length !== 3) return fechaStr;
+    const anio = parts[0];
+    const mesIdx = parseInt(parts[1], 10) - 1;
+    const dia = parseInt(parts[2], 10);
+    return `${dia} de ${mesesNombres[mesIdx]}, ${anio}`;
+  }
+
+  function abrirEscrutacioModal() {
+    const modal = document.getElementById('modalEscrutacio');
+    if (modal) {
+      modal.style.display = "flex";
+      modal.classList.add('open');
+      
+      inicializarSelectoresEscrutacio();
+      inicializarSelectoresEscrutacioHistorial();
+      actualizarRejillaCalendarioEscrutacio();
+      toggleSelectorPasaje(true);
+      
+      const visor = document.getElementById('escrutacioVisorArbol');
+      const vacio = document.getElementById('escrutacioVacioMsg');
+      if (visor && vacio) {
+        visor.style.display = 'none';
+        vacio.style.display = 'block';
+        vacio.textContent = "Selecciona un pasaje y presiona Escrutar.";
+      }
+      
+      const histCont = document.getElementById('escrutacioHistorialCont');
+      if (histCont) histCont.style.display = 'none';
+      
+      if (typeof window.closeMenu === 'function') window.closeMenu();
+    }
+  }
+
+  function toggleSelectorPasaje(show) {
+    const el = document.getElementById('escrutacioSelectorPasaje');
+    const body = document.getElementById('escrutacioSelectorPasajeBody');
+    const arrow = document.getElementById('selectorPasajeArrow');
+    if (!el || !body || !arrow) return;
+    
+    const currentlyVisible = body.style.display !== 'none';
+    const shouldShow = show !== undefined ? show : !currentlyVisible;
+    
+    if (shouldShow) {
+      body.style.display = 'block';
+      arrow.style.transform = 'rotate(0deg)';
+      el.classList.remove('collapsed');
+    } else {
+      body.style.display = 'none';
+      arrow.style.transform = 'rotate(-90deg)';
+      el.classList.add('collapsed');
+    }
+  }
+
+  function cerrarEscrutacioModal() {
+    const modal = document.getElementById('modalEscrutacio');
+    if (modal) {
+      modal.style.display = "none";
+      modal.classList.remove('open');
+    }
+  }
+
+  function configurarEventosEscrutacio() {
+    const inputBuscarLibro = document.getElementById('inputEscrutacioBuscarLibro');
+    if (inputBuscarLibro) {
+      inputBuscarLibro.addEventListener('input', filtrarLibrosEscrutacio);
+      
+      // Al enfocar, limpiar para permitir búsqueda y mostrar todos los elementos
+      inputBuscarLibro.addEventListener('focus', () => {
+        inputBuscarLibro.value = "";
+        filtrarLibrosEscrutacio();
+      });
+    }
+
+    // Cerrar el menú desplegable personalizado al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      const container = e.target.closest('.custom-select-container');
+      const listOptions = document.getElementById('listEscrutacioLibroCustom');
+      const inputBuscar = document.getElementById('inputEscrutacioBuscarLibro');
+      const hiddenLibro = document.getElementById('selectEscrutacioLibro');
+      
+      if (listOptions && listOptions.style.display === "block" && !container) {
+        listOptions.style.display = "none";
+        if (hiddenLibro && hiddenLibro.value && inputBuscar && window.indiceLibrosRutas[hiddenLibro.value]) {
+          inputBuscar.value = window.indiceLibrosRutas[hiddenLibro.value].nombre;
+        }
+      }
+    });
+
+    const btnCloseEscrutacio = document.getElementById('closeEscrutacioBtn');
+    if (btnCloseEscrutacio) {
+      btnCloseEscrutacio.addEventListener('click', cerrarEscrutacioModal);
+    }
+    
+    const modalEscrutacio = document.getElementById('modalEscrutacio');
+    if (modalEscrutacio) {
+      modalEscrutacio.addEventListener('click', (e) => {
+        if (e.target === modalEscrutacio) {
+          cerrarEscrutacioModal();
+        }
+      });
+    }
+    
+    const btnToggleSelector = document.getElementById('btnToggleSelectorPasaje');
+    if (btnToggleSelector) {
+      btnToggleSelector.addEventListener('click', () => {
+        toggleSelectorPasaje();
+      });
+    }
+
+    const btnToggleHistorial = document.getElementById('btnToggleEscrutacioHistorial');
+    const histCont = document.getElementById('escrutacioHistorialCont');
+    if (btnToggleHistorial && histCont) {
+      btnToggleHistorial.addEventListener('click', () => {
+        const isVisible = histCont.style.display === 'block';
+        if (isVisible) {
+          histCont.style.display = 'none';
+          toggleSelectorPasaje(true);
+        } else {
+          histCont.style.display = 'block';
+          toggleSelectorPasaje(false);
+        }
+      });
+    }
+    
+    const btnIniciar = document.getElementById('btnIniciarEscrutacio');
+    if (btnIniciar) {
+      btnIniciar.addEventListener('click', () => {
+        const clampRes = validarYClamparEscrutacioInputs();
+        if (!clampRes) return;
+        
+        const { libroId, cap, verInicio, verFin } = clampRes;
+        
+        const timestamp = Date.now().toString();
+        const hoyStr = obtenerFechaLocalHoy();
+        const infoLibro = window.indiceLibrosRutas[libroId];
+        
+        const nuevoEscrutacio = {
+          id: timestamp,
+          fecha: hoyStr,
+          libroId: libroId,
+          libroNombre: infoLibro.nombre,
+          capitulo: cap,
+          verInicio: verInicio,
+          verFin: verFin,
+          timestamp: timestamp
+        };
+        
+        if (!escrutacios[hoyStr]) {
+          escrutacios[hoyStr] = [];
+        }
+        escrutacios[hoyStr].push(nuevoEscrutacio);
+        guardarEscrutaciosLocales();
+        subirEscrutacioFirestore(nuevoEscrutacio);
+        actualizarRejillaCalendarioEscrutacio();
+        
+        renderizarArbolEscrutacio(libroId, cap, verInicio, verFin);
+      });
+    }
+  }
 
   // 3. Aplicar estilos en los versículos renderizados en el DOM
   function aplicarAnotacionesAlCapituloActual() {
@@ -526,8 +1652,9 @@
         </div>
         
         <!-- Entrada para notas -->
-        <div class="accion-v-nota-contenedor" id="accionVNotaCont">
+        <div class="accion-v-nota-contenedor" id="accionVNotaCont" style="position: relative;">
           <textarea class="accion-v-nota-input" id="accionVNotaInput" placeholder="Añade un comentario personal o nota de estudio..."></textarea>
+          <button id="btnGuardarNotaRapido" class="btn-guardar-nota-rapido inhibido" title="Cambios guardados">✔️</button>
         </div>
       </div>
     `;
@@ -625,6 +1752,7 @@
       btnNota.classList.remove('active');
       notaCont.style.display = 'none';
     }
+    actualizarIndicadorNota();
 
     // Configurar botón de Paralelos (Solo si hay un único versículo seleccionado)
     const btnParalelos = document.getElementById('btnAccionParalelos');
@@ -643,6 +1771,78 @@
 
     // Deslizar panel arriba
     document.getElementById('panelAccionVersiculo').classList.add('open');
+  }
+
+  function actualizarIndicadorNota() {
+    const input = document.getElementById('accionVNotaInput');
+    const btn = document.getElementById('btnGuardarNotaRapido');
+    if (!input || !btn) return;
+    
+    let notaOriginal = "";
+    if (seleccionados.length > 0) {
+      const primeraAnotacion = anotaciones[seleccionados[0].key];
+      if (primeraAnotacion) {
+        notaOriginal = primeraAnotacion.nota || "";
+      }
+    }
+    
+    const textoActual = input.value.trim();
+    const esDiferente = textoActual !== notaOriginal;
+    
+    if (esDiferente) {
+      btn.textContent = "💾";
+      btn.className = "btn-guardar-nota-rapido activo";
+      btn.title = "Guardar cambios pendientes";
+    } else {
+      btn.textContent = "✔️";
+      btn.className = "btn-guardar-nota-rapido inhibido";
+      btn.title = "Cambios guardados";
+    }
+  }
+
+  function guardarNotaRapida(e) {
+    if (e) e.stopPropagation();
+    if (seleccionados.length === 0) return;
+    
+    const input = document.getElementById('accionVNotaInput');
+    if (!input) return;
+    
+    const notaTexto = input.value.trim();
+    const batchFecha = new Date().toISOString();
+    
+    seleccionados.forEach(sel => {
+      const anotacion = anotaciones[sel.key] || {
+        id: sel.key,
+        libroNombre: sel.libroNombre,
+        libroId: sel.libroId,
+        capitulo: sel.capitulo,
+        versiculo: sel.vNum,
+        texto: sel.texto,
+        color: null,
+        subrayado: false,
+        marcador: false,
+        nota: "",
+        fecha: batchFecha
+      };
+      
+      anotacion.nota = notaTexto;
+      anotacion.fecha = batchFecha;
+      
+      anotaciones[sel.key] = anotacion;
+      guardarAnotacionesLocales();
+      subirAnotacionFirestore(anotacion);
+    });
+    
+    const btnNota = document.getElementById('btnAccionNota');
+    if (btnNota) {
+      if (notaTexto !== "") {
+        btnNota.classList.add('active');
+      } else {
+        btnNota.classList.remove('active');
+      }
+    }
+    
+    actualizarIndicadorNota();
   }
 
   function cerrarActionSheet() {
@@ -930,6 +2130,15 @@
           }
         }
       });
+    }
+
+    const btnGuardarNotaRapido = document.getElementById('btnGuardarNotaRapido');
+    if (notaInput) {
+      notaInput.addEventListener('input', actualizarIndicadorNota);
+      notaInput.addEventListener('blur', () => guardarNotaRapida());
+    }
+    if (btnGuardarNotaRapido) {
+      btnGuardarNotaRapido.addEventListener('click', guardarNotaRapida);
     }
 
     // Botón Copiar
@@ -1317,10 +2526,34 @@
 
   // 7. Enlazar eventos de la barra lateral al iniciar
   function configurarEventosSidebar() {
+    const btnEscrutacio = document.getElementById('menuEscrutacioBtn');
+    if (btnEscrutacio) {
+      btnEscrutacio.addEventListener('click', (e) => {
+        e.preventDefault();
+        abrirEscrutacioModal();
+      });
+    }
+
+    const btnEscrutacioCalendario = document.getElementById('menuEscrutacioCalendarioBtn');
+    if (btnEscrutacioCalendario) {
+      btnEscrutacioCalendario.addEventListener('click', (e) => {
+        e.stopPropagation();
+        abrirEscrutacioModal();
+        const histCont = document.getElementById('escrutacioHistorialCont');
+        if (histCont) histCont.style.display = 'block';
+        toggleSelectorPasaje(false); // Colapsar el selector al abrir desde el calendario del menú
+      });
+    }
+
     const btnMarcadores = document.getElementById('menuMarcadoresBtn');
     const btnNotas = document.getElementById('menuNotasBtn');
     const btnDestacados = document.getElementById('menuDestacadosBtn');
     const btnCompartirApp = document.getElementById('menuCompartirAppBtn');
+    const btnComentarios = document.getElementById('menuComentariosBtn');
+    const btnOtrosRecursos = document.getElementById('btnOtrosRecursos');
+    const submenuOtrosRecursos = document.getElementById('submenuOtrosRecursos');
+    const btnRedesSociales = document.getElementById('btnRedesSociales');
+    const submenuRedesSociales = document.getElementById('submenuRedesSociales');
 
     if (btnMarcadores) {
       btnMarcadores.addEventListener('click', (e) => {
@@ -1359,8 +2592,8 @@
         }
 
         const shareData = {
-          title: 'Biblia de Estudio Pro',
-          text: 'Te comparto la Biblia de Estudio Pro para leer y estudiar las Escrituras.',
+          title: 'Biblia de Jerusalén con Paralelos',
+          text: 'Te comparto la Biblia de Jerusalén con Paralelos para leer y estudiar las Escrituras.',
           url: 'https://biblia.resucito.do/'
         };
 
@@ -1380,13 +2613,96 @@
         }
       });
     }
+
+    if (btnComentarios) {
+      btnComentarios.addEventListener('click', (e) => {
+        // Cerrar menú lateral si está abierto
+        if (typeof window.closeMenu === 'function') {
+          window.closeMenu();
+        } else {
+          const sidebar = document.getElementById('sidebar');
+          const overlay = document.getElementById('overlay');
+          if (sidebar) sidebar.classList.remove('open');
+          if (overlay) overlay.classList.remove('show');
+        }
+        // Dejamos que continúe el comportamiento nativo del enlace
+      });
+    }
+
+    if (btnOtrosRecursos && submenuOtrosRecursos) {
+      btnOtrosRecursos.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isVisible = submenuOtrosRecursos.style.display === 'block';
+        submenuOtrosRecursos.style.display = isVisible ? 'none' : 'block';
+        btnOtrosRecursos.classList.toggle('open', !isVisible);
+      });
+    }
+
+    if (btnRedesSociales && submenuRedesSociales) {
+      btnRedesSociales.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isVisible = submenuRedesSociales.style.display === 'block';
+        submenuRedesSociales.style.display = isVisible ? 'none' : 'block';
+        btnRedesSociales.classList.toggle('open', !isVisible);
+      });
+    }
+
+    // Cerrar sidebar al hacer clic en cualquier recurso del submenú
+    const submenuItems = document.querySelectorAll('.sidebar-submenu .submenu-item');
+    submenuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (typeof window.closeMenu === 'function') {
+          window.closeMenu();
+        } else {
+          const sidebar = document.getElementById('sidebar');
+          const overlay = document.getElementById('overlay');
+          if (sidebar) sidebar.classList.remove('open');
+          if (overlay) overlay.classList.remove('show');
+        }
+      });
+    });
+
+    // Eventos de Versículo Diario y Calendario
+    const btnVersiculoDiario = document.getElementById('menuVersiculoDiarioBtn');
+    const btnCalendario = document.getElementById('menuCalendarioBtn');
+    const btnCloseCalendario = document.getElementById('closeCalendarioBtn');
+    const modalCalendario = document.getElementById('modalCalendario');
+
+    if (btnVersiculoDiario) {
+      btnVersiculoDiario.addEventListener('click', (e) => {
+        e.preventDefault();
+        mostrarVersiculoDiarioHoy();
+      });
+    }
+
+    if (btnCalendario) {
+      btnCalendario.addEventListener('click', (e) => {
+        e.stopPropagation();
+        abrirCalendarioModal();
+      });
+    }
+
+    if (btnCloseCalendario) {
+      btnCloseCalendario.addEventListener('click', cerrarCalendarioModal);
+    }
+
+    if (modalCalendario) {
+      modalCalendario.addEventListener('click', (e) => {
+        if (e.target === modalCalendario) {
+          cerrarCalendarioModal();
+        }
+      });
+    }
   }
 
   // Inicialización de lógica
   document.addEventListener('DOMContentLoaded', () => {
     cargarAnotacionesLocales();
+    cargarVersiculosDiariosLocales();
+    cargarEscrutaciosLocales();
     inyectarActionSheet();
     configurarEventosSidebar();
+    configurarEventosEscrutacio();
     
     // Si la carga inicial de jsgral.js ya renderizó versículos, aplicar anotaciones
     setTimeout(() => {
