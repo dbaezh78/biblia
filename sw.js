@@ -7,6 +7,8 @@ const ASSETS_TO_CACHE = [
   './src/js/jsgral.js',
   './src/js/setting.js',
   './src/js/googlefirebase.js',
+  './src/js/liturgia_data.js',
+  './src/js/liturgia.js',
   './src/js/annotation.js',
   './src/img/ico.ico',
   './src/img/icon-192.png',

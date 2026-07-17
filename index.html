@@ -54,7 +54,11 @@
         <a href="#" id="menuInstallBtn" style="font-weight: bold; color: #3182ce; padding: 15px 10px 15px 20px;">📲 Instalar Aplicación</a>
       </li>
       <li class="diario-menu-item" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf2f7;">
-        <a href="#" id="menuVersiculoDiarioBtn" style="flex-grow: 1; border-bottom: none; padding: 15px 10px 15px 20px;">✝️ Versículo Diario</a>
+        <a href="#" id="menuLecturaDiaBtn" style="flex-grow: 1; border-bottom: none; padding: 15px 10px 15px 20px;">📖 Lectura del día</a>
+        <button id="menuCalendarioLiturgicoBtn" title="Calendario Litúrgico" style="background: transparent; border: none; font-size: 1.25rem; padding: 15px 20px 15px 10px; cursor: pointer; color: #4a5568; display: flex; align-items: center; justify-content: center; height: 100%; transition: all 0.2s;">⛪</button>
+      </li>
+      <li class="diario-menu-item" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf2f7;">
+        <a href="#" id="menuVersiculoDiarioBtn" style="flex-grow: 1; border-bottom: none; padding: 15px 10px 15px 20px;">✝️ Versículo del día</a>
         <button id="menuCalendarioBtn" title="Calendario de Versículos Diarios" style="background: transparent; border: none; font-size: 1.25rem; padding: 15px 20px 15px 10px; cursor: pointer; color: #4a5568; display: flex; align-items: center; justify-content: center; height: 100%; transition: all 0.2s;">📅</button>
       </li>
       <li class="diario-menu-item" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf2f7;">
@@ -174,6 +178,72 @@
     </div>
   </div>
 
+  <!-- Modal de Lectura del Día y Calendario Litúrgico -->
+  <div class="modal-calendario" id="modalLecturaDia" style="display: none;">
+    <div class="modal-calendario-content" style="max-width: 600px;">
+      <div class="modal-calendario-header" style="background-color: #2b6cb0;">
+        <h3 class="modal-calendario-titulo" style="color: white; display: flex; align-items: center;">
+          <span style="font-size: 1.35rem; margin-right: 8px;">⛪</span>
+          <span id="lecturaModalTitulo" style="color: white;">Lectura del Día</span>
+        </h3>
+        <button class="modal-calendario-close" id="closeLecturaDiaBtn" style="color: white;" aria-label="Cerrar">&times;</button>
+      </div>
+
+      <!-- Selector Manual (Calendario Litúrgico) -->
+      <div id="lecturaSeleccionManual" style="padding: 15px 20px; background-color: #ebf8ff; border-bottom: 1px solid #bee3f8; display: none;">
+        <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #2b6cb0; font-weight: bold;">Calendario Litúrgico:</h4>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+          <!-- Ciclo -->
+          <div>
+            <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Ciclo</label>
+            <select id="selectLiturgiaCiclo" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem;">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <!-- Tiempo -->
+          <div>
+            <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Tiempo</label>
+            <select id="selectLiturgiaTiempo" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem;">
+              <option value="Adviento">Adviento</option>
+              <option value="Navidad">Navidad</option>
+              <option value="Ordinario">Ordinario</option>
+              <option value="Cuaresma">Cuaresma</option>
+              <option value="Pascual">Pascual</option>
+            </select>
+          </div>
+          <!-- Semana -->
+          <div>
+            <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Semana</label>
+            <select id="selectLiturgiaSemana" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem;">
+              <!-- Se llena dinámicamente -->
+            </select>
+          </div>
+          <!-- Día -->
+          <div>
+            <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Día</label>
+            <select id="selectLiturgiaDia" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem;">
+              <option value="do">Domingo</option>
+              <option value="lu">Lunes</option>
+              <option value="ma">Martes</option>
+              <option value="mi">Miércoles</option>
+              <option value="ju">Jueves</option>
+              <option value="vi">Viernes</option>
+              <option value="sa">Sábado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visor de las Lecturas -->
+      <div style="flex-grow: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; background-color: #fff; display: flex; flex-direction: column;" id="lecturasVisorCuerpo">
+        <h4 id="lecturaDiaTituloDescripcion" style="margin: 0 0 15px 0; color: #2b6cb0; font-size: 1.1rem; border-bottom: 2px solid #ebf8ff; padding-bottom: 8px;">Cargando...</h4>
+        <div id="lecturasContenidoCuerpo"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal de Escrutacio -->
   <div class="modal-escrutacio" id="modalEscrutacio" style="display: none;">
     <div class="modal-escrutacio-content">
@@ -261,6 +331,8 @@
   <script src="src/js/jsgral.js"></script>
   <script src="src/js/setting.js"></script>
   <script src="src/js/googlefirebase.js"></script>
+  <script src="src/js/liturgia_data.js"></script>
+  <script src="src/js/liturgia.js"></script>
   <script src="src/js/annotation.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
