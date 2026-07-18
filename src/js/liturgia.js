@@ -7,7 +7,13 @@
   const cacheLibros = {};
 
   // Mapear abreviaturas a los IDs de los libros locales de la Biblia
-  const mapAbreviaturas = window.liturgiaData ? window.liturgiaData.mapAbreviaturas : {};
+  const mapAbreviaturasRaw = window.liturgiaData ? window.liturgiaData.mapAbreviaturas : {};
+  const mapAbreviaturas = {};
+  for (const key in mapAbreviaturasRaw) {
+    if (Object.prototype.hasOwnProperty.call(mapAbreviaturasRaw, key)) {
+      mapAbreviaturas[key.replace(/\s+/g, '')] = mapAbreviaturasRaw[key];
+    }
+  }
   const liturgiaFechas = window.liturgiaData ? window.liturgiaData.liturgiaFechas : {};
   const liturgiaLecturas = window.liturgiaData ? window.liturgiaData.liturgiaLecturas : {};
 
@@ -68,9 +74,25 @@
   function parseCita(citaStr) {
     if (!citaStr) return null;
     
-    // Limpiar prefijos comunes de liturgia en español
-    const regexPrefijos = /^(lectura del libro de|lectura de la profecía de|lectura de la primera carta del apóstol san pablo a los|lectura de la segunda carta del apóstol san pablo a los|lectura de la carta del apóstol san pablo a los|lectura de la carta de|lectura de la primera carta de|lectura de la segunda carta de|comienzo de la primera carta del apóstol san pablo a los|lectura del santo evangelio según san|lectura del santo evangelio según|salmo responsorial:|salmo:|ev\.\s+|lectura del primer libro de los reyes|lectura del segundo libro de los reyes|lectura de la carta del apóstol san pablo a|hechos de los apóstoles:?|hechos de los apóstoles|pablo a tito|del libro de los)/gi;
-    
+    // 1. Reemplazar frases litúrgicas largas por nombres cortos/estándar de libros
+    const reemplazos = [
+      { regex: /lectura del primer libro de los reyes/gi, rep: "1 reyes" },
+      { regex: /lectura del segundo libro de los reyes/gi, rep: "2 reyes" },
+      { regex: /lectura de la primera carta del apóstol san pablo a los/gi, rep: "1" },
+      { regex: /lectura de la segunda carta del apóstol san pablo a los/gi, rep: "2" },
+      { regex: /lectura de la carta del apóstol san pablo a los/gi, rep: "" },
+      { regex: /lectura de la carta del apóstol san pablo a/gi, rep: "" },
+      { regex: /comienzo de la primera carta del apóstol san pablo a los/gi, rep: "1" },
+      { regex: /lectura de la primera carta de/gi, rep: "1" },
+      { regex: /lectura de la segunda carta de/gi, rep: "2" },
+      { regex: /pablo a tito/gi, rep: "tito" }
+    ];
+    reemplazos.forEach(r => {
+      citaStr = citaStr.replace(r.regex, r.rep);
+    });
+
+    // 2. Limpiar prefijos genéricos comunes
+    const regexPrefijos = /^(lectura del libro de|lectura de la profecía de|lectura de la carta de|lectura del santo evangelio según san|lectura del santo evangelio según|salmo responsorial:|salmo:|ev\.\s+|del libro de los)/gi;
     citaStr = citaStr.replace(regexPrefijos, '').trim();
     
     // Remover respuestas parentéticas en salmos, ej: (R.: 8a y 9a)
@@ -86,58 +108,50 @@
     const citaVisible = citaStr.charAt(0).toUpperCase() + citaStr.slice(1);
     citaStr = citaStr.toLowerCase();
     
-    // Detectar si es multicapítulo (tiene un guión que separa capítulos, ej: "8, 23—9, 3")
-    // Para ello, dividimos por guión y vemos si la parte derecha contiene una coma
-    const partsDash = citaStr.split(/[-—–]/);
+    // 3. Extraer el libro y el primer capítulo
+    const bcMatch = citaStr.match(/^([1-3]?\s*[a-záéíóúñ\s]+?)\s+(\d+)/);
+    if (!bcMatch) return null;
     
-    let libroId = null;
+    const abrev = bcMatch[1].trim().replace(/\s+/g, '');
+    const libroId = mapAbreviaturas[abrev];
+    const abrevOriginal = bcMatch[1].trim();
+    
+    const capInicio = parseInt(bcMatch[2], 10);
+    const rest = citaStr.substring(bcMatch[0].length).trim();
+    
     const chapters = [];
-    let abrevOriginal = "";
     
-    if (partsDash.length === 2 && partsDash[1].includes(',')) {
-      const left = partsDash[0].trim();
-      const right = partsDash[1].trim();
+    // 4. Detectar si es multicapítulo
+    // Buscamos si en la parte restante hay un guión seguido por un número de capítulo y una coma (ej: "—2," o "- 9,")
+    const transitionMatch = rest.match(/([—–-])\s*(\d+)\s*,/);
+    
+    if (transitionMatch) {
+      // Caso multicapítulo
+      const leftRest = rest.substring(0, transitionMatch.index).trim();
+      const rightRest = rest.substring(transitionMatch.index + transitionMatch[0].length).trim();
       
-      // Parsear parte izquierda (inicio) - Separar por el primer coma
-      const idxLeftComma = left.indexOf(',');
-      if (idxLeftComma === -1) return null;
-      
-      const bookAndCap = left.substring(0, idxLeftComma).trim();
-      const leftVersePart = left.substring(idxLeftComma + 1).trim();
-      
-      const bcMatch = bookAndCap.match(/^([1-3]?\s*[a-záéíóúñ]+)\s+(\d+)/);
-      if (!bcMatch) return null;
-      
-      const abrev = bcMatch[1].replace(/\s+/g, '');
-      libroId = mapAbreviaturas[abrev];
-      abrevOriginal = bcMatch[1];
-      
-      let capInicio = parseInt(bcMatch[2], 10);
+      let capInicioReal = capInicio;
       if (libroId === "23_sal") {
-        capInicio = getHebrewPsalmChapter(capInicio);
+        capInicioReal = getHebrewPsalmChapter(capInicioReal);
       }
       
       // Versículos de inicio (van desde verInicio hasta el final del capítulo)
-      const verseNumbers = leftVersePart.match(/\d+/g);
-      if (!verseNumbers || verseNumbers.length === 0) return null;
-      const verInicio = parseInt(verseNumbers[0], 10);
+      const leftVerseNumbers = leftRest.match(/\d+/g);
+      if (!leftVerseNumbers || leftVerseNumbers.length === 0) return null;
+      const verInicio = parseInt(leftVerseNumbers[0], 10);
       
       chapters.push({
-        capNum: capInicio,
-        ranges: [{ start: verInicio, end: null }] // null significa hasta el final del capítulo
+        capNum: capInicioReal,
+        ranges: [{ start: verInicio, end: null }]
       });
       
-      // Parsear parte derecha (fin) - Separar por el primer coma
-      const idxRightComma = right.indexOf(',');
-      if (idxRightComma === -1) return null;
-      
-      let capFin = parseInt(right.substring(0, idxRightComma).trim(), 10);
+      let capFin = parseInt(transitionMatch[2], 10);
       if (libroId === "23_sal") {
         capFin = getHebrewPsalmChapter(capFin);
       }
-      const rightVersePart = right.substring(idxRightComma + 1).trim();
       
-      const segments = rightVersePart.split(/[.,]/);
+      // Parsear la parte de versículos del capítulo final
+      const segments = rightRest.split(/[.,]/);
       const rightRanges = [];
       segments.forEach((seg, idx) => {
         const nums = seg.match(/\d+/g);
@@ -149,7 +163,7 @@
       });
       
       if (rightRanges.length === 0) {
-        const fallbackNums = rightVersePart.match(/\d+/g);
+        const fallbackNums = rightRest.match(/\d+/g);
         if (fallbackNums) {
           rightRanges.push({ start: 1, end: parseInt(fallbackNums[0], 10) });
         }
@@ -161,26 +175,15 @@
       });
       
     } else {
-      // Caso estándar: un único capítulo - Separar por el primer coma
-      const idxComma = citaStr.indexOf(',');
-      if (idxComma === -1) return null;
+      // Caso estándar: un único capítulo
+      const idxComma = rest.indexOf(',');
+      const versePart = idxComma !== -1 ? rest.substring(idxComma + 1).trim() : rest.trim();
       
-      const bookAndCap = citaStr.substring(0, idxComma).trim();
-      const versePart = citaStr.substring(idxComma + 1).trim();
-      
-      const bcMatch = bookAndCap.match(/^([1-3]?\s*[a-záéíóúñ]+)\s+(\d+)/);
-      if (!bcMatch) return null;
-      
-      const abrev = bcMatch[1].replace(/\s+/g, '');
-      libroId = mapAbreviaturas[abrev];
-      abrevOriginal = bcMatch[1];
-      
-      let cap = parseInt(bcMatch[2], 10);
+      let cap = capInicio;
       if (libroId === "23_sal") {
         cap = getHebrewPsalmChapter(cap);
       }
       
-      // Separar por punto o coma los segmentos de versículos
       const segments = versePart.split(/[.,]/);
       const ranges = [];
       
@@ -357,6 +360,7 @@
   function abrirLecturaDiaModal(mostrarSelector = false) {
     const modal = document.getElementById('modalLecturaDia');
     const selectorManual = document.getElementById('lecturaSeleccionManual');
+    const inputSelector = document.getElementById('inputLiturgiaFechaSelector');
     
     if (modal) {
       modal.style.display = "flex";
@@ -364,6 +368,15 @@
       
       if (selectorManual) {
         selectorManual.style.display = mostrarSelector ? "block" : "none";
+      }
+
+      // Inicializar el selector de fecha con el día de hoy
+      if (inputSelector) {
+        const hoyDate = new Date();
+        const yyyy = hoyDate.getFullYear();
+        const mm = String(hoyDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoyDate.getDate()).padStart(2, '0');
+        inputSelector.value = `${yyyy}-${mm}-${dd}`;
       }
 
       // Si no es selección manual, cargar la lectura de hoy
@@ -386,36 +399,84 @@
     }
   }
 
+  // Helper para obtener la clave litúrgica basada en una fecha (añadiendo días solemnes fijos)
+  function obtenerClaveLiturgicaDeFecha(date) {
+    const diaNum = date.getDate();
+    const mesNum = date.getMonth() + 1; // 1-indexed
+    
+    // Comprobar días solemnes específicos fijos
+    if (diaNum === 6 && mesNum === 1) {
+      return "enero6";
+    }
+    if (diaNum === 1 && mesNum === 1) {
+      return "enero1";
+    }
+    
+    // Carga desde el mapa liturgiaFechas
+    const fechaStr = obtenerFechaFormatoLimpio(date);
+    return liturgiaFechas[fechaStr] || null;
+  }
+
   // 8. Cargar lecturas para la fecha de hoy
   function cargarLecturaHoy() {
     const hoyDate = new Date();
-    const hoyStr = obtenerFechaFormatoLimpio(hoyDate);
     const ciclo = obtenerCicloLiturgico(hoyDate);
+    const anoFerial = (hoyDate.getFullYear() % 2 === 0) ? "PAR" : "IMPAR";
     
-    const claveLiturgica = liturgiaFechas[hoyStr];
+    const claveLiturgica = obtenerClaveLiturgicaDeFecha(hoyDate);
     if (claveLiturgica) {
-      cargarLiturgiaPorClave(claveLiturgica, ciclo);
+      const esDiaEspecial = claveLiturgica.startsWith("enero");
+      const parts = claveLiturgica.split('_');
+      const dia = parts[parts.length - 1]; // "lu", "ma", etc.
+      const opcionCicloOAnio = (dia === "do" || esDiaEspecial) ? ciclo : anoFerial;
+      cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
     } else {
       mostrarMensajeVacio();
     }
   }
 
-  // 9. Inicializar filtros manuales con valores sugeridos de hoy
+  // 9. Alternar la visibilidad entre Ciclo y Año Ferial según el día de la semana
+  function actualizarVisibilidadCicloOAno() {
+    const selectDia = document.getElementById('selectLiturgiaDia');
+    const containerCiclo = document.getElementById('containerLiturgiaCiclo');
+    const containerAnoFerial = document.getElementById('containerLiturgiaAnoFerial');
+    
+    if (!selectDia) return;
+    
+    const esDomingo = (selectDia.value === "do");
+    if (containerCiclo) {
+      containerCiclo.style.display = esDomingo ? "block" : "none";
+    }
+    if (containerAnoFerial) {
+      containerAnoFerial.style.display = esDomingo ? "none" : "block";
+    }
+  }
+
+  // 10. Inicializar filtros manuales con valores sugeridos de hoy
   function inicializarFiltrosManuales() {
     const selectCiclo = document.getElementById('selectLiturgiaCiclo');
     const selectTiempo = document.getElementById('selectLiturgiaTiempo');
     const selectSemana = document.getElementById('selectLiturgiaSemana');
     const selectDia = document.getElementById('selectLiturgiaDia');
+    const selectAnoFerial = document.getElementById('selectLiturgiaAnoFerial');
     
     if (!selectCiclo || !selectTiempo || !selectSemana || !selectDia) return;
 
-    // Preseleccionar ciclo según fecha actual
     const hoyDate = new Date();
+    // Preseleccionar ciclo según fecha actual
     selectCiclo.value = obtenerCicloLiturgico(hoyDate);
+
+    // Preseleccionar Año Ferial (Par/Impar) según fecha actual
+    if (selectAnoFerial) {
+      selectAnoFerial.value = (hoyDate.getFullYear() % 2 === 0) ? "PAR" : "IMPAR";
+    }
 
     // Preseleccionar Lunes a Domingo de hoy
     const diasSemana = ["do", "lu", "ma", "mi", "ju", "vi", "sa"];
     selectDia.value = diasSemana[hoyDate.getDay()];
+
+    // Ajustar visibilidad ciclo/año según el día actual
+    actualizarVisibilidadCicloOAno();
 
     // Si la fecha actual está mapeada a un tiempo/semana litúrgica, preseleccionarlo
     const hoyStr = obtenerFechaFormatoLimpio(hoyDate);
@@ -479,12 +540,23 @@
     const tiempo = document.getElementById('selectLiturgiaTiempo').value.toLowerCase();
     const semana = document.getElementById('selectLiturgiaSemana').value;
     const dia = document.getElementById('selectLiturgiaDia').value;
+    
+    const selectAnoFerial = document.getElementById('selectLiturgiaAnoFerial');
+    const anoFerial = selectAnoFerial ? selectAnoFerial.value : "PAR";
+
+    // Actualizar la visibilidad de los selectores según el día
+    actualizarVisibilidadCicloOAno();
 
     let claveTiempo = tiempo;
     if (claveTiempo === "pascual") claveTiempo = "pascua";
 
     const claveLiturgica = `${claveTiempo}_s${semana}_${dia}`;
-    cargarLiturgiaPorClave(claveLiturgica, ciclo);
+    
+    // Si es domingo ("do"), usamos ciclo (A, B, C)
+    // Si es día de semana (lu, ma, mi, ju, vi, sa), usamos año ferial (PAR, IMPAR)
+    const opcionCicloOAnio = (dia === "do") ? ciclo : anoFerial;
+    
+    cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
   }
 
   // 12. Enlazar eventos de interacción
@@ -525,6 +597,7 @@
     const selectTiempo = document.getElementById('selectLiturgiaTiempo');
     const selectSemana = document.getElementById('selectLiturgiaSemana');
     const selectDia = document.getElementById('selectLiturgiaDia');
+    const selectAnoFerial = document.getElementById('selectLiturgiaAnoFerial');
 
     if (selectTiempo) {
       selectTiempo.addEventListener('change', () => {
@@ -534,7 +607,38 @@
     }
     if (selectCiclo) selectCiclo.addEventListener('change', ejecutarFiltroManual);
     if (selectSemana) selectSemana.addEventListener('change', ejecutarFiltroManual);
-    if (selectDia) selectDia.addEventListener('change', ejecutarFiltroManual);
+    if (selectDia) {
+      selectDia.addEventListener('change', () => {
+        actualizarVisibilidadCicloOAno();
+        ejecutarFiltroManual();
+      });
+    }
+    if (selectAnoFerial) selectAnoFerial.addEventListener('change', ejecutarFiltroManual);
+
+    // Selector de fecha (Calendario)
+    const inputSelector = document.getElementById('inputLiturgiaFechaSelector');
+    if (inputSelector) {
+      inputSelector.addEventListener('change', function () {
+        const val = this.value;
+        if (!val) return;
+        
+        // Parsear fecha seleccionada
+        const selectedDate = new Date(val + "T00:00:00");
+        const ciclo = obtenerCicloLiturgico(selectedDate);
+        const anoFerial = (selectedDate.getFullYear() % 2 === 0) ? "PAR" : "IMPAR";
+        
+        const claveLiturgica = obtenerClaveLiturgicaDeFecha(selectedDate);
+        if (claveLiturgica) {
+          const esDiaEspecial = claveLiturgica.startsWith("enero");
+          const parts = claveLiturgica.split('_');
+          const dia = parts[parts.length - 1]; // "lu", "ma", etc.
+          const opcionCicloOAnio = (dia === "do" || esDiaEspecial) ? ciclo : anoFerial;
+          cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
+        } else {
+          mostrarMensajeVacio();
+        }
+      });
+    }
   }
 
   // Registrar DOMContentLoaded para iniciar el módulo

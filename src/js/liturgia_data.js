@@ -114,6 +114,7 @@ const mapAbreviaturas = {
   "isa": "29_is",
   "isaias": "29_is",
   "isaías": "29_is",
+  "Isaías": "29_is",
   "jr": "30_jr",
   "jer": "30_jr",
   "jeremias": "30_jr",
@@ -299,7 +300,7 @@ const liturgiaFechas = {
 };
 
 // Base de datos de lecturas litúrgicas
-const liturgiaLecturas = ﻿{
+const liturgiaLecturas = {
     "ordinario_s2_do":  {
                             "A":  {
                                       "lecturas":  [
@@ -313,7 +314,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Comienzo de la primera carta del apóstol san Pablo a los Corintios 1, 1-3"
+                                                           "cita":  "1 Corintios 1, 1-3"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -323,71 +324,231 @@ const liturgiaLecturas = ﻿{
                                       "titulo":  "Domingo de la 2ª semana de Tiempo Ordinario"
                                   }
                         },
-    "ordinario_s1_do":  {
-                            "C":  {
-                                      "lecturas":  [
-                                                       {
-                                                           "tipo":  "1ª Lectura",
-                                                           "cita":  "Isaías 60, 1-6"
-                                                       },
-                                                       {
-                                                           "tipo":  "Salmo",
-                                                           "cita":  "Salmo 71, 1-2. 7-8. 10-11. 12-13"
-                                                       },
-                                                       {
-                                                           "tipo":  "2ª Lectura",
-                                                           "cita":  "Efesios 3, 2-3a. 5-6"
-                                                       },
-                                                       {
-                                                           "tipo":  "Evangelio",
-                                                           "cita":  "Mateo 2, 1-12"
-                                                       }
-                                                   ],
-                                      "titulo":  "Epifanía del Señor"
-                                  },
-                            "A":  {
-                                      "lecturas":  [
-                                                       {
-                                                           "tipo":  "1ª Lectura",
-                                                           "cita":  "Deuteronomio 7, 6-11"
-                                                       },
-                                                       {
-                                                           "tipo":  "Salmo",
-                                                           "cita":  "Salmo 102. 1-2. 3-4. 6-7. 8 y 10"
-                                                       },
-                                                       {
-                                                           "tipo":  "2ª Lectura",
-                                                           "cita":  "Juan 4, 7-16"
-                                                       },
-                                                       {
-                                                           "tipo":  "Evangelio",
-                                                           "cita":  "Mateo 11, 25-30"
-                                                       }
-                                                   ],
-                                      "titulo":  "El sagrado Corazón de Jesús"
-                                  },
-                            "B":  {
-                                      "lecturas":  [
-                                                       {
-                                                           "tipo":  "1ª Lectura",
-                                                           "cita":  "Isaías 60, 1-6"
-                                                       },
-                                                       {
-                                                           "tipo":  "Salmo",
-                                                           "cita":  "Salmo 71, 1-2. 7-8. 10-11. 12-13"
-                                                       },
-                                                       {
-                                                           "tipo":  "2ª Lectura",
-                                                           "cita":  "Efesios 3, 2-3a. 5-6"
-                                                       },
-                                                       {
-                                                           "tipo":  "Evangelio",
-                                                           "cita":  "Mateo 2, 1-12"
-                                                       }
-                                                   ],
-                                      "titulo":  "Epifanía del Señor"
-                                  }
-                        },
+    "enero6":  {
+        "A":  {
+            "lecturas":  [
+                {
+                    "tipo":  "1ª Lectura",
+                    "cita":  "Isaías 60, 1-6"
+                },
+                {
+                    "tipo":  "Salmo",
+                    "cita":  "Salmo 71, 1-2. 7-8. 10-11. 12-13"
+                },
+                {
+                    "tipo":  "2ª Lectura",
+                    "cita":  "Efesios 3, 2-3a. 5-6"
+                },
+                {
+                    "tipo":  "Evangelio",
+                    "cita":  "Mateo 2, 1-12"
+                }
+            ],
+            "titulo":  "Epifanía del Señor"
+        },
+        "B":  {
+            "lecturas":  [
+                {
+                    "tipo":  "1ª Lectura",
+                    "cita":  "Isaías 60, 1-6"
+                },
+                {
+                    "tipo":  "Salmo",
+                    "cita":  "Salmo 71, 1-2. 7-8. 10-11. 12-13"
+                },
+                {
+                    "tipo":  "2ª Lectura",
+                    "cita":  "Efesios 3, 2-3a. 5-6"
+                },
+                {
+                    "tipo":  "Evangelio",
+                    "cita":  "Mateo 2, 1-12"
+                }
+            ],
+            "titulo":  "Epifanía del Señor"
+        },
+        "C":  {
+            "lecturas":  [
+                {
+                    "tipo":  "1ª Lectura",
+                    "cita":  "Isaías 60, 1-6"
+                },
+                {
+                    "tipo":  "Salmo",
+                    "cita":  "Salmo 71, 1-2. 7-8. 10-11. 12-13"
+                },
+                {
+                    "tipo":  "2ª Lectura",
+                    "cita":  "Efesios 3, 2-3a. 5-6"
+                },
+                {
+                    "tipo":  "Evangelio",
+                    "cita":  "Mateo 2, 1-12"
+                }
+            ],
+            "titulo":  "Epifanía del Señor"
+        }
+    },
+    "enero1": {
+        "A": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "Números 6, 22-27"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "Salmo 66, 2-3. 5-6. 8"
+                },
+                {
+                    "tipo": "2ª Lectura",
+                    "cita": "Gálatas 4, 4-7"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Lucas 2, 16-21"
+                }
+            ],
+            "titulo": "Santa María, Madre de Dios (1 de Enero)"
+        }
+    },
+    "sagrado_corazon":  {
+        "A":  {
+            "lecturas":  [
+                {
+                    "tipo":  "1ª Lectura",
+                    "cita":  "Deuteronomio 7, 6-11"
+                },
+                {
+                    "tipo":  "Salmo",
+                    "cita":  "Salmo 102. 1-2. 3-4. 6-7. 8 y 10"
+                },
+                {
+                    "tipo":  "2ª Lectura",
+                    "cita":  "Juan 4, 7-16"
+                },
+                {
+                    "tipo":  "Evangelio",
+                    "cita":  "Mateo 11, 25-30"
+                }
+            ],
+            "titulo":  "El sagrado Corazón de Jesús"
+        }
+    },
+    "ordinario_s1_lu": {
+        "PAR": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "1 Samuel 1, 1-8"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "Salmo 115, 12-13. 14 y 17. 18-19"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Marcos 1, 14-20"
+                }
+            ],
+            "titulo": "Lunes de la 1ª semana de Tiempo Ordinario (Año Par)"
+        }
+    },
+    "ordinario_s1_ma": {
+        "PAR": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "1 Samuel 1, 9-20"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "1 Samuel 2, 1. 4-5. 6-7. 8"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Marcos 1, 21-28"
+                }
+            ],
+            "titulo": "Martes de la 1ª semana de Tiempo Ordinario (Año Par)"
+        }
+    },
+    "ordinario_s1_mi": {
+        "PAR": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "1 Samuel 3, 1-10. 19-20"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "Salmo 39, 2 y 5. 7-8a. 8b-9. 10"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Marcos 1, 29-39"
+                }
+            ],
+            "titulo": "Miércoles de la 1ª semana de Tiempo Ordinario (Año Par)"
+        }
+    },
+    "ordinario_s1_ju": {
+        "PAR": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "1 Samuel 4, 1-11"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "Salmo 43, 10-11. 14-15. 24-25"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Marcos 1, 40-45"
+                }
+            ],
+            "titulo": "Jueves de la 1ª semana de Tiempo Ordinario (Año Par)"
+        }
+    },
+    "ordinario_s1_vi": {
+        "PAR": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "1 Samuel 8, 4-7. 10-22a"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "Salmo 88, 16-17. 18-19"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Marcos 2, 1-12"
+                }
+            ],
+            "titulo": "Viernes de la 1ª semana de Tiempo Ordinario (Año Par)"
+        }
+    },
+    "ordinario_s1_sa": {
+        "PAR": {
+            "lecturas": [
+                {
+                    "tipo": "1ª Lectura",
+                    "cita": "1 Samuel 9, 1-4. 17-19; 10, 1a"
+                },
+                {
+                    "tipo": "Salmo",
+                    "cita": "Salmo 20, 2-3. 4-5. 6-7"
+                },
+                {
+                    "tipo": "Evangelio",
+                    "cita": "Marcos 2, 13-17"
+                }
+            ],
+            "titulo": "Sábado de la 1ª semana de Tiempo Ordinario (Año Par)"
+        }
+    },
     "adviento_s3_do":  {
                            "A":  {
                                      "lecturas":  [
@@ -447,7 +608,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 2, 1-5"
+                                                           "cita":  "1 corintios 2, 1-5"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -527,15 +688,15 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "3, 5. 7-12"
+                                                            "cita":  "1 reyes 3, 5. 7-12"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
-                                                            "cita":  "Salmo 118, 57 y 72. 76-77. 127-128. 129-130 (R.: 97a)"
+                                                            "cita":  "Salmo 118, 57 y 72. 76-77. 127-128. 129-130"
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 8, 28-30"
+                                                            "cita":  "Romanos 8, 28-30"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -573,15 +734,15 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "la Sabiduría: 12, 13. 16-19"
+                                                            "cita":  "sabiduria 12, 13. 16-19"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
-                                                            "cita":  "Salmo 85, 5-6. 9-10. 15-16a (R.: 5a)"
+                                                            "cita":  "Salmo 85, 5-6. 9-10. 15-16a"
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 8, 26-27"
+                                                            "cita":  "Romanos 8, 26-27"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -596,15 +757,15 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Isaías: 5, 1-7"
+                                                            "cita":  "Isaías 5, 1-7"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
-                                                            "cita":  "Salmo 79, 9 y 12. 13-14. 15-16. 19-20 (R.: Is 5,71)"
+                                                            "cita":  "Salmo 79, 9 y 12. 13-14. 15-16. 19-20"
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Filipenses 4, 6-9"
+                                                            "cita":  "Filipenses 4, 6-9"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -627,7 +788,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 1, 10-13. 17"
+                                                           "cita":  "1 Corintios 1, 10-13. 17"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -673,7 +834,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 5, 12-15"
+                                                            "cita":  "Romanos 5, 12-15"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -688,7 +849,7 @@ const liturgiaLecturas = ﻿{
                                       "lecturas":  [
                                                        {
                                                            "tipo":  "1ª Lectura",
-                                                           "cita":  "Lectura del libro del Levítico  19, 1-2. 17-18"
+                                                           "cita":  "Levítico  19, 1-2. 17-18"
                                                        },
                                                        {
                                                            "tipo":  "Salmo",
@@ -696,7 +857,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 3, 16-23"
+                                                           "cita":  "1 Corintios 3, 16-23"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -776,7 +937,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "los Proverbios 31, 10-13. 19-20. 30-31"
+                                                            "cita":  "proverbios 31, 10-13. 19-20. 30-31"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -784,7 +945,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la primera carta del apóstol san Pablo a los Tesalonicenses 5, 1-6"
+                                                            "cita":  "1 Tesalonicenses 5, 1-6"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -799,15 +960,15 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura del libro del Éxodo 19, 2-6a"
+                                                            "cita":  "Éxodo 19, 2-6a"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
-                                                            "cita":  "Salmo 99, 2. 3. 5 (R.: 3c)"
+                                                            "cita":  "Salmo 99, 2. 3. 5"
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 5, 6-11"
+                                                            "cita":  "Romanos 5, 6-11"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -830,7 +991,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 11, 13-15. 29-32"
+                                                            "cita":  "Romanos 11, 13-15. 29-32"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -845,22 +1006,22 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura de la profecía de Ezequiel 34, 11-12. 15-17"
+                                                            "cita":  "Ezequiel 34, 11-12. 15-17"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
-                                                            "cita":  "22, 1-2a. 2b-3. 5-6 (R.: 1)"
+                                                            "cita":  "22, 1-2. 2-3. 5-6"
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 15, 20-26. 28"
+                                                            "cita":  "1 Corintios 15, 20-26. 28"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
                                                             "cita":  "Mateo 25, 31-46"
                                                         }
                                                     ],
-                                       "titulo":  "Domingo de la 34ª semana de Tiempo Ordinario"
+                                       "titulo":  "Cristo Rey del Universo, Domingo de la 34ª semana de Tiempo Ordinario"
                                    }
                          },
     "adviento_s4_do":  {
@@ -891,7 +1052,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura de la profecía de Malaquías 1, 14b—2, 2b. 8-10"
+                                                            "cita":  "Malaquías 1, 14b—2, 2b. 8-10"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -899,7 +1060,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la primera carta del apóstol san Pablo a los Tesalonicenses 2, 7b-9. 13"
+                                                            "cita":  "1 Tesalonicenses 2, 7b-9. 13"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -914,7 +1075,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "19, 9a. 11-13a"
+                                                            "cita":  "1 reyes 19, 9a. 11-13a"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -922,7 +1083,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 9, 1-5"
+                                                            "cita":  "Romanos 9, 1-5"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -983,7 +1144,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura de la profecía de Ezequiel 18, 25-28"
+                                                            "cita":  "Ezequiel 18, 25-28"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -991,7 +1152,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Filipenses 2, 1-11 / Lectura de la carta del apóstol san Pablo a los Filipenses 2, 1-5"
+                                                            "cita":  "Filipenses 2, 1-11 / Filipenses 2, 1-5"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1006,7 +1167,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "la Sabiduría 6, 12-16"
+                                                            "cita":  "sabiduria 6, 12-16"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -1014,7 +1175,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la primera carta del apóstol san Pablo a los Tesalonicenses 4, 13-18"
+                                                            "cita":  "1 Tesalonicenses 4, 13-18"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1075,7 +1236,7 @@ const liturgiaLecturas = ﻿{
                                       "lecturas":  [
                                                        {
                                                            "tipo":  "1ª Lectura",
-                                                           "cita":  "Lectura del libro del Deuteronomio 11, 18. 26-28. 32"
+                                                           "cita":  "Deuteronomio 11, 18. 26-28. 32"
                                                        },
                                                        {
                                                            "tipo":  "Salmo",
@@ -1083,7 +1244,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 3, 21-25a. 28"
+                                                           "cita":  "Romanos 3, 21-25a. 28"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -1106,7 +1267,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 2, 6-10"
+                                                           "cita":  "1 Corintios 2, 6-10"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -1152,7 +1313,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la primera carta del apóstol san Pablo a los Tesalonicenses 1, 1-5b"
+                                                            "cita":  "1 Tesalonicenses 1, 1-5b"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1175,7 +1336,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Filipenses 4, 12-14. 19-20"
+                                                            "cita":  "Filipenses 4, 12-14. 19-20"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1190,7 +1351,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Sirácida 27, 33—28, 9"
+                                                            "cita":  "Sirácida 27,30 - 28,9"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -1198,7 +1359,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 14, 7-9"
+                                                            "cita":  "Romanos 14, 7-9"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1221,7 +1382,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 12, 1-2"
+                                                            "cita":  "Romanos 12, 1-2"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1259,15 +1420,15 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "4, 8-11. 14-16a"
+                                                            "cita":  "2 reyes 4, 8-11. 14-16a"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
-                                                            "cita":  "Salmo 88, 2-3. 16-17. 18-19 (R.: 2a)"
+                                                            "cita":  "Salmo 88, 2-3. 16-17. 18-19"
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 6, 3-4. 8-11"
+                                                            "cita":  "Romanos 6, 3-4. 8-11"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1309,11 +1470,11 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "Salmo",
-                                                           "cita":  "61, 2-3. 6-7. 8-9ab (R.: 6a)"
+                                                           "cita":  "salmo 61, 2-3. 6-7. 8-9"
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 4, 1-5"
+                                                           "cita":  "1 Corintios 4, 1-5"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -1336,7 +1497,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Filipenses 1, 20c-24. 27a"
+                                                            "cita":  "Filipenses 1, 20c-24. 27a"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1351,7 +1512,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura de la profecía de Ezequiel 33, 7-9"
+                                                            "cita":  "Ezequiel 33, 7-9"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -1359,7 +1520,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 13, 8-10"
+                                                            "cita":  "Romanos 13, 8-10"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1374,7 +1535,7 @@ const liturgiaLecturas = ﻿{
                                      "lecturas":  [
                                                       {
                                                           "tipo":  "1ª Lectura",
-                                                          "cita":  "Isaías: 11, 1-10"
+                                                          "cita":  "Isaías 11, 1-10"
                                                       },
                                                       {
                                                           "tipo":  "Salmo",
@@ -1420,7 +1581,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura del libro del Éxodo 22, 20-26"
+                                                            "cita":  "Éxodo 22, 20-26"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -1428,7 +1589,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la primera carta del apóstol san Pablo a los Tesalonicenses 1, 5c-10"
+                                                            "cita":  "1 Tesalonicenses 1, 5c-10"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1516,7 +1677,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 11, 33-36"
+                                                            "cita":  "Romanos 11, 33-36"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1531,7 +1692,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura de la profecía de Oseas 6, 3-6"
+                                                            "cita":  "Oseas 6, 3-6"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -1539,7 +1700,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 4, 18-25"
+                                                            "cita":  "Romanos 4, 18-25"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1554,7 +1715,7 @@ const liturgiaLecturas = ﻿{
                                       "lecturas":  [
                                                        {
                                                            "tipo":  "1ª Lectura",
-                                                           "cita":  "Lectura de la profecía de Sofonías 2, 3; 3, 12-13"
+                                                           "cita":  "Sofonías 2, 3; 3, 12-13"
                                                        },
                                                        {
                                                            "tipo":  "Salmo",
@@ -1562,7 +1723,7 @@ const liturgiaLecturas = ﻿{
                                                        },
                                                        {
                                                            "tipo":  "2ª Lectura",
-                                                           "cita":  "Lectura de la primera carta del apóstol san Pablo a los Corintios 1, 26-31"
+                                                           "cita":  "1 Corintios 1, 26-31"
                                                        },
                                                        {
                                                            "tipo":  "Evangelio",
@@ -1585,7 +1746,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 8, 18-23"
+                                                            "cita":  "Romanos 8, 18-23"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1600,7 +1761,7 @@ const liturgiaLecturas = ﻿{
                                        "lecturas":  [
                                                         {
                                                             "tipo":  "1ª Lectura",
-                                                            "cita":  "Lectura de la profecía de Zacarías 9, 9-10"
+                                                            "cita":  "Zacarías 9, 9-10"
                                                         },
                                                         {
                                                             "tipo":  "Salmo",
@@ -1608,7 +1769,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 8, 9. 11-13"
+                                                            "cita":  "Romanos 8, 9. 11-13"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
@@ -1654,7 +1815,7 @@ const liturgiaLecturas = ﻿{
                                                         },
                                                         {
                                                             "tipo":  "2ª Lectura",
-                                                            "cita":  "Lectura de la carta del apóstol san Pablo a los Romanos 8, 35. 37-39"
+                                                            "cita":  "Romanos 8, 35. 37-39"
                                                         },
                                                         {
                                                             "tipo":  "Evangelio",
