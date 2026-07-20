@@ -634,7 +634,7 @@ const liturgiaLecturas = {
         ],"titulo": "Domingo de la 18ª semana del Tiempo Ordinario"}
   },
 
-// TIEMPO ORDINARIO - SEMANA 19 DOMINGO
+
     "ordinario_s19_do": {
     "A": {
       "lecturas": [
@@ -646,7 +646,6 @@ const liturgiaLecturas = {
     }
   },
 
-// TIEMPO ORDINARIO - SEMANA 20 DOMINGO
   "ordinario_s20_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Isaías 56, 1. 6-7"},
@@ -656,7 +655,9 @@ const liturgiaLecturas = {
         ],"titulo": "Domingo de la 20ª semana del Tiempo Ordinario"}
   },
 
-// TIEMPO ORDINARIO - SEMANA 21 DOMINGO
+
+
+
   "ordinario_s21_do": {
     "A": {
       "lecturas": [
@@ -668,7 +669,7 @@ const liturgiaLecturas = {
     }
   },
 
-// TIEMPO ORDINARIO - SEMANA 22 DOMINGO
+
   "ordinario_s22_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Jeremías 20, 7-9"},
@@ -678,7 +679,7 @@ const liturgiaLecturas = {
         ],"titulo": "Domingo de la 22ª semana del Tiempo Ordinario"}
   },
 
-// TIEMPO ORDINARIO - SEMANA 23 DOMINGO
+
   "ordinario_s23_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Lectura de la profecía de Ezequiel 33, 7-9"},
@@ -799,8 +800,8 @@ const liturgiaLecturas = {
     },
 
 
-
-// TIEMPO DE CUARESMA - SEMANA 1 DOMINGO
+// TIEMPO DE CUARESMA
+// SEMANA I - DOMINGO
   "cuaresma_s1_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Génesis 2, 7-9; 3, 1-7"},
@@ -810,7 +811,7 @@ const liturgiaLecturas = {
         ],"titulo": "Primer domingo de Cuaresma"}
   },
 
-// TIEMPO DE CUARESMA - SEMANA 2 DOMINGO
+// SEMANA II - DOMINGO
     "cuaresma_s2_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Génesis 12, 1-4"},
@@ -820,7 +821,7 @@ const liturgiaLecturas = {
         ],"titulo": "Segundo domingo de Cuaresma"}
   },
 
-// TIEMPO DE CUARESMA - SEMANA 3 DOMINGO
+// SEMANA III - DOMINGO
   "cuaresma_s3_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Éxodo 17, 3-7"},
@@ -830,7 +831,7 @@ const liturgiaLecturas = {
         ],"titulo": "Tercer domingo de Cuaresma"}
   },
 
-// TIEMPO DE CUARESMA - SEMANA 4 DOMINGO
+// SEMANA IV - DOMINGO
   "cuaresma_s4_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Samuel 16, 1b. 6-7. 10-13a"},
@@ -840,7 +841,7 @@ const liturgiaLecturas = {
       ],"titulo": "Cuarto domingo de Cuaresma"}
   },
 
-// TIEMPO DE CUARESMA - SEMANA 5 DOMINGO
+// SEMANA V - DOMINGO
   "cuaresma_s5_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Ezequiel 37, 12-14"},
@@ -850,7 +851,7 @@ const liturgiaLecturas = {
         ],"titulo": "Quinto domingo de Cuaresma"}
   },
 
-// TIEMPO DE CUARESMA - SEMANA 6 DOMINGO
+// TIEMPO DE CUARESMA - SEMANA 6 DOMINGO DE RAMOS
   "cuaresma_s6_do": {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Mateo 21, 1-11        Isaías 50, 4-7"},
@@ -861,28 +862,8 @@ const liturgiaLecturas = {
     }
   },
 
-// TIEMPO DE CUARESMA - SEMANA 6 JUEVES SANTO
-  "cuaresma_s6_ju": {
-    "A": {
-      "lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Éxodo 12, 1-8. 11-14"},
-        {"tipo": "Salmo",           "cita": "Salmo 115, 12-13. 15-16bc. 17-18"},
-        {"tipo": "2ª Lectura",      "cita": "Corintios 11, 23-26"},
-        {"tipo": "Evangelio",       "cita": "Juan 13, 1-15"}
-        ],"titulo": "Jueves santo"},
-    "B": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Éxodo 12, 1-8. 11-14"},
-        {"tipo": "Salmo",           "cita": "Salmo 115, 12-13. 15-16bc. 17-18"},
-        {"tipo": "2ª Lectura",      "cita": "Corintios 11, 23-26"},
-        {"tipo": "Evangelio",       "cita": "Juan 13, 1-15"}
-        ],"titulo": "Jueves santo"},
-    "C": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Éxodo 12, 1-8. 11-14"},
-        {"tipo": "Salmo",           "cita": "Salmo 115, 12-13. 15-16bc. 17-18"},
-        {"tipo": "2ª Lectura",      "cita": "Corintios 11, 23-26"},
-        {"tipo": "Evangelio",       "cita": "Juan 13, 1-15"}
-        ],"titulo": "Jueves santo"},
-  },
+
+
 
 // TIEMPO DE CUARESMA - SEMANA 6 VIERNES SANTO
   "cuaresma_s6_vi": {
@@ -916,55 +897,102 @@ const liturgiaLecturas = {
 
 
 
-// TIEMPO PASCUAL - SEMANA 1 DOMINGO
-  "pascua_s1_do": {
-    "C": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 10, 34a. 37-43"},
-        {"tipo": "Salmo",           "cita": "Salmo 117, 1-2. 16ab-17. 22-23"},
-        {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 1-4 / Corintios 5, 6b-8"},
-        {"tipo": "Evangelio",       "cita": "Juan 20, 1-9"}
-      ],"titulo": "Domingo de Pascua"},
+
+
+
+
+
+
+// TIEMPO PASCUAL
+
+  "pascua_s2_do": {
     "A": {
       "lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 1, 12-14"},
-        {"tipo": "Salmo",           "cita": "Salmo 26, 1. 4. 7-8"},
-        {"tipo": "2ª Lectura",      "cita": "Pedro 4, 13-16"},
-        {"tipo": "Evangelio",       "cita": "Juan 17, 1-11"}
-      ],"titulo": "Séptimo domingo de Pascua"},
+        {
+          "tipo": "1ª Lectura",
+          "cita": "Hechos de los apóstoles 2, 42-47"
+        },
+        {
+          "tipo": "Salmo",
+          "cita": "Salmo 117, 2-4. 13-15. 22-24"
+        },
+        {
+          "tipo": "2ª Lectura",
+          "cita": "Pedro: 1, 3-9"
+        },
+        {
+          "tipo": "Evangelio",
+          "cita": "Juan 20, 19-31"
+        }
+      ],
+      "titulo": "Segundo domingo de Pascua"
+    }
+  },
+  "cuaresma_s6_ju": {
+    "C": {
+      "lecturas": [
+        {
+          "tipo": "1ª Lectura",
+          "cita": "Éxodo 12, 1-8. 11-14"
+        },
+        {
+          "tipo": "Salmo",
+          "cita": "Salmo 115, 12-13. 15-16bc. 17-18"
+        },
+        {
+          "tipo": "2ª Lectura",
+          "cita": "Corintios 11, 23-26"
+        },
+        {
+          "tipo": "Evangelio",
+          "cita": "Juan 13, 1-15"
+        }
+      ],
+      "titulo": "Jueves santo"
+    },
+    "A": {
+      "lecturas": [
+        {
+          "tipo": "1ª Lectura",
+          "cita": "Éxodo 12, 1-8. 11-14"
+        },
+        {
+          "tipo": "Salmo",
+          "cita": "Salmo 115, 12-13. 15-16bc. 17-18"
+        },
+        {
+          "tipo": "2ª Lectura",
+          "cita": "Corintios 11, 23-26"
+        },
+        {
+          "tipo": "Evangelio",
+          "cita": "Juan 13, 1-15"
+        }
+      ],
+      "titulo": "Jueves santo"
+    },
     "B": {
       "lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 10, 34a. 37-43"},
-        {"tipo": "Salmo",           "cita": "Salmo 117, 1-2. 16ab-17. 22-23"},
-        {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 1-4 / Corintios 5, 6b-8"},
-        {"tipo": "Evangelio",       "cita": "Juan 20, 1-9"}
-      ],"titulo": "Domingo de Pascua"}
+        {
+          "tipo": "1ª Lectura",
+          "cita": "Éxodo 12, 1-8. 11-14"
+        },
+        {
+          "tipo": "Salmo",
+          "cita": "Salmo 115, 12-13. 15-16bc. 17-18"
+        },
+        {
+          "tipo": "2ª Lectura",
+          "cita": "Corintios 11, 23-26"
+        },
+        {
+          "tipo": "Evangelio",
+          "cita": "Juan 13, 1-15"
+        }
+      ],
+      "titulo": "Jueves santo"
+    }
   },
-
-// TIEMPO PASCUAL - SEMANA 2 DOMINGO
-  "pascua_s2_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 2, 42-47"},
-        {"tipo": "Salmo",           "cita": "Salmo 117, 2-4. 13-15. 22-24"},
-        {"tipo": "2ª Lectura",      "cita": "Pedro: 1, 3-9"},
-        {"tipo": "Evangelio",       "cita": "Juan 20, 19-31"}
-      ],"titulo": "Segundo domingo de Pascua"}
-  },
-
-// TIEMPO PASCUAL - SEMANA 3 DOMINGO
-  "pascua_s3_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 2, 14. 22-33"},
-        {"tipo": "Salmo",           "cita": "Salmo 15, 1-2a y 5. 7-8. 9-10. 11"},
-        {"tipo": "2ª Lectura",      "cita": "Pedro 1, 17-21"},
-        {"tipo": "Evangelio",       "cita": "Lucas 24, 13-35"}
-        ],"titulo": "Tercer domingo de Pascua"}
-    },
-
-
-
-
-
-
 
 
   "pascua_s4_do": {
@@ -1065,7 +1093,46 @@ const liturgiaLecturas = {
   },
 
 
+  "pascua_s1_do": {
+    "C": {
+      "lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 10, 34a. 37-43"},
+        {"tipo": "Salmo",           "cita": "Salmo 117, 1-2. 16ab-17. 22-23"},
+        {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 1-4 / Corintios 5, 6b-8"},
+        {"tipo": "Evangelio",       "cita": "Juan 20, 1-9"}
+      ],"titulo": "Domingo de Pascua"
+    },
+    "A": {
+      "lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 1, 12-14"},
+        {"tipo": "Salmo",           "cita": "Salmo 26, 1. 4. 7-8"},
+        {"tipo": "2ª Lectura",      "cita": "Pedro 4, 13-16"},
+        {"tipo": "Evangelio",       "cita": "Juan 17, 1-11"}
+      ],"titulo": "Séptimo domingo de Pascua"
+    },
+    "B": {
+      "lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 10, 34a. 37-43"},
+        {"tipo": "Salmo",           "cita": "Salmo 117, 1-2. 16ab-17. 22-23"},
+        {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 1-4 / Corintios 5, 6b-8"},
+        {"tipo": "Evangelio",       "cita": "Juan 20, 1-9"}
+      ],"titulo": "Domingo de Pascua"
+    }
+  },
 
+
+
+
+
+// TIEMPO PASCUAL - SEMANA 1 DOMINGO
+  "pascua_s3_do": {
+    "A": {"lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 2, 14. 22-33"},
+        {"tipo": "Salmo",           "cita": "Salmo 15, 1-2a y 5. 7-8. 9-10. 11"},
+        {"tipo": "2ª Lectura",      "cita": "Pedro 1, 17-21"},
+        {"tipo": "Evangelio",       "cita": "Lucas 24, 13-35"}
+        ],"titulo": "Tercer domingo de Pascua"}
+    },
 
 // AÑO PAR E IMPAR DEL TIEMPO ORDINARIO DE LOS DIAS LUNES A SABADO
 // TIEMPO ORDINARIO - SEMANA 1 LUNES

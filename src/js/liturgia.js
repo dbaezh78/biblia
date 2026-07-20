@@ -92,7 +92,7 @@
     });
 
     // 2. Limpiar prefijos genéricos comunes
-    const regexPrefijos = /^(lectura del libro de|lectura de la profecía de|lectura de la carta de|lectura del santo evangelio según san|lectura del santo evangelio según|salmo responsorial:|salmo:|ev\.\s+|del libro de los)/gi;
+    const regexPrefijos = /^(lectura del libro de|lectura de la profecía de|lectura de la carta de|lectura del santo evangelio según san|lectura del santo evangelio según|salmo responsorial:|salmo:|ev\.\s+|hechos de los apóstoles:?|hechos de los apóstoles|del libro de los)/gi;
     citaStr = citaStr.replace(regexPrefijos, '').trim();
     
     // Remover respuestas parentéticas en salmos, ej: (R.: 8a y 9a)
@@ -101,10 +101,13 @@
     // Remover letras variantes pegadas a versículos (14a -> 14, 4ab -> 4)
     citaStr = citaStr.replace(/\b(\d+)[a-z]+\b/gi, '$1');
     
-    // Reemplazar la conjunción " y " por un punto de separación "." para tratar los versículos como elementos individuales
+    // Reemplazar la conjunción " y " por un punto de separación "."
     citaStr = citaStr.replace(/\s+y\s+/gi, '.');
     
-    // Guardar una versión limpia con capitalización de título para mostrar de subtítulo
+    // Reemplazar punto y coma ";" por punto "."
+    citaStr = citaStr.replace(/;/g, '.');
+    
+    // Guardar versión limpia para mostrar en el subtítulo
     const citaVisible = citaStr.charAt(0).toUpperCase() + citaStr.slice(1);
     citaStr = citaStr.toLowerCase();
     
@@ -114,97 +117,117 @@
     
     const abrev = bcMatch[1].trim().replace(/\s+/g, '');
     const libroId = mapAbreviaturas[abrev];
+    if (!libroId) return null;
+    
     const abrevOriginal = bcMatch[1].trim();
+    let currentCap = parseInt(bcMatch[2], 10);
+    if (libroId === "23_sal") {
+      currentCap = getHebrewPsalmChapter(currentCap);
+    }
     
-    const capInicio = parseInt(bcMatch[2], 10);
-    const rest = citaStr.substring(bcMatch[0].length).trim();
+    const versePartStream = citaStr.substring(bcMatch[0].length).trim();
     
-    const chapters = [];
-    
-    // 4. Detectar si es multicapítulo
-    // Buscamos si en la parte restante hay un guión seguido por un número de capítulo y una coma (ej: "—2," o "- 9,")
-    const transitionMatch = rest.match(/([—–-])\s*(\d+)\s*,/);
-    
+    // Detectar si es un guión de transición continua entre capítulos (ej: "8, 23—9, 3" o "8, 23-9, 3")
+    const transitionMatch = versePartStream.match(/^,?\s*\d+\s*[-—–]\s*(\d+)\s*,/);
     if (transitionMatch) {
-      // Caso multicapítulo
-      const leftRest = rest.substring(0, transitionMatch.index).trim();
-      const rightRest = rest.substring(transitionMatch.index + transitionMatch[0].length).trim();
-      
-      let capInicioReal = capInicio;
-      if (libroId === "23_sal") {
-        capInicioReal = getHebrewPsalmChapter(capInicioReal);
-      }
-      
-      // Versículos de inicio (van desde verInicio hasta el final del capítulo)
-      const leftVerseNumbers = leftRest.match(/\d+/g);
-      if (!leftVerseNumbers || leftVerseNumbers.length === 0) return null;
-      const verInicio = parseInt(leftVerseNumbers[0], 10);
-      
-      chapters.push({
-        capNum: capInicioReal,
-        ranges: [{ start: verInicio, end: null }]
-      });
-      
-      let capFin = parseInt(transitionMatch[2], 10);
-      if (libroId === "23_sal") {
-        capFin = getHebrewPsalmChapter(capFin);
-      }
-      
-      // Parsear la parte de versículos del capítulo final
-      const segments = rightRest.split(/[.,]/);
-      const rightRanges = [];
-      segments.forEach((seg, idx) => {
-        const nums = seg.match(/\d+/g);
-        if (nums && nums.length > 0) {
-          const start = idx === 0 ? 1 : parseInt(nums[0], 10);
-          const end = nums.length > 1 ? parseInt(nums[1], 10) : parseInt(nums[0], 10);
-          rightRanges.push({ start, end });
+      const partsDash = versePartStream.split(/[-—–]/);
+      if (partsDash.length === 2 && partsDash[1].includes(',')) {
+        const leftVersePart = partsDash[0].replace(/^,/, '').trim();
+        const right = partsDash[1].trim();
+        
+        const verseNumbers = leftVersePart.match(/\d+/g);
+        if (!verseNumbers || verseNumbers.length === 0) return null;
+        const verInicio = parseInt(verseNumbers[0], 10);
+        
+        const idxRightComma = right.indexOf(',');
+        if (idxRightComma === -1) return null;
+        
+        let capFin = parseInt(right.substring(0, idxRightComma).trim(), 10);
+        if (libroId === "23_sal") {
+          capFin = getHebrewPsalmChapter(capFin);
         }
-      });
-      
-      if (rightRanges.length === 0) {
-        const fallbackNums = rightRest.match(/\d+/g);
-        if (fallbackNums) {
-          rightRanges.push({ start: 1, end: parseInt(fallbackNums[0], 10) });
+        const rightVersePart = right.substring(idxRightComma + 1).trim();
+        
+        const segments = rightVersePart.split(/[.,]/);
+        const rightRanges = [];
+        segments.forEach((seg, idx) => {
+          const nums = seg.match(/\d+/g);
+          if (nums && nums.length > 0) {
+            const start = idx === 0 ? 1 : parseInt(nums[0], 10);
+            const end = nums.length > 1 ? parseInt(nums[1], 10) : parseInt(nums[0], 10);
+            rightRanges.push({ start, end });
+          }
+        });
+        
+        if (rightRanges.length === 0) {
+          const fallbackNums = rightVersePart.match(/\d+/g);
+          if (fallbackNums) {
+            rightRanges.push({ start: 1, end: parseInt(fallbackNums[0], 10) });
+          }
         }
+        
+        const chapters = [
+          { capNum: currentCap, ranges: [{ start: verInicio, end: null }] },
+          { capNum: capFin, ranges: rightRanges }
+        ];
+        
+        return { libroId, chapters, abrevOriginal, citaVisible };
       }
+    }
+    
+    // Parsear segmentos de versículos separados por puntos, soportando saltos a capítulos con coma (ej: "Isaias 63, 16-17. 19. 64, 2-7")
+    const chapterMap = {};
+    chapterMap[currentCap] = [];
+    
+    // Remover la coma inicial si existe en el stream de versículos (ej: ", 16-17. 19...")
+    const cleanStream = versePartStream.replace(/^,/, '').trim();
+    const dotSegments = cleanStream.split('.');
+    
+    dotSegments.forEach(seg => {
+      seg = seg.trim();
+      if (!seg) return;
       
-      chapters.push({
-        capNum: capFin,
-        ranges: rightRanges
-      });
-      
-    } else {
-      // Caso estándar: un único capítulo
-      const idxComma = rest.indexOf(',');
-      const versePart = idxComma !== -1 ? rest.substring(idxComma + 1).trim() : rest.trim();
-      
-      let cap = capInicio;
-      if (libroId === "23_sal") {
-        cap = getHebrewPsalmChapter(cap);
-      }
-      
-      const segments = versePart.split(/[.,]/);
-      const ranges = [];
-      
-      segments.forEach(seg => {
+      if (seg.includes(',')) {
+        const segParts = seg.split(',');
+        let newCap = parseInt(segParts[0].trim(), 10);
+        if (!isNaN(newCap)) {
+          if (libroId === "23_sal") {
+            newCap = getHebrewPsalmChapter(newCap);
+          }
+          currentCap = newCap;
+          if (!chapterMap[currentCap]) {
+            chapterMap[currentCap] = [];
+          }
+          
+          const verseStr = segParts.slice(1).join(',').trim();
+          const nums = verseStr.match(/\d+/g);
+          if (nums && nums.length > 0) {
+            const start = parseInt(nums[0], 10);
+            const end = nums.length > 1 ? parseInt(nums[1], 10) : start;
+            chapterMap[currentCap].push({ start, end });
+          }
+        }
+      } else {
         const nums = seg.match(/\d+/g);
         if (nums && nums.length > 0) {
           const start = parseInt(nums[0], 10);
           const end = nums.length > 1 ? parseInt(nums[1], 10) : start;
-          ranges.push({ start, end });
+          chapterMap[currentCap].push({ start, end });
         }
-      });
-      
-      if (ranges.length === 0) return null;
-      
-      chapters.push({
-        capNum: cap,
-        ranges: ranges
-      });
+      }
+    });
+    
+    const chapters = [];
+    for (const capNumStr in chapterMap) {
+      if (chapterMap[capNumStr].length > 0) {
+        chapters.push({
+          capNum: parseInt(capNumStr, 10),
+          ranges: chapterMap[capNumStr]
+        });
+      }
     }
     
-    if (!libroId || chapters.length === 0) return null;
+    if (chapters.length === 0) return null;
     
     return {
       libroId,
