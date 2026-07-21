@@ -127,59 +127,57 @@
     
     const versePartStream = citaStr.substring(bcMatch[0].length).trim();
     
-    // Detectar si es un guión de transición continua entre capítulos (ej: "8, 23—9, 3" o "8, 23-9, 3")
-    const transitionMatch = versePartStream.match(/^,?\s*\d+\s*[-—–]\s*(\d+)\s*,/);
+    // Transición entre capítulos por guión (ej: "9, 35 - 10, 1. 6-8" o "8, 23—9, 3")
+    const transitionMatch = versePartStream.match(/^(.*?)[-—–]\s*(\d+)\s*,(.*)$/);
     if (transitionMatch) {
-      const partsDash = versePartStream.split(/[-—–]/);
-      if (partsDash.length === 2 && partsDash[1].includes(',')) {
-        const leftVersePart = partsDash[0].replace(/^,/, '').trim();
-        const right = partsDash[1].trim();
-        
-        const verseNumbers = leftVersePart.match(/\d+/g);
-        if (!verseNumbers || verseNumbers.length === 0) return null;
-        const verInicio = parseInt(verseNumbers[0], 10);
-        
-        const idxRightComma = right.indexOf(',');
-        if (idxRightComma === -1) return null;
-        
-        let capFin = parseInt(right.substring(0, idxRightComma).trim(), 10);
-        if (libroId === "23_sal") {
-          capFin = getHebrewPsalmChapter(capFin);
-        }
-        const rightVersePart = right.substring(idxRightComma + 1).trim();
-        
-        const segments = rightVersePart.split(/[.,]/);
-        const rightRanges = [];
-        segments.forEach((seg, idx) => {
-          const nums = seg.match(/\d+/g);
-          if (nums && nums.length > 0) {
-            const start = idx === 0 ? 1 : parseInt(nums[0], 10);
-            const end = nums.length > 1 ? parseInt(nums[1], 10) : parseInt(nums[0], 10);
+      const leftVersePart = transitionMatch[1].replace(/^,/, '').trim();
+      let capFin = parseInt(transitionMatch[2].trim(), 10);
+      if (libroId === "23_sal") {
+        capFin = getHebrewPsalmChapter(capFin);
+      }
+      const rightVersePart = transitionMatch[3].trim();
+      
+      const verseNumbers = leftVersePart.match(/\d+/g);
+      if (!verseNumbers || verseNumbers.length === 0) return null;
+      const verInicio = parseInt(verseNumbers[0], 10);
+      
+      const rightSegments = rightVersePart.split('.');
+      const rightRanges = [];
+      const isSingleNumberOnly = rightSegments.length === 1 && !rightVersePart.includes('-') && (rightVersePart.match(/\d+/g) || []).length === 1;
+      
+      rightSegments.forEach(seg => {
+        const nums = seg.match(/\d+/g);
+        if (nums && nums.length > 0) {
+          if (isSingleNumberOnly) {
+            rightRanges.push({ start: 1, end: parseInt(nums[0], 10) });
+          } else {
+            const start = parseInt(nums[0], 10);
+            const end = nums.length > 1 ? parseInt(nums[1], 10) : start;
             rightRanges.push({ start, end });
           }
-        });
-        
-        if (rightRanges.length === 0) {
-          const fallbackNums = rightVersePart.match(/\d+/g);
-          if (fallbackNums) {
-            rightRanges.push({ start: 1, end: parseInt(fallbackNums[0], 10) });
-          }
         }
-        
-        const chapters = [
-          { capNum: currentCap, ranges: [{ start: verInicio, end: null }] },
-          { capNum: capFin, ranges: rightRanges }
-        ];
-        
-        return { libroId, chapters, abrevOriginal, citaVisible };
+      });
+      
+      if (rightRanges.length === 0) {
+        const fallbackNums = rightVersePart.match(/\d+/g);
+        if (fallbackNums) {
+          rightRanges.push({ start: 1, end: parseInt(fallbackNums[0], 10) });
+        }
       }
+      
+      const chapters = [
+        { capNum: currentCap, ranges: [{ start: verInicio, end: null }] },
+        { capNum: capFin, ranges: rightRanges }
+      ];
+      
+      return { libroId, chapters, abrevOriginal, citaVisible };
     }
     
-    // Parsear segmentos de versículos separados por puntos, soportando saltos a capítulos con coma (ej: "Isaias 63, 16-17. 19. 64, 2-7")
+    // Segmentos de versículos en el mismo capítulo o con saltos a nuevos capítulos marcados por coma
+    // (ej: "Isaias 63, 16-17. 19. 64, 2-7" o "Salmo 26, 1. 4. 13-14")
     const chapterMap = {};
     chapterMap[currentCap] = [];
     
-    // Remover la coma inicial si existe en el stream de versículos (ej: ", 16-17. 19...")
     const cleanStream = versePartStream.replace(/^,/, '').trim();
     const dotSegments = cleanStream.split('.');
     
@@ -237,26 +235,65 @@
     };
   }
 
+  let currentLecturasList = null;
+  let currentTituloDia = "";
+  let currentOpcionesConfig = null;
+  let subOpcionesState = {};
+
   // 4. Cargar y renderizar pasajes de las lecturas
-  async function cargarYMostrarLecturas(lecturasList, tituloDia) {
+  async function cargarYMostrarLecturas(lecturasList, tituloDia, opcionesConfig = null, subState = null) {
+    currentLecturasList = lecturasList;
+    currentTituloDia = tituloDia;
+    currentOpcionesConfig = opcionesConfig;
+    if (subState !== null) {
+      subOpcionesState = subState;
+    }
+
     const contenedor = document.getElementById('lecturasContenidoCuerpo');
     const descHeader = document.getElementById('lecturaDiaTituloDescripcion');
     if (!contenedor || !descHeader) return;
 
-    descHeader.textContent = tituloDia;
+    let htmlSelectorOpciones = "";
+    if (opcionesConfig && opcionesConfig.totalOpciones > 1) {
+      htmlSelectorOpciones += `<div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">`;
+      for (let i = 0; i < opcionesConfig.totalOpciones; i++) {
+        const isActive = i === opcionesConfig.opcionIndexActual;
+        const styleBtn = isActive
+          ? "padding: 1px 6px; font-size: 0.85rem; font-weight: bold; border: 1.5px solid #1a202c; border-radius: 2px; background-color: #ffffff; color: #1a202c; cursor: pointer; min-width: 22px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"
+          : "padding: 1px 6px; font-size: 0.85rem; font-weight: bold; border: 1px solid #cbd5e0; border-radius: 2px; background-color: #ffffff; color: #718096; cursor: pointer; min-width: 22px; text-align: center;";
+        
+        htmlSelectorOpciones += `<button style="${styleBtn}" onclick="window.cambiarOpcionMisa('${opcionesConfig.baseClave}', '${opcionesConfig.ciclo}', ${i})">${i + 1}</button>`;
+      }
+      htmlSelectorOpciones += `</div>`;
+    }
+
+    descHeader.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; width: 100%;">
+        <span style="flex-grow: 1;">${tituloDia}</span>
+        ${htmlSelectorOpciones}
+      </div>
+    `;
+
     contenedor.innerHTML = `<div style="text-align: center; padding: 30px; color: #4a5568;">Cargando lecturas litúrgicas...</div>`;
 
     let htmlAcumulado = "";
 
     try {
-      for (const lec of lecturasList) {
-        const parsed = parseCita(lec.cita);
+      for (let idxLec = 0; idxLec < lecturasList.length; idxLec++) {
+        const lec = lecturasList[idxLec];
+        
+        // Detectar si la cita contiene alternativas separadas por " o ", " ó ", " o bien "
+        const subCitas = lec.cita.split(/\s+(?:o bien|o|ó)\s+/i).map(c => c.trim()).filter(Boolean);
+        const subSelectedIdx = subOpcionesState[idxLec] !== undefined ? subOpcionesState[idxLec] : 0;
+        const citaActiva = subCitas[subSelectedIdx] || subCitas[0] || lec.cita;
+
+        const parsed = parseCita(citaActiva);
         if (!parsed) {
           // Mostrar cita simple si no se puede parsear localmente
           htmlAcumulado += `
             <div style="margin-bottom: 25px; padding: 15px; border-left: 4px solid #cbd5e0; background-color: #f7fafc; border-radius: 6px;">
               <h5 style="margin: 0 0 8px 0; color: #2d3748; font-size: 1rem; font-weight: bold;">${lec.tipo}</h5>
-              <p style="margin: 0; font-size: 0.95rem; color: #e53e3e;">Cita: ${lec.cita} (Lectura en Biblia física)</p>
+              <p style="margin: 0; font-size: 0.95rem; color: #e53e3e;">Cita: ${citaActiva} (Lectura en Biblia física)</p>
             </div>
           `;
           continue;
@@ -280,7 +317,6 @@
           if (!capData) return;
           
           if (parsed.chapters.length > 1) {
-            // Separador y título de capítulo si son múltiples capítulos
             if (idxCh > 0) {
               textHtml += `<hr style="border: none; border-top: 1px dashed #e2e8f0; margin: 15px 0;">`;
             }
@@ -317,10 +353,26 @@
         const startCap = parsed.chapters[0].capNum;
         const startVer = parsed.chapters[0].ranges[0].start;
 
+        // Selector numerado de sub-opciones para la lectura individual
+        let htmlSubOpciones = "";
+        if (subCitas.length > 1) {
+          htmlSubOpciones += `<div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">`;
+          for (let sIdx = 0; sIdx < subCitas.length; sIdx++) {
+            const isSubActive = sIdx === subSelectedIdx;
+            const btnStyle = isSubActive
+              ? "padding: 1px 6px; font-size: 0.85rem; font-weight: bold; border: 1.5px solid #1a202c; border-radius: 2px; background-color: #ffffff; color: #1a202c; cursor: pointer; min-width: 22px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"
+              : "padding: 1px 6px; font-size: 0.85rem; font-weight: bold; border: 1px solid #cbd5e0; border-radius: 2px; background-color: #ffffff; color: #718096; cursor: pointer; min-width: 22px; text-align: center;";
+
+            htmlSubOpciones += `<button style="${btnStyle}" onclick="window.cambiarSubOpcionLectura(${idxLec}, ${sIdx})">${sIdx + 1}</button>`;
+          }
+          htmlSubOpciones += `</div>`;
+        }
+
         htmlAcumulado += `
           <div style="margin-bottom: 25px; padding: 15px; border-left: 4px solid #3182ce; background-color: #f7fafc; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-            <h5 style="margin: 0 0 10px 0; color: #2b6cb0; font-size: 1.05rem; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <h5 style="margin: 0 0 10px 0; color: #2b6cb0; font-size: 1.05rem; font-weight: bold; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <span>${lec.tipo} <span style="font-size: 0.85em; color: #718096; font-weight: normal;">(${parsed.citaVisible})</span></span>
+              ${htmlSubOpciones}
             </h5>
             <div style="padding-right: 5px;">
               ${textHtml}
@@ -340,21 +392,62 @@
     }
   }
 
-  // 5. Cargar lectura por clave litúrgica y ciclo
-  function cargarLiturgiaPorClave(clave, ciclo) {
-    const diaObj = liturgiaLecturas[clave];
-    if (!diaObj) {
+  window.cambiarSubOpcionLectura = function (idxLec, subIdx) {
+    if (!currentLecturasList) return;
+    subOpcionesState[idxLec] = subIdx;
+    cargarYMostrarLecturas(currentLecturasList, currentTituloDia, currentOpcionesConfig, subOpcionesState);
+  };
+
+  // 5. Cargar lectura por clave litúrgica, ciclo y número de opción (0-indexed)
+  function cargarLiturgiaPorClave(clave, ciclo, opcionIndex = 0) {
+    if (!clave) {
       mostrarMensajeVacio();
       return;
     }
 
-    const dataCiclo = diaObj[ciclo] || diaObj["A"] || diaObj["B"] || diaObj["C"];
+    const baseClave = clave.replace(/_\d+$/, '');
+    const opcionesList = [];
+
+    if (Array.isArray(liturgiaLecturas[baseClave])) {
+      opcionesList.push(...liturgiaLecturas[baseClave]);
+    } else if (liturgiaLecturas[baseClave]) {
+      opcionesList.push(liturgiaLecturas[baseClave]);
+
+      let idx = 2;
+      while (liturgiaLecturas[`${baseClave}_${idx}`]) {
+        opcionesList.push(liturgiaLecturas[`${baseClave}_${idx}`]);
+        idx++;
+      }
+    }
+
+    if (opcionesList.length === 0) {
+      mostrarMensajeVacio();
+      return;
+    }
+
+    if (opcionIndex < 0 || opcionIndex >= opcionesList.length) {
+      opcionIndex = 0;
+    }
+
+    const diaObj = opcionesList[opcionIndex];
+    const dataCiclo = diaObj[ciclo] || diaObj["A"] || diaObj["B"] || diaObj["C"] || diaObj["PAR"] || diaObj["IMPAR"];
+
     if (dataCiclo) {
-      cargarYMostrarLecturas(dataCiclo.lecturas, dataCiclo.titulo);
+      subOpcionesState = {};
+      cargarYMostrarLecturas(dataCiclo.lecturas, dataCiclo.titulo, {
+        baseClave,
+        ciclo,
+        totalOpciones: opcionesList.length,
+        opcionIndexActual: opcionIndex
+      }, {});
     } else {
       mostrarMensajeVacio();
     }
   }
+
+  window.cambiarOpcionMisa = function (baseClave, ciclo, opcionIdx) {
+    cargarLiturgiaPorClave(baseClave, ciclo, opcionIdx);
+  };
 
   function mostrarMensajeVacio() {
     const contenedor = document.getElementById('lecturasContenidoCuerpo');
@@ -422,22 +515,25 @@
     }
   }
 
-  // Helper para obtener la clave litúrgica basada en una fecha (añadiendo días solemnes fijos)
+  // Helper para obtener la clave litúrgica basada en una fecha (soporta fechas completas DD/MM/YYYY y fechas fijas independientes del año D/M o DD/MM)
   function obtenerClaveLiturgicaDeFecha(date) {
     const diaNum = date.getDate();
     const mesNum = date.getMonth() + 1; // 1-indexed
+    const anioNum = date.getFullYear();
+
+    const fechaCompleta = `${String(diaNum).padStart(2, '0')}/${String(mesNum).padStart(2, '0')}/${anioNum}`; // "01/01/2026"
+    const fechaDDMM = `${String(diaNum).padStart(2, '0')}/${String(mesNum).padStart(2, '0')}`; // "01/01"
+    const fechaDM = `${diaNum}/${mesNum}`; // "1/1"
     
-    // Comprobar días solemnes específicos fijos
-    if (diaNum === 6 && mesNum === 1) {
-      return "enero6";
-    }
-    if (diaNum === 1 && mesNum === 1) {
-      return "enero1";
-    }
-    
-    // Carga desde el mapa liturgiaFechas
-    const fechaStr = obtenerFechaFormatoLimpio(date);
-    return liturgiaFechas[fechaStr] || null;
+    if (liturgiaFechas[fechaCompleta]) return liturgiaFechas[fechaCompleta];
+    if (liturgiaFechas[fechaDDMM]) return liturgiaFechas[fechaDDMM];
+    if (liturgiaFechas[fechaDM]) return liturgiaFechas[fechaDM];
+
+    // Fallbacks históricos
+    if (diaNum === 6 && mesNum === 1) return "enero6";
+    if (diaNum === 1 && mesNum === 1) return "enero1";
+
+    return null;
   }
 
   // 8. Cargar lecturas para la fecha de hoy
@@ -448,10 +544,10 @@
     
     const claveLiturgica = obtenerClaveLiturgicaDeFecha(hoyDate);
     if (claveLiturgica) {
-      const esDiaEspecial = claveLiturgica.startsWith("enero");
       const parts = claveLiturgica.split('_');
       const dia = parts[parts.length - 1]; // "lu", "ma", etc.
-      const opcionCicloOAnio = (dia === "do" || esDiaEspecial) ? ciclo : anoFerial;
+      const esDiaFijoOEspecial = claveLiturgica.startsWith("enero") || !["lu", "ma", "mi", "ju", "vi", "sa", "do"].includes(dia);
+      const opcionCicloOAnio = (dia === "do" || esDiaFijoOEspecial) ? ciclo : anoFerial;
       cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
     } else {
       mostrarMensajeVacio();
@@ -652,10 +748,10 @@
         
         const claveLiturgica = obtenerClaveLiturgicaDeFecha(selectedDate);
         if (claveLiturgica) {
-          const esDiaEspecial = claveLiturgica.startsWith("enero");
           const parts = claveLiturgica.split('_');
           const dia = parts[parts.length - 1]; // "lu", "ma", etc.
-          const opcionCicloOAnio = (dia === "do" || esDiaEspecial) ? ciclo : anoFerial;
+          const esDiaFijoOEspecial = claveLiturgica.startsWith("enero") || !["lu", "ma", "mi", "ju", "vi", "sa", "do"].includes(dia);
+          const opcionCicloOAnio = (dia === "do" || esDiaFijoOEspecial) ? ciclo : anoFerial;
           cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
         } else {
           mostrarMensajeVacio();
