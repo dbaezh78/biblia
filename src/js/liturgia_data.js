@@ -318,6 +318,7 @@ const liturgiaFechas = {
     "23/12": "adviento_23_dic",
     "24/12": "adviento_24_dic",
     "25/12": "navidad_25_dic",
+
     "26/12": "navidad_26_dic",
     "27/12": "navidad_27_dic",
     "28/12": "navidad_28_dic",
@@ -325,6 +326,9 @@ const liturgiaFechas = {
     "30/12": "navidad_30_dic",
     "31/12": "navidad_31_dic",
     
+    //Segundo domingo despues de navidad ahora cae el 3 de Enero 2027
+    "3/1": "navidad_s2_do",
+
     "1/1": "navidad_1_ene",
     "2/1": "navidad_2_ene",
     "3/1": "navidad_3_ene",
@@ -349,8 +353,18 @@ const liturgiaLecturas = {
 ║  FIESTA - SAGRADO CORAZON DE JESUS - CICLO ABC  ║
 ╚═════════════════════════════════════════════════╝
 */
+/*
+ _____    ___   _____   ___   _____    ___      ___ 
+|  ___|  |_ _| | ____| / __| |_   _|  / _ \    / __|
+| |_      | |  |  _|   \__ \   | |   / ___ \   \__ \
+|_|      |___| |_____| |___/   |_|  /_/   \_\  |___/
+ ___    ___    _       _____   __  __   _   _   ___    ____     ___      ____    _____   ___
+/ __|  / _ \  | |     | ____| |  \/  | | \ | |  |_ _| |  _ \   / _ \    |  _ \  | ____| / __|
+\__ \ | (_) | | |___  |  _|   | |\/| | |  \| |   | |  | |_) | / ___ \   | |_) | |  _|   \__ \
+|___/  \___/  |_____| |_____| |_|  |_| |_|\__|  |___| |____/  /_/   \_\ |____/  |_____| |___/
+*/
 
-// FIESTA
+
 "scorazondeJesus": {
    "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Deuteronomio 7, 6-11"},
@@ -371,31 +385,11 @@ const liturgiaLecturas = {
         {"tipo": "Evangelio",       "cita": "Lucas 15, 3-7"}
         ],"titulo": "El sagrado Corazón de Jesús"},},
 
-/*******************************************\
-╔═══════════════════════════════════════════╗
-║  FIESTA - EPIFANIA DEL SEÑOR - CICLO ABC  ║
-╚═══════════════════════════════════════════╝
+/* ___      ____   __   __   ___   _____   _   _   _____    ___
+  / _ \    |  _ \  \ \ / /  |_ _| | ____| | \ | | |_   _|  / _ \
+ / ___ \   | |_) |  \ V /    | |  |  _|   |  \| |   | |   | (_) |
+/_/   \_\  |____/    \_/    |___| |_____| |_|\__|   |_|    \___/
 */
-"epifania": {
-   "A": {"lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Isaías 60, 1-6"},
-            {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 10-11. 12-13"},
-            {"tipo": "2ª Lectura",      "cita": "Efesios 3, 2-3a. 5-6"},
-            {"tipo": "Evangelio",       "cita": "Mateo 2, 1-12"},
-            ],"titulo": "Epifanía del Señor"},
-   "B": {"lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Isaías 60, 1-6"},
-            {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 10-11. 12-13"},
-            {"tipo": "2ª Lectura",      "cita": "Efesios 3, 2-3a. 5-6"},
-            {"tipo": "Evangelio",       "cita": "Mateo 2, 1-12"},
-            ],"titulo": "Epifanía del Señor"},
-   "C": {"lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Isaías 60, 1-6"},
-            {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 10-11. 12-13"},
-            {"tipo": "2ª Lectura",      "cita": "Efesios 3, 2-3a. 5-6"},
-            {"tipo": "Evangelio",       "cita": "Mateo 2, 1-12"},
-            ],"titulo": "Epifanía del Señor"},},
-
 /************************************************\
 ╔════════════════════════════════════════════════╗
 ║  TIEMPO ADVIENTO - SEMANA 1 DOMINGO CICLO ABC  ║
@@ -540,7 +534,31 @@ const liturgiaLecturas = {
                 {"tipo": "2ª Lectura",      "cita": "Romanos 1, 1-7"},
                 {"tipo": "Evangelio",       "cita": "Mateo 1, 18-24"}
                 ],"titulo": "Domingo 4º de Adviento"}
-        },          /*
+        },          
+        
+        
+/**************************************************\
+╔══════════════════════════════════════════════════╗
+║  TIEMPO DE NAVIDAD - SEMANA 1 DOMINGO CICLO ABC  ║
+╚══════════════════════════════════════════════════╝
+*/ 
+  "navidad_s1_do": {
+    "A": {"lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Sirácida 3, 2-6. 12-14"},
+        {"tipo": "Salmo",           "cita": "Salmo 127, 1-2. 3. 4-5"},
+        {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 12-21"},
+        {"tipo": "Evangelio",       "cita": "Mateo 2, 13-15. 19-23"}
+          ],"titulo": "1º Domingo después de Navidad"}},
+
+  "navidad_s2_do": {
+    "A": {"lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Sirácida 24. 1-2. 8-12"},
+        {"tipo": "Salmo",           "cita": "Salmo 147, 12-13. 14-15. 19-20"},
+        {"tipo": "2ª Lectura",      "cita": "Efesios 1, 3-6. 15-18"},
+        {"tipo": "Evangelio",       "cita": "Juan 1, 1-18 o Juan 1, 1-5. 9-14"}
+          ],"titulo": "2º Domingo después de Navidad"}},
+
+        /*
 ╔═══════════════════════════════════════════════════════════════════════════════════════╗
 ║  TIEMPO ADVIENTO - ENTRANDO A NAVIDAD DEL 17 AL 24 DE DICIEMBRE CICLO ABC, PAR/IMPAR  ║
 ╚═══════════════════════════════════════════════════════════════════════════════════════╝*/ 
@@ -578,14 +596,15 @@ const liturgiaLecturas = {
                     {"tipo": "Evangelio",       "cita": "Lucas 1, 67-79"}],},},
 
 
-/*25 Diciembre*/"navidad_25_dic": {"A": {"titulo": "Natividad del Señor, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Isaías 62, 1-5"},
-                    {"tipo": "Salmo",           "cita": "Salmo 88, 4-5. 16-17. 27 y 29"},
-                    {"tipo": "2ª Lectura",      "cita": "apóstoles 13, 16-17. 22-25"},
-                    {"tipo": "Evangelio",       "cita": "Mateo 1, 1-25 o Mateo 1, 18-25"}],},},
-
 //Esta tiene dos opciones en una y se alcanza al 2 de Enero con la opcion 1 y 2 cuando estas en el calendario en el dia 2
-/*2 Enero*/     "navidad_25_dic": [
+// NATIVIDAD DEL SEÑOR
+/*
+ _   _     ___     __   __   ___    ____     ___      ____
+| \ | |   / _ \    \ \ / /   |_ _| |  _ \   / _ \    |  _ \
+|  \| |  / ___ \    \ V /     | |  | |_) | / ___ \   | |_) |
+|_|\__| /_/   \_\    \_/     |___| |____/  /_/   \_\ |____/
+*/
+/*25 Diciembre*/"navidad_25_dic": [
                     {"A": {"titulo": "25 de Diciembre, Natividad del Señor, Misa de la Vigilia","lecturas": [
                         {"tipo": "1ª Lectura",      "cita": "Isaías 62, 1-5"},
                         {"tipo": "Salmo",           "cita": "Salmo 88, 4-5. 16-17. 27 y 29"},
@@ -710,7 +729,6 @@ const liturgiaLecturas = {
                         {"tipo": "Evangelio",       "cita": "Marcos 6, 45-52"}]}}],
 /*******************************************************************************************/
 
-
 /*10 Enero*/     "navidad_10_ene": {"A": {"titulo": "10 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
                     {"tipo": "1ª Lectura",      "cita": "Juan 4, 19—5, 4"},
                     {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 14 y 15bc. 17"},
@@ -727,8 +745,8 @@ const liturgiaLecturas = {
                     {"tipo": "Evangelio",       "cita": "Juan 3, 22-30"}],},},
 
 
-// BOCETO
-/*
+
+/*           BOCETO
 ╔══════════════════════════════════════════════════════════════╗
 ║  TIEMPO ADVIENTO - DIAS DE LA SEMANA 4 CICLO ABC, PAR/IMPAR  ║
 ╚══════════════════════════════════════════════════════════════╝*/ 
@@ -761,19 +779,10 @@ const liturgiaLecturas = {
 
 
 
-/**************************************************\
-╔══════════════════════════════════════════════════╗
-║  TIEMPO DE NAVIDAD - SEMANA 1 DOMINGO CICLO ABC  ║
-╚══════════════════════════════════════════════════╝
-*/ 
-  "navidad_s1_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Sirácida 3, 2-6. 12-14"},
-        {"tipo": "Salmo",           "cita": "Salmo 127, 1-2. 3. 4-5"},
-        {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 12-21"},
-        {"tipo": "Evangelio",       "cita": "Mateo 2, 13-15. 19-23"}
-          ],"titulo": "La Sagrada Familia"}},
-
+/*___    ____    ____    ___   _   _     ___     ____     ___    ___
+ / _ \  |  _ \  |  _ \  |_ _| | \ | |   / _ \   |  _ \   |_ _|  / _ \
+| (_) | |  _ <  | |_) |  | |  |  \| |  / ___ \  |  _ <    | |  | (_) |
+ \___/  |_| \_\ |____/  |___| |_|\__| /_/   \_\ |_| \_\  |___|  \___/  */
 
 /************************************************\
 ╔═════════════════════════════════════════════════╗
@@ -1181,9 +1190,10 @@ const liturgiaLecturas = {
         {"tipo": "Evangelio",       "cita": "Mateo 25, 31-46"}
         ],"titulo": "Domingo de la 34ª semana del Tiempo Ordinario"}
     },
-
-
-/************************************************\ 
+/*___   _   _    ___     ____    _____   ___   __  __     ___
+ / __| | | | |  / _ \   |  _ \  | ____| / __| |  \/  |   / _ \
+| (__  | |_| | / ___ \  |  _ <  |  _|   \__ \ | |\/| |  / ___ \
+ \___|  \___/ /_/   \_\ |_| \_\ |_____| |___/ |_|  |_| /_/   \_\
 ╔════════════════════════════════════════════════╗
 ║  TIEMPO CUARESMA - SEMANA 1 DOMINGO CICLO ABC  ║
 ╚════════════════════════════════════════════════╝
@@ -1193,19 +1203,19 @@ const liturgiaLecturas = {
                 {"tipo": "Salmo",           "cita": "Salmo 50, 3-4. 5-6a. 12-13. 14 y 17"},
                 {"tipo": "2ª Lectura",      "cita": "Romanos 5, 12-19 / Romanos 5, 12. 17-19"},
                 {"tipo": "Evangelio",       "cita": "Mateo 4, 1-11"}
-                ],"titulo": "Primer domingo de Cuaresma"},
+                ],"titulo": "Primer Domingo de Cuaresma"},
             "B": {"lecturas": [
                 {"tipo": "1ª Lectura",      "cita": "Génesis 9, 8-15"},
                 {"tipo": "Salmo",           "cita": "Salmo 24, 4bc-5ab. 6-7bc. 8-9"},
                 {"tipo": "2ª Lectura",      "cita": "1 Pedro 3, 18-22"},
                 {"tipo": "Evangelio",       "cita": "Marcos 1, 12-15"}
-                ],"titulo": "Primer domingo de Cuaresma"},
+                ],"titulo": "Segundo Domingo de Cuaresma"},
             "C": {"lecturas": [
                 {"tipo": "1ª Lectura",      "cita": "Deuteronomio 26, 4-10"},
                 {"tipo": "Salmo",           "cita": "Salmo 90, 1-2. 10-11. 12-13. 14-15"},
                 {"tipo": "2ª Lectura",      "cita": "Romanos 10, 8-13"},
                 {"tipo": "Evangelio",       "cita": "Lucas 4, 1-13"}
-                ],"titulo": "Primer domingo de Cuaresma"}
+                ],"titulo": "Tercer Domingo de Cuaresma"}
         },
 
 /*
@@ -1218,51 +1228,179 @@ const liturgiaLecturas = {
                 {"tipo": "Salmo",           "cita": "Salmo 32, 4-5. 18-19. 20 y 22"},
                 {"tipo": "2ª Lectura",      "cita": "Timoteo 1, 8b-10"},
                 {"tipo": "Evangelio",       "cita": "Mateo 17, 1-9"}
+                ],"titulo": "Segundo domingo de Cuaresma"},
+            "B": {"lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Génesis 22, 1-2. 9-13. 15-18"},
+                {"tipo": "Salmo",           "cita": "Salmo 115, 10 y 15. 16-17. 18-19"},
+                {"tipo": "2ª Lectura",      "cita": "Romanos 8, 31b-34"},
+                {"tipo": "Evangelio",       "cita": "Marcos 9, 2-10"}
+                ],"titulo": "Segundo domingo de Cuaresma"},
+            "C": {"lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Génesis 15, 5-12. 17-18"},
+                {"tipo": "Salmo",           "cita": "Salmo 26, 1. 7-8a. 8b-9abc. 13-14"},
+                {"tipo": "2ª Lectura",      "cita": "Filipenses 3, 17—4, 1 o Filipenses 3, 20—4, 1"},
+                {"tipo": "Evangelio",       "cita": "Lucas 9, 28b-36"}
                 ],"titulo": "Segundo domingo de Cuaresma"}
+            
         },
 
-// TIEMPO DE CUARESMA - SEMANA 3 DOMINGO
-  "cuaresma_s3_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Éxodo 17, 3-7"},
-        {"tipo": "Salmo",           "cita": "Salmo 94, 1-2. 6-7. 8-9"},
-        {"tipo": "2ª Lectura",      "cita": "Romanos 5, 1-2. 5-8"},
-        {"tipo": "Evangelio",       "cita": "Juan 4, 5-42"}
-        ],"titulo": "Tercer domingo de Cuaresma"}
-  },
+/*
+╔═══════════════════════════════════════════════════╗
+║  TIEMPO DE CUARESMA - SEMANA 3 DOMINGO CICLO ABC  ║
+╚═══════════════════════════════════════════════════╝
+*/      "cuaresma_s3_do": {
+            "A": {"titulo": "Tercer domingo de Cuaresma, Ciclo A","lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Éxodo 17, 3-7"},
+                {"tipo": "Salmo",           "cita": "Salmo 94, 1-2. 6-7. 8-9"},
+                {"tipo": "2ª Lectura",      "cita": "Romanos 5, 1-2. 5-8"},
+                {"tipo": "Evangelio",       "cita": "Juan 4, 5-42 o Juan 4, 15. 19b-26. 39a. 40-42"}],},
+            "B": {"titulo": "Tercer domingo de Cuaresma, Ciclo B","lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Éxodo 20, 1-17 o Éxodo 20, 1-3. 7-8. 12-17"},
+                {"tipo": "Salmo",           "cita": "Salmo 18, 8. 9. 10. 11"},
+                {"tipo": "2ª Lectura",      "cita": "1 Corintios 1, 22-25"},
+                {"tipo": "Evangelio",       "cita": "Juan 2, 13-25."}],},
+            "C": {"titulo": "Tercer domingo de Cuaresma, Ciclo C","lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Éxodo 3, 1-8a. 13-15"},
+                {"tipo": "Salmo",           "cita": "Salmo 102, 1-2. 3-4. 6-7. 8 y 11"},
+                {"tipo": "2ª Lectura",      "cita": "1 Corintios 10, 1-6. 10-12"},
+                {"tipo": "Evangelio",       "cita": "Lucas 13, 1-9"}],}
+        },
 
-// TIEMPO DE CUARESMA - SEMANA 4 DOMINGO
-  "cuaresma_s4_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Samuel 16, 1b. 6-7. 10-13a"},
-        {"tipo": "Salmo",           "cita": "Salmo 22, 1-3a. 3b-4. 5. 6"},
-        {"tipo": "2ª Lectura",      "cita": "Efesios 5, 8-14"},
-        {"tipo": "Evangelio",       "cita": "Juan 9, 1-41"}
-      ],"titulo": "Cuarto domingo de Cuaresma"}
-  },
+/*
+╔═══════════════════════════════════════════════════╗
+║  TIEMPO DE CUARESMA - SEMANA 4 DOMINGO CICLO ABC  ║
+╚═══════════════════════════════════════════════════╝
+*/      "cuaresma_s4_do": {
+            "A": {"titulo": "Cuarto domingo de Cuaresma", "lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Samuel 16, 1b. 6-7. 10-13a"},
+                {"tipo": "Salmo",           "cita": "Salmo 22, 1-3a. 3b-4. 5. 6"},
+                {"tipo": "2ª Lectura",      "cita": "Efesios 5, 8-14"},
+                {"tipo": "Evangelio",       "cita": "Juan 9, 1-41 o Juan 9, 1. 6-9. 13-17. 34-38"}],},
+            "B": {"titulo": "Cuarto domingo de Cuaresma", "lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "2 Crónicas 36, 14-16. 19-23"},
+                {"tipo": "Salmo",           "cita": "Salmo 136, 1-2. 3. 4. 5. 6"},
+                {"tipo": "2ª Lectura",      "cita": "Efesios 2, 4-10"},
+                {"tipo": "Evangelio",       "cita": "Juan 3, 14-21"}]},
+            "C": {"titulo": "Cuarto domingo de Cuaresma", "lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Josué 5, 9a. 10-12"},
+                {"tipo": "Salmo",           "cita": "Salmo 33, 2-3. 4-5. 6-7"},
+                {"tipo": "2ª Lectura",      "cita": "2 Corintios 5, 17-21"},
+                {"tipo": "Evangelio",       "cita": "Lucas 15, 1-3. 11-32"}],}
+        },
 
-// TIEMPO DE CUARESMA - SEMANA 5 DOMINGO
-  "cuaresma_s5_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Ezequiel 37, 12-14"},
-        {"tipo": "Salmo",           "cita": "Salmo 129, 1-2. 3-4ab. 4c-6. 7-8"},
-        {"tipo": "2ª Lectura",      "cita": "Romanos 8, 8-11"},
-        {"tipo": "Evangelio",       "cita": "Juan 11, 1-45"}
-        ],"titulo": "Quinto domingo de Cuaresma"}
-  },
 
-// TIEMPO DE CUARESMA - SEMANA 6 DOMINGO
-  "cuaresma_s6_do": {
-    "A": {"lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Mateo 21, 1-11        Isaías 50, 4-7"},
-        {"tipo": "Salmo",           "cita": "Salmo 21, 8-9. 17-18a. 19-20. 23-24"},
-        {"tipo": "2ª Lectura",      "cita": "Filipenses 2, 6-11"},
-        {"tipo": "Evangelio",       "cita": "Mateo 26, 14—27, 66"}
-      ],"titulo": "Domingo de ramos"
-    }
-  },
+/*
+╔═══════════════════════════════════════════════════╗
+║  TIEMPO DE CUARESMA - SEMANA 5 DOMINGO CICLO ABC  ║
+╚═══════════════════════════════════════════════════╝
+*/      "cuaresma_s5_do": {
+            "A": {"titulo": "Quinto Domingo de Cuaresma", "lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Ezequiel 37, 12-14"},
+                {"tipo": "Salmo",           "cita": "Salmo 129, 1-2. 3-4ab. 4c-6. 7-8"},
+                {"tipo": "2ª Lectura",      "cita": "Romanos 8, 8-11"},
+                {"tipo": "Evangelio",       "cita": "Juan 11, 1-45 o Juan 11, 3-7. 17. 20-27. 33b-45"}],},
+            "B": {"titulo": "Quinto Domingo de Cuaresma", "lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Jeremías 31, 31-34"},
+                {"tipo": "Salmo",           "cita": "Salmo 50, 3-4, 12-13. 14-15"},
+                {"tipo": "2ª Lectura",      "cita": "Hebreos 5, 7-9"},
+                {"tipo": "Evangelio",       "cita": "Juan 12, 20-33"}]},
+            "C": {"titulo": "Quinto Domingo de Cuaresma", "lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Isaías 43, 16-21"},
+                {"tipo": "Salmo",           "cita": "Salmo 125, 1-2ab. 2cd-3. 4-5. 6"},
+                {"tipo": "2ª Lectura",      "cita": "Filipenses 3, 8-14"},
+                {"tipo": "Evangelio",       "cita": "Juan 8, 1-11"}],}
+        },      /*
+╔═════════════════════════════════════════════════════════════╗
+║  TIEMPO DE CUARESMA - SEMANA 6 DOMINGO DE RAMOS, CICLO ABC  ║
+╚═════════════════════════════════════════════════════════════╝
+*/      "cuaresma_s6_do": {
+            "A": {"titulo": "Domingo de Ramos Ciclo A", "lecturas": [
+                {"tipo": "Evangelio de Entrada","cita": "Mateo 21, 1-11"},
+                {"tipo": "1ª Lectura",       "cita": "Isaías 50, 4-7"},
+                {"tipo": "Salmo",            "cita": "Salmo 21, 8-9. 17-18a. 19-20. 23-24"},
+                {"tipo": "2ª Lectura",       "cita": "Filipenses 2, 6-11"},
+                {"tipo": "Evangelio",        "cita": "Mateo 26, 14—27, 66 o Mateo 27, 11-54"}],},
+            "B": {"titulo": "Domingo de Ramos Ciclo B", "lecturas": [
+                {"tipo": "Evangelio de Entrada","cita": "Marcos 11, 1-10 o Juan 12, 12-16"},
+                {"tipo": "1ª Lectura",       "cita": "Isaías 50, 4-7"},
+                {"tipo": "Salmo",            "cita": "Salmo 21, 8-9. 17-18a. 19-20. 23-24"},
+                {"tipo": "2ª Lectura",       "cita": "Filipenses 2, 6-11"},
+                {"tipo": "Evangelio",        "cita": "Marcos 14, 1—15, 47 o Marcos 15, 1-39"}]},
+            "C": {"titulo": "Domingo de Ramos Ciclo C", "lecturas": [
+                {"tipo": "Evangelio de Entrada","cita": "Lucas 19, 28-40"},
+                {"tipo": "1ª Lectura",       "cita": "Isaías 50, 4-7"},
+                {"tipo": "Salmo",            "cita": "Salmo 21, 8-9. 17-18a. 19-20. 23-24"},
+                {"tipo": "2ª Lectura",       "cita": "Filipenses 2, 6-11"},
+                {"tipo": "Evangelio",        "cita": "Lucas 22, 14—23, 56 o Lucas 23, 1-49"}],}
+        },
+
+/*LUNES SANTO*/     "cuaresma_s6_lu": {"A": {"titulo": "Lunes 1º de Adviento Ciclo A,B,C, Par/Impar","lecturas": [
+                        {"tipo": "1ª Lectura",      "cita": "Isaías 2, 1-5 / Isaías 4, 2-6"},
+                        {"tipo": "Salmo",           "cita": "Salmo 121, 1-2. 4-5. 6-7. 8-9"},
+                        {"tipo": "Evangelio",       "cita": "Mateo 8, 5-11"}],},},
+/*MARTES SANTO*/    "cuaresma_s6_ma": {"A": {"titulo": "Martes 1º de Adviento Ciclo A,B,C, Par/Impar","lecturas": [
+                        {"tipo": "1ª Lectura",      "cita": "Isaías 11, 1-10"},
+                        {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 12-13. 17"},
+                        {"tipo": "Evangelio",       "cita": "Lucas 10,21-24"}],},},
+/*MIERCOLES SANTO*/ "cuaresma_s6_mi": {"A": {"titulo": "Miércoles 1º de Adviento Ciclo A,B,C, Par/Impar","lecturas": [
+                        {"tipo": "1ª Lectura",      "cita": "Isaías 25, 6-10a"},
+                        {"tipo": "Salmo",           "cita": "Salmo 22, 1-3a. 3b-4. 5. 6"},
+                        {"tipo": "Evangelio",       "cita": "Mateo 15, 29-37"}],},},
+/*JUEVES SANTO*/    "cuaresma_s6_ju": {"A": {"titulo": "Jueves 1º de Adviento Ciclo A,B,C, Par/Impar","lecturas": [
+                        {"tipo": "1ª Lectura",      "cita": "Isaías 26, 1-6"},
+                        {"tipo": "Salmo",           "cita": "Salmo 117, 1 y 8-9. 19-21. 25-27a"},
+                        {"tipo": "Evangelio",       "cita": "Mateo 7, 21. 24-27"}],},},
+
+
+
+/*
+╔═════════════════════════════════════════════════════════════╗
+║  TIEMPO DE CUARESMA - SEMANA 6 DOMINGO DE RAMOS, CICLO ABC  ║
+╚═════════════════════════════════════════════════════════════╝
+*/      "cuaresma_s6_do": {
+           "A": {"titulo": "Domingo de Ramos Ciclo A", "lecturas": [
+                {"tipo": "1ª Lectura",       "cita": "Isaías 61, 1-3a. 6a. 8b-9"},
+                {"tipo": "Salmo",            "cita": "Salmo 88, 21-22. 25 y 27"},
+                {"tipo": "2ª Lectura",       "cita": "Apocalipsis 1, 5-8"},
+                {"tipo": "Evangelio",        "cita": "Lucas 4, 16-21"}],},
+           "B": {"titulo": "Domingo de Ramos Ciclo B", "lecturas": [
+                {"tipo": "Evangelio de Entrada","cita": "Marcos 11, 1-10 o Juan 12, 12-16"},
+                {"tipo": "1ª Lectura",       "cita": "Isaías 50, 4-7"},
+                {"tipo": "Salmo",            "cita": "Salmo 21, 8-9. 17-18a. 19-20. 23-24"},
+                {"tipo": "2ª Lectura",       "cita": "Filipenses 2, 6-11"},
+                {"tipo": "Evangelio",        "cita": "Marcos 14, 1—15, 47 o Marcos 15, 1-39"}]},
+           "C": {"titulo": "Domingo de Ramos Ciclo C", "lecturas": [
+                {"tipo": "Evangelio de Entrada","cita": "Lucas 19, 28-40"},
+                {"tipo": "1ª Lectura",       "cita": "Isaías 50, 4-7"},
+                {"tipo": "Salmo",            "cita": "Salmo 21, 8-9. 17-18a. 19-20. 23-24"},
+                {"tipo": "2ª Lectura",       "cita": "Filipenses 2, 6-11"},
+                {"tipo": "Evangelio",        "cita": "Lucas 22, 14—23, 56 o Lucas 23, 1-49"}],}
+        },
+
+
+
+
+/*
+╔═════════════════════════════════════════════════════════╗
+║  TIEMPO DE CUARESMA - SEMANA 6 JUEVES SANTO, CICLO ABC  ║
+╚═════════════════════════════════════════════════════════╝
+*/      "cuaresma_s6_ju": [
+                    {"A": {"titulo": "Jueves santo, Misa Crismal","lecturas": [
+                        {"tipo": "1ª Lectura",      "cita": "Isaías 61, 1-3a. 6a. 8b-9"},
+                        {"tipo": "Salmo",           "cita": "Salmo 88, 21-22. 25 y 27"},
+                        {"tipo": "2ª Lectura",      "cita": "Apocalipsis 1, 5-8"},
+                        {"tipo": "Evangelio",       "cita": "Lucas 4, 16-21"}]}},
+                    {"A": {"titulo": "Jueves santo, Misa de la cena del Señor, Ciclos A, B y C","lecturas": [
+                        {"tipo": "1ª Lectura",      "cita": "Éxodo 12, 1-8. 11-14"},
+                        {"tipo": "Salmo",           "cita": "Salmo 115, 12-13. 15-16bc. 17-18"},
+                        {"tipo": "2ª Lectura",      "cita": "1 Corintios 11,23-26"},
+                        {"tipo": "Evangelio",       "cita": "Juan 13, 1-15"}]}}
+                            ],
+
+
 
 // TIEMPO DE CUARESMA - SEMANA 6 JUEVES SANTO
+/*  REVISAR Y BORRAR YA ESTÁ ARRIBA EL JUEVES SANTO
   "cuaresma_s6_ju": {
     "A": {
       "lecturas": [
@@ -1284,6 +1422,8 @@ const liturgiaLecturas = {
         {"tipo": "Evangelio",       "cita": "Juan 13, 1-15"}
         ],"titulo": "Jueves santo"},
   },
+
+  */
 
 // TIEMPO DE CUARESMA - SEMANA 6 VIERNES SANTO
   "cuaresma_s6_vi": {

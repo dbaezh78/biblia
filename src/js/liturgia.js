@@ -634,7 +634,7 @@
     let maxSemanas = 4;
     if (tiempo === 'Adviento') maxSemanas = 4;
     else if (tiempo === 'Navidad') maxSemanas = 2;
-    else if (tiempo === 'Cuaresma') maxSemanas = 5;
+    else if (tiempo === 'Cuaresma') maxSemanas = 6;
     else if (tiempo === 'Pascual') maxSemanas = 7;
     else if (tiempo === 'Ordinario') maxSemanas = 34;
     
