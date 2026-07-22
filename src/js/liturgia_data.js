@@ -348,11 +348,6 @@ const liturgiaFechas = {
 const liturgiaLecturas = {
 
 
-/*******************************************\
-╔═════════════════════════════════════════════════╗
-║  FIESTA - SAGRADO CORAZON DE JESUS - CICLO ABC  ║
-╚═════════════════════════════════════════════════╝
-*/
 /*
  _____    ___   _____   ___   _____    ___      ___ 
 |  ___|  |_ _| | ____| / __| |_   _|  / _ \    / __|
@@ -362,8 +357,11 @@ const liturgiaLecturas = {
 / __|  / _ \  | |     | ____| |  \/  | | \ | |  |_ _| |  _ \   / _ \    |  _ \  | ____| / __|
 \__ \ | (_) | | |___  |  _|   | |\/| | |  \| |   | |  | |_) | / ___ \   | |_) | |  _|   \__ \
 |___/  \___/  |_____| |_____| |_|  |_| |_|\__|  |___| |____/  /_/   \_\ |____/  |_____| |___/
-*/
 
+╔═════════════════════════════════════════════════╗
+║  FIESTA - SAGRADO CORAZON DE JESUS - CICLO ABC  ║
+╚═════════════════════════════════════════════════╝
+*/
 
 "scorazondeJesus": {
    "A": {"lecturas": [
@@ -543,20 +541,20 @@ const liturgiaLecturas = {
 ╚══════════════════════════════════════════════════╝
 */ 
   "navidad_s1_do": {
-    "A": {"lecturas": [
+    "A": {"titulo": "1º Domingo después de Navidad","lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Sirácida 3, 2-6. 12-14"},
         {"tipo": "Salmo",           "cita": "Salmo 127, 1-2. 3. 4-5"},
         {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 12-21"},
         {"tipo": "Evangelio",       "cita": "Mateo 2, 13-15. 19-23"}
-          ],"titulo": "1º Domingo después de Navidad"}},
+          ],}},
 
   "navidad_s2_do": {
-    "A": {"lecturas": [
+    "A": {"titulo": "2º Domingo después de Navidad","lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Sirácida 24. 1-2. 8-12"},
         {"tipo": "Salmo",           "cita": "Salmo 147, 12-13. 14-15. 19-20"},
         {"tipo": "2ª Lectura",      "cita": "Efesios 1, 3-6. 15-18"},
         {"tipo": "Evangelio",       "cita": "Juan 1, 1-18 o Juan 1, 1-5. 9-14"}
-          ],"titulo": "2º Domingo después de Navidad"}},
+          ],}},
 
         /*
 ╔═══════════════════════════════════════════════════════════════════════════════════════╗
