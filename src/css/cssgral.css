@@ -3102,3 +3102,14 @@ body.modo-oscuro .custom-select-option:hover {
   font-size: larger !important;
   text-align: justify;
 }
+
+#btnToggleSelectorLiturgico {
+  transition: transform 0.2s, opacity 0.2s;
+}
+#btnToggleSelectorLiturgico:hover {
+  transform: scale(1.15);
+  opacity: 0.9;
+}
+#btnToggleSelectorLiturgico:active {
+  transform: scale(0.95);
+}

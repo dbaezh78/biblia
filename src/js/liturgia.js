@@ -312,39 +312,68 @@
 
         let textHtml = "";
         
-        parsed.chapters.forEach((ch, idxCh) => {
-          const capData = bookData.capitulos[ch.capNum];
-          if (!capData) return;
-          
-          if (parsed.chapters.length > 1) {
-            if (idxCh > 0) {
-              textHtml += `<hr style="border: none; border-top: 1px dashed #e2e8f0; margin: 15px 0;">`;
-            }
-            textHtml += `<p style="font-weight: bold; font-size: 0.85rem; color: #4a5568; margin-top: 10px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Capítulo ${ch.capNum}</p>`;
-          }
-          
-          const allStarts = ch.ranges.map(r => r.start);
-          const allEnds = ch.ranges.map(r => r.end === null ? Object.keys(capData).length : r.end);
-          const minV = Math.min(...allStarts);
-          const maxV = Math.max(...allEnds);
-          
-          let lastRendered = null;
+        // Caso especial: Ester Capítulo 14 en Biblia Griega (se encuentra dentro del cap 4 del JSON)
+        const esEster14 = (parsed.libroId === "19_est" && parsed.chapters.some(c => c.capNum === 14));
 
-          for (let v = minV; v <= maxV; v++) {
-            const matched = ch.ranges.some(r => {
-              const rEnd = r.end === null ? Object.keys(capData).length : r.end;
-              return v >= r.start && v <= rEnd;
+        if (esEster14) {
+          const capData = bookData.capitulos["4"];
+          if (capData) {
+            const mapEster14 = {
+              1: "17-k",
+              3: "17-l",
+              4: "17-m",
+              5: "17-n",
+              12: "17-r",
+              13: "17-s",
+              14: "17-t"
+            };
+            parsed.chapters.forEach(ch => {
+              ch.ranges.forEach(r => {
+                const rEnd = r.end === null ? r.start : r.end;
+                for (let v = r.start; v <= rEnd; v++) {
+                  const key = mapEster14[v];
+                  if (key && capData[key]) {
+                    textHtml += `<p style="margin: 6px 0; font-size: 0.98rem; line-height: 1.6; text-align: justify; color: #2d3748;"><strong style="color: #c0392b; margin-right: 6px; font-size: 0.85em;">${v}</strong>${capData[key]}</p>`;
+                  }
+                }
+              });
             });
-            
-            if (matched && capData[v]) {
-              if (lastRendered !== null && v > lastRendered + 1) {
-                textHtml += `<div style="text-align: center; margin: 8px 0; color: #a0aec0; font-size: 0.85rem; font-style: italic; letter-spacing: 4px;">...</div>`;
-              }
-              textHtml += `<p style="margin: 6px 0; font-size: 0.98rem; line-height: 1.6; text-align: justify; color: #2d3748;"><strong style="color: #c0392b; margin-right: 6px; font-size: 0.85em;">${v}</strong>${capData[v]}</p>`;
-              lastRendered = v;
-            }
           }
-        });
+        } else {
+          parsed.chapters.forEach((ch, idxCh) => {
+            const capData = bookData.capitulos[ch.capNum];
+            if (!capData) return;
+            
+            if (parsed.chapters.length > 1) {
+              if (idxCh > 0) {
+                textHtml += `<hr style="border: none; border-top: 1px dashed #e2e8f0; margin: 15px 0;">`;
+              }
+              textHtml += `<p style="font-weight: bold; font-size: 0.85rem; color: #4a5568; margin-top: 10px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Capítulo ${ch.capNum}</p>`;
+            }
+            
+            const allStarts = ch.ranges.map(r => r.start);
+            const allEnds = ch.ranges.map(r => r.end === null ? Object.keys(capData).length : r.end);
+            const minV = Math.min(...allStarts);
+            const maxV = Math.max(...allEnds);
+            
+            let lastRendered = null;
+
+            for (let v = minV; v <= maxV; v++) {
+              const matched = ch.ranges.some(r => {
+                const rEnd = r.end === null ? Object.keys(capData).length : r.end;
+                return v >= r.start && v <= rEnd;
+              });
+              
+              if (matched && capData[v]) {
+                if (lastRendered !== null && v > lastRendered + 1) {
+                  textHtml += `<div style="text-align: center; margin: 8px 0; color: #a0aec0; font-size: 0.85rem; font-style: italic; letter-spacing: 4px;">...</div>`;
+                }
+                textHtml += `<p style="margin: 6px 0; font-size: 0.98rem; line-height: 1.6; text-align: justify; color: #2d3748;"><strong style="color: #c0392b; margin-right: 6px; font-size: 0.85em;">${v}</strong>${capData[v]}</p>`;
+                lastRendered = v;
+              }
+            }
+          });
+        }
 
         if (textHtml === "") {
           textHtml = `<p style="font-style: italic; color: #a0aec0;">Texto no disponible en este capítulo.</p>`;
@@ -398,14 +427,20 @@
     cargarYMostrarLecturas(currentLecturasList, currentTituloDia, currentOpcionesConfig, subOpcionesState);
   };
 
-  // 5. Cargar lectura por clave litúrgica, ciclo y número de opción (0-indexed)
+  // 5. Cargar lectura por clave litúrgica, ciclo y número de opción del ciclo (0-indexed)
   function cargarLiturgiaPorClave(clave, ciclo, opcionIndex = 0) {
     if (!clave) {
       mostrarMensajeVacio();
       return;
     }
 
-    const baseClave = clave.replace(/_\d+$/, '');
+    let baseClave = clave.replace(/_\d+$/, '');
+
+    // Fallback automático de Ascensión del Jueves a Ascensión del Domingo si no está definida en los datos
+    if (baseClave === "pascua_as_ju" && !liturgiaLecturas["pascua_as_ju"]) {
+      baseClave = "pascua_as_do";
+    }
+
     const opcionesList = [];
 
     if (Array.isArray(liturgiaLecturas[baseClave])) {
@@ -420,24 +455,48 @@
       }
     }
 
-    if (opcionesList.length === 0) {
+    // Filtrar las opciones que corresponden al ciclo o año ferial solicitado
+    const opcionesFiltradas = [];
+    opcionesList.forEach(opt => {
+      if (opt[ciclo]) {
+        opcionesFiltradas.push({
+          data: opt[ciclo],
+          originalOption: opt
+        });
+      }
+    });
+
+    // Fallback general por si no hay ninguna específica para ese ciclo
+    if (opcionesFiltradas.length === 0) {
+      opcionesList.forEach(opt => {
+        const fallbackKey = opt[ciclo] ? ciclo : (opt["A"] ? "A" : (opt["B"] ? "B" : (opt["C"] ? "C" : (opt["PAR"] ? "PAR" : (opt["IMPAR"] ? "IMPAR" : null)))));
+        if (fallbackKey && opt[fallbackKey]) {
+          opcionesFiltradas.push({
+            data: opt[fallbackKey],
+            originalOption: opt
+          });
+        }
+      });
+    }
+
+    if (opcionesFiltradas.length === 0) {
       mostrarMensajeVacio();
       return;
     }
 
-    if (opcionIndex < 0 || opcionIndex >= opcionesList.length) {
+    if (opcionIndex < 0 || opcionIndex >= opcionesFiltradas.length) {
       opcionIndex = 0;
     }
 
-    const diaObj = opcionesList[opcionIndex];
-    const dataCiclo = diaObj[ciclo] || diaObj["A"] || diaObj["B"] || diaObj["C"] || diaObj["PAR"] || diaObj["IMPAR"];
+    const selectedOption = opcionesFiltradas[opcionIndex];
+    const dataCiclo = selectedOption.data;
 
     if (dataCiclo) {
       subOpcionesState = {};
       cargarYMostrarLecturas(dataCiclo.lecturas, dataCiclo.titulo, {
         baseClave,
         ciclo,
-        totalOpciones: opcionesList.length,
+        totalOpciones: opcionesFiltradas.length,
         opcionIndexActual: opcionIndex
       }, {});
     } else {
@@ -602,27 +661,125 @@
     const claveLiturgica = liturgiaFechas[hoyStr]; // ej. "adviento_s1_do" o "ordinario_s15_vi"
     
     if (claveLiturgica) {
-      const parts = claveLiturgica.split('_'); // ["adviento", "s1", "do"]
-      if (parts.length === 3) {
+      const parts = claveLiturgica.split('_'); // ["cuaresma", "mc", "mi"] o ["pascua", "as", "do"]
+      if (parts.length >= 2) {
         let tiempo = parts[0];
         // Capitalizar tiempo
         tiempo = tiempo.charAt(0).toUpperCase() + tiempo.slice(1);
         if (tiempo === "Pascua") tiempo = "Pascual";
 
-        const semana = parts[1].replace('s', ''); // "1" o "15"
+        let semana = parts[1];
+        if (semana === "pentecostes" || semana === "pent") {
+          semana = "pentecostes";
+        } else if (semana === "mc") {
+          semana = "mc";
+        } else if (semana.startsWith('s')) {
+          semana = semana.replace('s', ''); // "1" o "15"
+        }
 
         selectTiempo.value = tiempo;
         actualizarSemanasLiturgia();
         selectSemana.value = semana;
+        actualizarDiasLiturgia();
+
+        if (parts.length === 3) {
+          const dia = parts[2];
+          const optionExists = Array.from(selectDia.options).some(opt => opt.value === dia);
+          if (optionExists) {
+            selectDia.value = dia;
+          }
+        }
       }
     } else {
       // Default: Ordinario
       selectTiempo.value = "Ordinario";
       actualizarSemanasLiturgia();
       selectSemana.value = "1";
+      actualizarDiasLiturgia();
     }
 
     ejecutarFiltroManual();
+  }
+
+  // 9b. Actualizar las opciones del select de días según la semana seleccionada
+  function actualizarDiasLiturgia() {
+    const selectSemana = document.getElementById('selectLiturgiaSemana');
+    const selectDia = document.getElementById('selectLiturgiaDia');
+    if (!selectSemana || !selectDia) return;
+
+    const semana = selectSemana.value;
+    const valorPrevio = selectDia.value;
+
+    const selectTiempo = document.getElementById('selectLiturgiaTiempo');
+    const tiempo = selectTiempo ? selectTiempo.value : "";
+
+    const todosLosDias = [
+      { value: "do", text: "Domingo" },
+      { value: "lu", text: "Lunes" },
+      { value: "ma", text: "Martes" },
+      { value: "mi", text: "Miércoles" },
+      { value: "ju", text: "Jueves" },
+      { value: "vi", text: "Viernes" },
+      { value: "sa", text: "Sábado" }
+    ];
+
+    let diasFiltrados = todosLosDias;
+
+    if (semana === "pentecostes") {
+      // Solo Domingo para Pentecostés
+      diasFiltrados = [
+        { value: "do", text: "Domingo" }
+      ];
+    } else if (semana === "as") {
+      // Solo Domingo y Jueves para Ascensión
+      diasFiltrados = [
+        { value: "do", text: "Domingo" },
+        { value: "ju", text: "Jueves" }
+      ];
+    } else if (semana === "mc") {
+      // Solo Miércoles a Sábado para Ceniza
+      diasFiltrados = [
+        { value: "mi", text: "Miércoles" },
+        { value: "ju", text: "Jueves" },
+        { value: "vi", text: "Viernes" },
+        { value: "sa", text: "Sábado" }
+      ];
+    } else if (tiempo === "Cuaresma" && ["3", "4", "5"].includes(semana)) {
+      // Libre Elección debajo de Domingo y antes de Lunes
+      diasFiltrados = [
+        { value: "do", text: "Domingo" },
+        { value: "le", text: "Libre Elección" },
+        { value: "lu", text: "Lunes" },
+        { value: "ma", text: "Martes" },
+        { value: "mi", text: "Miércoles" },
+        { value: "ju", text: "Jueves" },
+        { value: "vi", text: "Viernes" },
+        { value: "sa", text: "Sábado" }
+      ];
+    }
+
+    console.log("actualizarDiasLiturgia - tiempo:", tiempo, "semana:", semana, "diasFiltrados:", diasFiltrados);
+
+    selectDia.innerHTML = "";
+    diasFiltrados.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.value;
+      opt.textContent = d.text;
+      selectDia.appendChild(opt);
+    });
+
+    // Si el valor previo existe en la lista filtrada, lo restauramos.
+    // De lo contrario, por defecto va Miércoles para Ceniza ("mi") y Domingo ("do") para los demás.
+    const optionExists = Array.from(selectDia.options).some(opt => opt.value === valorPrevio);
+    if (optionExists) {
+      selectDia.value = valorPrevio;
+    } else {
+      if (semana === "mc") {
+        selectDia.value = "mi";
+      } else {
+        selectDia.value = "do";
+      }
+    }
   }
 
   // 10. Actualizar las opciones del select de semanas según el tiempo litúrgico
@@ -631,26 +788,68 @@
     const selectSemana = document.getElementById('selectLiturgiaSemana');
     if (!selectSemana) return;
     
-    let maxSemanas = 4;
-    if (tiempo === 'Adviento') maxSemanas = 4;
-    else if (tiempo === 'Navidad') maxSemanas = 2;
-    else if (tiempo === 'Cuaresma') maxSemanas = 6;
-    else if (tiempo === 'Pascual') maxSemanas = 7;
-    else if (tiempo === 'Ordinario') maxSemanas = 34;
-    
     const valorPrevio = selectSemana.value;
-    
     selectSemana.innerHTML = "";
-    for (let i = 1; i <= maxSemanas; i++) {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = `Semana ${i}`;
-      selectSemana.appendChild(opt);
+
+    if (tiempo === 'Pascual') {
+      // Agregar semanas de Pascua de la 1 a la 6, luego la Ascensión, luego la semana 7 y luego Pentecostés
+      for (let i = 1; i <= 6; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Semana ${i}`;
+        selectSemana.appendChild(opt);
+      }
+      
+      const optAs = document.createElement('option');
+      optAs.value = "as";
+      optAs.textContent = "Ascensión";
+      selectSemana.appendChild(optAs);
+
+      const opt7 = document.createElement('option');
+      opt7.value = 7;
+      opt7.textContent = `Semana 7`;
+      selectSemana.appendChild(opt7);
+
+      const optPent = document.createElement('option');
+      optPent.value = "pentecostes";
+      optPent.textContent = "Pentecostés";
+      selectSemana.appendChild(optPent);
+    } else if (tiempo === 'Cuaresma') {
+      // Miércoles de Ceniza (mc) antes de la semana 1
+      const optMc = document.createElement('option');
+      optMc.value = "mc";
+      optMc.textContent = "Mié.Ceniza";
+      selectSemana.appendChild(optMc);
+
+      for (let i = 1; i <= 6; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Semana ${i}`;
+        selectSemana.appendChild(opt);
+      }
+    } else {
+      let maxSemanas = 4;
+      if (tiempo === 'Adviento') maxSemanas = 4;
+      else if (tiempo === 'Navidad') maxSemanas = 2;
+      else if (tiempo === 'Ordinario') maxSemanas = 34;
+
+      for (let i = 1; i <= maxSemanas; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Semana ${i}`;
+        selectSemana.appendChild(opt);
+      }
     }
 
-    if (valorPrevio && parseInt(valorPrevio, 10) <= maxSemanas) {
-      selectSemana.value = valorPrevio;
+    // Restaurar valor previo si existe y es válido
+    if (valorPrevio) {
+      const optionExists = Array.from(selectSemana.options).some(opt => opt.value === valorPrevio);
+      if (optionExists) {
+        selectSemana.value = valorPrevio;
+      }
     }
+
+    actualizarDiasLiturgia();
   }
 
   // 11. Ejecutar consulta de lectura manual
@@ -669,7 +868,16 @@
     let claveTiempo = tiempo;
     if (claveTiempo === "pascual") claveTiempo = "pascua";
 
-    const claveLiturgica = `${claveTiempo}_s${semana}_${dia}`;
+    let claveLiturgica;
+    if (semana === "pentecostes") {
+      claveLiturgica = `${claveTiempo}_pentecostes`;
+    } else if (semana === "as") {
+      claveLiturgica = `${claveTiempo}_as_${dia}`;
+    } else if (semana === "mc") {
+      claveLiturgica = `${claveTiempo}_mc_${dia}`;
+    } else {
+      claveLiturgica = `${claveTiempo}_s${semana}_${dia}`;
+    }
     
     // Si es domingo ("do"), usamos ciclo (A, B, C)
     // Si es día de semana (lu, ma, mi, ju, vi, sa), usamos año ferial (PAR, IMPAR)
@@ -702,6 +910,51 @@
       btnClose.addEventListener('click', cerrarLecturaDiaModal);
     }
 
+    // Botón de alternancia de selector manual (Calendario Litúrgico) en el encabezado del modal
+    const btnToggleSelectorLiturgico = document.getElementById('btnToggleSelectorLiturgico');
+    if (btnToggleSelectorLiturgico) {
+      btnToggleSelectorLiturgico.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const selectorManual = document.getElementById('lecturaSeleccionManual');
+        if (!selectorManual) return;
+
+        const isHidden = selectorManual.style.display === "none";
+        if (isHidden) {
+          selectorManual.style.display = "block";
+          inicializarFiltrosManuales();
+        } else {
+          selectorManual.style.display = "none";
+          // Cargar lectura de la fecha seleccionada en el selector de fecha
+          const inputSelector = document.getElementById('inputLiturgiaFechaSelector');
+          if (inputSelector && inputSelector.value) {
+            const parts = inputSelector.value.split('-');
+            if (parts.length === 3) {
+              const yyyy = parseInt(parts[0], 10);
+              const mm = parseInt(parts[1], 10) - 1;
+              const dd = parseInt(parts[2], 10);
+              const selDate = new Date(yyyy, mm, dd);
+              
+              const cycle = obtenerCicloLiturgico(selDate);
+              const ferialYear = (selDate.getFullYear() % 2 === 0) ? "PAR" : "IMPAR";
+              const key = obtenerClaveLiturgicaDeFecha(selDate);
+              
+              if (key) {
+                const keyParts = key.split('_');
+                const dia = keyParts[keyParts.length - 1];
+                const esDiaFijoOEspecial = key.startsWith("enero") || !["lu", "ma", "mi", "ju", "vi", "sa", "do"].includes(dia);
+                const opcionCicloOAnio = (dia === "do" || esDiaFijoOEspecial) ? cycle : ferialYear;
+                cargarLiturgiaPorClave(key, opcionCicloOAnio);
+              } else {
+                mostrarMensajeVacio();
+              }
+            }
+          } else {
+            cargarLecturaHoy();
+          }
+        }
+      });
+    }
+
     const modal = document.getElementById('modalLecturaDia');
     if (modal) {
       modal.addEventListener('click', (e) => {
@@ -725,7 +978,12 @@
       });
     }
     if (selectCiclo) selectCiclo.addEventListener('change', ejecutarFiltroManual);
-    if (selectSemana) selectSemana.addEventListener('change', ejecutarFiltroManual);
+    if (selectSemana) {
+      selectSemana.addEventListener('change', () => {
+        actualizarDiasLiturgia();
+        ejecutarFiltroManual();
+      });
+    }
     if (selectDia) {
       selectDia.addEventListener('change', () => {
         actualizarVisibilidadCicloOAno();

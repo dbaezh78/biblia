@@ -186,6 +186,11 @@
             </label>
           </div>
         </div>
+        <div class="ajustes-seccion" style="border-top: 1px solid #edf2f7; padding-top: 15px; margin-top: 15px; text-align: center;">
+          <button id="btnActualizarAplicacion" style="width: 100%; padding: 10px; font-size: 0.95rem; font-weight: bold; background-color: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s;">
+            🔄 Actualizar Aplicación
+          </button>
+        </div>
       </div>
     `;
     
@@ -620,6 +625,156 @@
         } catch (err) {
           console.error(err);
         }
+      });
+    }
+
+    // Evento para limpiar la caché de PWA y forzar recarga del navegador manteniendo la sesión
+    const btnActualizarAplicacion = document.getElementById('btnActualizarAplicacion');
+    if (btnActualizarAplicacion) {
+      btnActualizarAplicacion.addEventListener('click', async function (e) {
+        e.stopPropagation();
+        btnActualizarAplicacion.disabled = true;
+        btnActualizarAplicacion.textContent = "Actualizando...";
+
+        // Crear e inyectar el overlay de progreso premium
+        const progressOverlay = document.createElement('div');
+        progressOverlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(26, 32, 44, 0.88);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          z-index: 999999;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        `;
+        progressOverlay.innerHTML = `
+          <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 35px 25px; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+            <div style="font-size: 2.5rem; margin-bottom: 15px;">📚</div>
+            <h3 style="margin: 0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #fff; letter-spacing: -0.5px;">Actualizando Aplicación</h3>
+            <p style="margin: 0 0 25px 0; font-size: 0.92rem; color: #a0aec0; line-height: 1.4;">Descargando textos sagrados y archivos del sistema para uso sin conexión (offline).</p>
+            
+            <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <div id="progresoBarActualizar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4299e1, #667eea); border-radius: 5px; transition: width 0.1s ease;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: #e2e8f0; margin-bottom: 15px;">
+              <span id="progresoTextoActualizar">Preparando descarga...</span>
+              <span id="progresoPorcentajeActualizar">0%</span>
+            </div>
+            
+            <div id="progresoDetalleActualizar" style="font-size: 0.8rem; color: #a0aec0; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"></div>
+          </div>
+        `;
+        document.body.appendChild(progressOverlay);
+
+        const progressBar = document.getElementById('progresoBarActualizar');
+        const progressText = document.getElementById('progresoTextoActualizar');
+        const progressPercent = document.getElementById('progresoPorcentajeActualizar');
+        const progressDetail = document.getElementById('progresoDetalleActualizar');
+
+        // Construir lista de archivos a actualizar/precargar
+        const ASSETS = [
+          './',
+          './index.html',
+          './manifest.json',
+          './src/css/cssgral.css',
+          './src/js/jsgral.js',
+          './src/js/setting.js',
+          './src/js/googlefirebase.js',
+          './src/js/liturgia_data.js',
+          './src/js/liturgia.js',
+          './src/js/annotation.js',
+          './src/img/ico.ico',
+          './src/img/icon-192.png',
+          './src/img/icon-512.png',
+          'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'
+        ];
+
+        // Añadir todos los libros JSON
+        if (window.indiceLibrosRutas) {
+          for (const key in window.indiceLibrosRutas) {
+            ASSETS.push(window.indiceLibrosRutas[key].ruta);
+          }
+        }
+
+        const totalFiles = ASSETS.length;
+        let downloadedCount = 0;
+
+        try {
+          // Abrir la caché principal de la app
+          const cache = await caches.open('biblia-digital-cache-v1');
+
+          for (let i = 0; i < totalFiles; i++) {
+            const url = ASSETS[i];
+            
+            // Extraer un nombre legible para el detalle
+            let fileLabel = url;
+            if (url.startsWith('./src/libros/') || url.startsWith('src/libros/')) {
+              const filename = url.substring(url.lastIndexOf('/') + 1);
+              let foundBook = null;
+              if (window.indiceLibrosRutas) {
+                foundBook = Object.values(window.indiceLibrosRutas).find(b => b.ruta === url || b.ruta === `./${url}`);
+              }
+              fileLabel = foundBook ? `Libro: ${foundBook.nombre}` : `Archivo: ${filename}`;
+            } else if (url === './' || url === './index.html') {
+              fileLabel = "Aplicación Principal";
+            } else if (url.includes('cssgral')) {
+              fileLabel = "Estilos visuales (CSS)";
+            } else if (url.includes('jsgral') || url.includes('setting') || url.includes('liturgia')) {
+              const jsName = url.substring(url.lastIndexOf('/') + 1);
+              fileLabel = `Módulo: ${jsName}`;
+            } else if (url.includes('icon') || url.includes('ico')) {
+              fileLabel = "Iconos e imágenes";
+            }
+
+            progressText.textContent = `Descargando: ${downloadedCount + 1} de ${totalFiles}`;
+            progressDetail.textContent = fileLabel;
+            
+            try {
+              // Descargar omitiendo la caché del navegador para obtener el archivo fresco del servidor
+              const response = await fetch(url, { cache: 'reload' });
+              if (response.ok) {
+                await cache.put(url, response);
+              }
+            } catch (fetchErr) {
+              console.warn(`Fallo al descargar ${url}:`, fetchErr);
+              try {
+                const responseFallback = await fetch(url);
+                if (responseFallback.ok) {
+                  await cache.put(url, responseFallback);
+                }
+              } catch (fallbackErr) {
+                console.error(`Error definitivo al descargar ${url}:`, fallbackErr);
+              }
+            }
+
+            downloadedCount++;
+            const percent = Math.round((downloadedCount / totalFiles) * 100);
+            progressBar.style.width = `${percent}%`;
+            progressPercent.textContent = `${percent}%`;
+          }
+
+          progressText.textContent = "¡Actualización completada!";
+          progressDetail.textContent = "Reiniciando aplicación...";
+          await new Promise(resolve => setTimeout(resolve, 800));
+
+        } catch (cacheErr) {
+          console.error("Error al guardar en Cache Storage:", cacheErr);
+          progressText.textContent = "Error al actualizar caché local";
+          progressDetail.textContent = "Recargando...";
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        // Forzar recarga completa para activar los cambios
+        window.location.reload();
       });
     }
   }
