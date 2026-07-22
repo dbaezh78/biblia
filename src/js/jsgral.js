@@ -1100,6 +1100,42 @@ function closeMenu() {
 if (openBtn) openBtn.addEventListener('click', openMenu);
 if (overlay) overlay.addEventListener('click', closeMenu);
 
+// Gestos de deslizamiento (swipe) de borde de pantalla para abrir/cerrar el menú lateral
+(function () {
+  let touchstartX = 0;
+  let touchstartY = 0;
+  const EDGE_THRESHOLD = 35; // Umbral de píxeles desde el borde izquierdo para abrir
+  const SWIPE_THRESHOLD = 50;  // Distancia mínima requerida para activar el deslizamiento
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    touchstartX = e.touches[0].clientX;
+    touchstartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1) return;
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const diffX = currentX - touchstartX;
+    const diffY = currentY - touchstartY;
+
+    const isMenuOpen = sidebar && sidebar.classList.contains('open');
+
+    if (!isMenuOpen) {
+      // Si el menú está cerrado y el deslizamiento se inició en el borde izquierdo
+      if (touchstartX <= EDGE_THRESHOLD && diffX > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+        openMenu();
+      }
+    } else {
+      // Si el menú está abierto, permitir deslizar hacia la izquierda para cerrarlo
+      if (diffX < -SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+        closeMenu();
+      }
+    }
+  }, { passive: true });
+})();
+
 
 
 function construirNavegacionDinamica() {
