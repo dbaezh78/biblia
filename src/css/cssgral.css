@@ -807,6 +807,8 @@ body.modo-oscuro .custom-option-grid-item.selected {
   border-top-right-radius: 20px;
   padding: 24px;
   box-sizing: border-box;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 /* Glassmorphism support if background is white */
