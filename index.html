@@ -184,7 +184,7 @@
       <div class="modal-calendario-header" style="background-color: #2b6cb0;">
         <h3 class="modal-calendario-titulo" style="color: white; display: flex; align-items: center;">
           <img src="src/img/icon-192.png" style="width: 24px; height: 24px; margin-right: 8px; border-radius: 4px; vertical-align: middle;">
-          <span id="lecturaModalTitulo" style="color: white;">Lectura del Día</span>
+          <span id="lecturaModalTitulo" class="lectdia">Lectura del Día</span>
         </h3>
         <div style="margin-left: auto; margin-right: 15px; display: flex; align-items: center; gap: 8px;">
           <button id="btnToggleSelectorLiturgico" title="Calendario Litúrgico" style="background: transparent; border: none; font-size: 1.3rem; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; padding: 4px; transition: transform 0.2s;">⛪</button>
@@ -194,15 +194,15 @@
       </div>
 
       <!-- Selector Manual (Calendario Litúrgico) -->
-      <div id="lecturaSeleccionManual" style="padding: 15px 20px; background-color: #ebf8ff; border-bottom: 1px solid #bee3f8; display: none;">
+      <div id="lecturaSeleccionManual" style="padding: 15px 2px; background-color: #ebf8ff; border-bottom: 1px solid #bee3f8; display: none;">
         <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #2b6cb0; font-weight: bold;">Calendario Litúrgico:</h4>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;">
           <!-- Ciclo / Año Ferial -->
           <div>
             <!-- Ciclo -->
             <div id="containerLiturgiaCiclo">
               <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Ciclo</label>
-              <select id="selectLiturgiaCiclo" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem; width: 100%;">
+              <select id="selectLiturgiaCiclo" class="select-escrutacio-control CampCal1">
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
@@ -210,8 +210,8 @@
             </div>
             <!-- Año Ferial -->
             <div id="containerLiturgiaAnoFerial" style="display: none;">
-              <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Año Ferial</label>
-              <select id="selectLiturgiaAnoFerial" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem; width: 100%;">
+              <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Año</label>
+              <select id="selectLiturgiaAnoFerial" class="select-escrutacio-control CampCal1">
                 <option value="PAR">Par (II)</option>
                 <option value="IMPAR">Impar (I)</option>
               </select>
@@ -220,7 +220,7 @@
           <!-- Tiempo -->
           <div>
             <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Tiempo</label>
-            <select id="selectLiturgiaTiempo" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem; width: 100%;">
+            <select id="selectLiturgiaTiempo" class="select-escrutacio-control CampCal">
               <option value="Adviento">Adviento</option>
               <option value="Navidad">Navidad</option>
               <option value="Ordinario">Ordinario</option>
@@ -231,14 +231,14 @@
           <!-- Semana -->
           <div>
             <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Semana</label>
-            <select id="selectLiturgiaSemana" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem; width: 100%;">
+            <select id="selectLiturgiaSemana" class="select-escrutacio-control CampCal msize">
               <!-- Se llena dinámicamente -->
             </select>
           </div>
           <!-- Día -->
           <div>
             <label style="font-size: 0.75rem; color: #4a5568; display: block; margin-bottom: 4px;">Día</label>
-            <select id="selectLiturgiaDia" class="select-escrutacio-control" style="padding: 6px; font-size: 0.85rem; width: 100%;">
+            <select id="selectLiturgiaDia" class="select-escrutacio-control CampCal">
               <option value="do">Domingo</option>
               <option value="lu">Lunes</option>
               <option value="ma">Martes</option>

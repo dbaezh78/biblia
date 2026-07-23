@@ -633,6 +633,13 @@
     if (btnActualizarAplicacion) {
       btnActualizarAplicacion.addEventListener('click', async function (e) {
         e.stopPropagation();
+
+        // Verificar si el dispositivo está online para poder descargar
+        if (!navigator.onLine) {
+          alert("No se puede actualizar la aplicación sin conexión a Internet. Por favor, conéctate a una red e inténtalo de nuevo.");
+          return;
+        }
+
         btnActualizarAplicacion.disabled = true;
         btnActualizarAplicacion.textContent = "Actualizando...";
 
