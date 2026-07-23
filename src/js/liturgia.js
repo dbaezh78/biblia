@@ -61,8 +61,7 @@
   // Helper para mapear Salmos del calendario litúrgico a la numeración hebrea del JSON
   function getHebrewPsalmChapter(vulgateCap) {
     if (vulgateCap >= 1 && vulgateCap <= 8) return vulgateCap;
-    if (vulgateCap === 9) return 9;
-    if (vulgateCap >= 10 && vulgateCap <= 112) return vulgateCap + 1;
+    if (vulgateCap >= 9 && vulgateCap <= 112) return vulgateCap + 1;
     if (vulgateCap === 113) return 114;
     if (vulgateCap === 114 || vulgateCap === 115) return 116;
     if (vulgateCap >= 116 && vulgateCap <= 145) return vulgateCap + 1;
@@ -92,7 +91,7 @@
     });
 
     // 2. Limpiar prefijos genéricos comunes
-    const regexPrefijos = /^(lectura del libro de|lectura de la profecía de|lectura de la carta de|lectura del santo evangelio según san|lectura del santo evangelio según|salmo responsorial:|salmo:|ev\.\s+|hechos de los apóstoles:?|hechos de los apóstoles|del libro de los)/gi;
+    const regexPrefijos = /^(lectura del libro de|lectura de la profecía de|lectura de la carta de|lectura del santo evangelio según san|lectura del santo evangelio según|salmo responsorial:|salmo:|ev\.\s+|del libro de los)/gi;
     citaStr = citaStr.replace(regexPrefijos, '').trim();
     
     // Remover respuestas parentéticas en salmos, ej: (R.: 8a y 9a)
@@ -122,7 +121,7 @@
     const abrevOriginal = bcMatch[1].trim();
     let currentCap = parseInt(bcMatch[2], 10);
     if (libroId === "23_sal") {
-      currentCap = getHebrewPsalmChapter(currentCap);
+      currentCap = getHebrewPsalmChapter(currentCap, citaStr);
     }
     
     const versePartStream = citaStr.substring(bcMatch[0].length).trim();
@@ -133,7 +132,7 @@
       const leftVersePart = transitionMatch[1].replace(/^,/, '').trim();
       let capFin = parseInt(transitionMatch[2].trim(), 10);
       if (libroId === "23_sal") {
-        capFin = getHebrewPsalmChapter(capFin);
+        capFin = getHebrewPsalmChapter(capFin, citaStr);
       }
       const rightVersePart = transitionMatch[3].trim();
       
@@ -190,7 +189,7 @@
         let newCap = parseInt(segParts[0].trim(), 10);
         if (!isNaN(newCap)) {
           if (libroId === "23_sal") {
-            newCap = getHebrewPsalmChapter(newCap);
+            newCap = getHebrewPsalmChapter(newCap, citaStr);
           }
           currentCap = newCap;
           if (!chapterMap[currentCap]) {
@@ -341,7 +340,11 @@
           }
         } else {
           parsed.chapters.forEach((ch, idxCh) => {
-            const capData = bookData.capitulos[ch.capNum];
+            let lookupCap = ch.capNum;
+            if (parsed.libroId === "13_1cr" && lookupCap >= 3) {
+              lookupCap = lookupCap - 1;
+            }
+            const capData = bookData.capitulos[lookupCap];
             if (!capData) return;
             
             if (parsed.chapters.length > 1) {
@@ -427,6 +430,52 @@
     cargarYMostrarLecturas(currentLecturasList, currentTituloDia, currentOpcionesConfig, subOpcionesState);
   };
 
+  // Helper para normalizar terminaciones de mes y prefijos para días especiales fijos
+  function normalizarClaveEspecial(key) {
+    if (liturgiaLecturas[key]) return key;
+    
+    let resolvedClave = key;
+    // Intentar alternar entre epifania_ y navidad_ para Enero
+    if (resolvedClave.startsWith("epifania_")) {
+      const alt = resolvedClave.replace(/^epifania_/, "navidad_");
+      if (liturgiaLecturas[alt]) return alt;
+    } else if (resolvedClave.startsWith("navidad_") && resolvedClave.endsWith("_ene")) {
+      const alt = resolvedClave.replace(/^navidad_/, "epifania_");
+      if (liturgiaLecturas[alt]) return alt;
+    }
+    
+    // Intentar alternar _ene y _enero
+    if (resolvedClave.endsWith("_ene")) {
+      const alt = resolvedClave.replace(/_ene$/, "_enero");
+      if (liturgiaLecturas[alt]) return alt;
+    } else if (resolvedClave.endsWith("_enero")) {
+      const alt = resolvedClave.replace(/_enero$/, "_ene");
+      if (liturgiaLecturas[alt]) return alt;
+    }
+    
+    // Casos específicos de fallbacks cruzados
+    if (resolvedClave === "enero6") {
+      if (liturgiaLecturas["epifania_6_ene"]) return "epifania_6_ene";
+      if (liturgiaLecturas["navidad_6_ene"]) return "navidad_6_ene";
+    }
+    if (resolvedClave === "epifania_6_ene" || resolvedClave === "navidad_6_ene") {
+      if (liturgiaLecturas["enero6"]) return "enero6";
+    }
+    
+    if (resolvedClave === "enero1") {
+      if (liturgiaLecturas["navidad_1_ene"]) return "navidad_1_ene";
+    }
+    if (resolvedClave === "navidad_1_ene") {
+      if (liturgiaLecturas["enero1"]) return "enero1";
+    }
+    
+    if (resolvedClave === "pascua_pentecostes" || resolvedClave === "pascua_pentecostes_do") {
+      if (liturgiaLecturas["pascua_pent_do"]) return "pascua_pent_do";
+    }
+
+    return resolvedClave;
+  }
+
   // 5. Cargar lectura por clave litúrgica, ciclo y número de opción del ciclo (0-indexed)
   function cargarLiturgiaPorClave(clave, ciclo, opcionIndex = 0) {
     if (!clave) {
@@ -435,6 +484,7 @@
     }
 
     let baseClave = clave.replace(/_\d+$/, '');
+    baseClave = normalizarClaveEspecial(baseClave);
 
     // Fallback automático de Ascensión del Jueves a Ascensión del Domingo si no está definida en los datos
     if (baseClave === "pascua_as_ju" && !liturgiaLecturas["pascua_as_ju"]) {
@@ -591,6 +641,7 @@
     // Fallbacks históricos
     if (diaNum === 6 && mesNum === 1) return "enero6";
     if (diaNum === 1 && mesNum === 1) return "enero1";
+    if (diaNum === 25 && mesNum === 12) return "navidad_navidad_25";
 
     return null;
   }
@@ -605,7 +656,7 @@
     if (claveLiturgica) {
       const parts = claveLiturgica.split('_');
       const dia = parts[parts.length - 1]; // "lu", "ma", etc.
-      const esDiaFijoOEspecial = claveLiturgica.startsWith("enero") || !["lu", "ma", "mi", "ju", "vi", "sa", "do"].includes(dia);
+      const esDiaFijoOEspecial = claveLiturgica.startsWith("enero") || ["25", "1", "6"].includes(dia);
       const opcionCicloOAnio = (dia === "do" || esDiaFijoOEspecial) ? ciclo : anoFerial;
       cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
     } else {
@@ -613,7 +664,7 @@
     }
   }
 
-  // 9. Alternar la visibilidad entre Ciclo y Año Ferial según el día de la semana
+  // 9. Alternar la visibilidad entre Ciclo y Año Ferial según el día de la semana o fecha fija
   function actualizarVisibilidadCicloOAno() {
     const selectDia = document.getElementById('selectLiturgiaDia');
     const containerCiclo = document.getElementById('containerLiturgiaCiclo');
@@ -621,12 +672,13 @@
     
     if (!selectDia) return;
     
-    const esDomingo = (selectDia.value === "do");
+    const dia = selectDia.value;
+    const esCiclo = (dia === "do" || dia === "25" || dia === "1" || dia === "6");
     if (containerCiclo) {
-      containerCiclo.style.display = esDomingo ? "block" : "none";
+      containerCiclo.style.display = esCiclo ? "block" : "none";
     }
     if (containerAnoFerial) {
-      containerAnoFerial.style.display = esDomingo ? "none" : "block";
+      containerAnoFerial.style.display = esCiclo ? "none" : "block";
     }
   }
 
@@ -756,30 +808,85 @@
         { value: "vi", text: "Viernes" },
         { value: "sa", text: "Sábado" }
       ];
+    } else if (tiempo === "Adviento" && semana === "4") {
+      // Semana 4 de Adviento solo tiene Domingo
+      diasFiltrados = [
+        { value: "do", text: "Domingo" }
+      ];
+    } else if (tiempo === "Adviento" && semana === "feria") {
+      // Feria de Adviento del 17 al 24 de Diciembre
+      diasFiltrados = [
+        { value: "17", text: "17 de Diciembre" },
+        { value: "18", text: "18 de Diciembre" },
+        { value: "19", text: "19 de Diciembre" },
+        { value: "20", text: "20 de Diciembre" },
+        { value: "21", text: "21 de Diciembre" },
+        { value: "22", text: "22 de Diciembre" },
+        { value: "23", text: "23 de Diciembre" },
+        { value: "24", text: "24 de Diciembre" }
+      ];
+    } else if (tiempo === "Navidad" && ["1", "2"].includes(semana)) {
+      // Semanas 1 y 2 de Navidad solo tienen Domingo
+      diasFiltrados = [
+        { value: "do", text: "Domingo" }
+      ];
+    } else if (tiempo === "Navidad" && semana === "navidad") {
+      // Día de Navidad (25 de Diciembre)
+      diasFiltrados = [
+        { value: "25", text: "25 de Diciembre" }
+      ];
+    } else if (tiempo === "Navidad" && semana === "octava") {
+      // Octava de Navidad del 26 de Diciembre al 1 de Enero
+      diasFiltrados = [
+        { value: "26", text: "26 de Diciembre" },
+        { value: "27", text: "27 de Diciembre" },
+        { value: "28", text: "28 de Diciembre" },
+        { value: "29", text: "29 de Diciembre" },
+        { value: "30", text: "30 de Diciembre" },
+        { value: "31", text: "31 de Diciembre" },
+        { value: "1", text: "1 de Enero" }
+      ];
+    } else if (tiempo === "Navidad" && semana === "epifania") {
+      // Tiempo de Epifanía del 2 al 12 de Enero
+      diasFiltrados = [
+        { value: "2", text: "2 de Enero" },
+        { value: "3", text: "3 de Enero" },
+        { value: "4", text: "4 de Enero" },
+        { value: "5", text: "5 de Enero" },
+        { value: "6", text: "6 de Enero" },
+        { value: "7", text: "7 de Enero" },
+        { value: "8", text: "8 de Enero" },
+        { value: "9", text: "9 de Enero" },
+        { value: "10", text: "10 de Enero" },
+        { value: "11", text: "11 de Enero" },
+        { value: "12", text: "12 de Enero" }
+      ];
     }
-
-    console.log("actualizarDiasLiturgia - tiempo:", tiempo, "semana:", semana, "diasFiltrados:", diasFiltrados);
-
-    selectDia.innerHTML = "";
-    diasFiltrados.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.value;
-      opt.textContent = d.text;
-      selectDia.appendChild(opt);
-    });
-
-    // Si el valor previo existe en la lista filtrada, lo restauramos.
-    // De lo contrario, por defecto va Miércoles para Ceniza ("mi") y Domingo ("do") para los demás.
-    const optionExists = Array.from(selectDia.options).some(opt => opt.value === valorPrevio);
-    if (optionExists) {
-      selectDia.value = valorPrevio;
-    } else {
-      if (semana === "mc") {
-        selectDia.value = "mi";
-      } else {
-        selectDia.value = "do";
-      }
-    }
+ 
+     console.log("actualizarDiasLiturgia - tiempo:", tiempo, "semana:", semana, "diasFiltrados:", diasFiltrados);
+ 
+     selectDia.innerHTML = "";
+     diasFiltrados.forEach(d => {
+       const opt = document.createElement('option');
+       opt.value = d.value;
+       opt.textContent = d.text;
+       selectDia.appendChild(opt);
+     });
+ 
+     // Si el valor previo existe en la lista filtrada, lo restauramos.
+     // De lo contrario, por defecto va Miércoles para Ceniza ("mi") y Domingo ("do") para los demás.
+     const optionExists = Array.from(selectDia.options).some(opt => opt.value === valorPrevio);
+     if (optionExists) {
+       selectDia.value = valorPrevio;
+     } else {
+       if (semana === "mc") {
+         selectDia.value = "mi";
+       } else if (diasFiltrados.some(opt => opt.value === "do")) {
+         selectDia.value = "do";
+       } else if (diasFiltrados.length > 0) {
+         selectDia.value = diasFiltrados[0].value;
+       }
+     }
   }
 
   // 10. Actualizar las opciones del select de semanas según el tiempo litúrgico
@@ -827,12 +934,40 @@
         opt.textContent = `Semana ${i}`;
         selectSemana.appendChild(opt);
       }
+    } else if (tiempo === 'Adviento') {
+      for (let i = 1; i <= 4; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Semana ${i}`;
+        selectSemana.appendChild(opt);
+      }
+      const optFeria = document.createElement('option');
+      optFeria.value = "feria";
+      optFeria.textContent = "Feria Adviento";
+      selectSemana.appendChild(optFeria);
+    } else if (tiempo === 'Navidad') {
+      for (let i = 1; i <= 2; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Semana ${i}`;
+        selectSemana.appendChild(opt);
+      }
+      const optNav = document.createElement('option');
+      optNav.value = "navidad";
+      optNav.textContent = "Navidad";
+      selectSemana.appendChild(optNav);
+      
+      const optOct = document.createElement('option');
+      optOct.value = "octava";
+      optOct.textContent = "Octava";
+      selectSemana.appendChild(optOct);
+      
+      const optEpi = document.createElement('option');
+      optEpi.value = "epifania";
+      optEpi.textContent = "Epifanía";
+      selectSemana.appendChild(optEpi);
     } else {
-      let maxSemanas = 4;
-      if (tiempo === 'Adviento') maxSemanas = 4;
-      else if (tiempo === 'Navidad') maxSemanas = 2;
-      else if (tiempo === 'Ordinario') maxSemanas = 34;
-
+      let maxSemanas = 34; // Ordinario
       for (let i = 1; i <= maxSemanas; i++) {
         const opt = document.createElement('option');
         opt.value = i;
@@ -870,18 +1005,31 @@
 
     let claveLiturgica;
     if (semana === "pentecostes") {
-      claveLiturgica = `${claveTiempo}_pentecostes`;
+      claveLiturgica = `pascua_pent_do`;
     } else if (semana === "as") {
       claveLiturgica = `${claveTiempo}_as_${dia}`;
     } else if (semana === "mc") {
       claveLiturgica = `${claveTiempo}_mc_${dia}`;
+    } else if (semana === "feria" && tiempo === "adviento") {
+      claveLiturgica = `adviento_${dia}_dic`;
+    } else if (semana === "navidad" && tiempo === "navidad") {
+      claveLiturgica = `navidad_${dia}_dic`;
+    } else if (semana === "octava" && tiempo === "navidad") {
+      if (dia === "1") {
+        claveLiturgica = `navidad_1_ene`;
+      } else {
+        claveLiturgica = `navidad_${dia}_dic`;
+      }
+    } else if (semana === "epifania" && tiempo === "navidad") {
+      claveLiturgica = `epifania_${dia}_ene`;
     } else {
       claveLiturgica = `${claveTiempo}_s${semana}_${dia}`;
     }
     
-    // Si es domingo ("do"), usamos ciclo (A, B, C)
-    // Si es día de semana (lu, ma, mi, ju, vi, sa), usamos año ferial (PAR, IMPAR)
-    const opcionCicloOAnio = (dia === "do") ? ciclo : anoFerial;
+    // Si es domingo ("do") o un día solemne de fecha fija (como 25, 1, 6), usamos ciclo (A, B, C)
+    // De lo contrario, usamos año ferial (PAR, IMPAR)
+    const esCiclo = (dia === "do" || dia === "25" || dia === "1" || dia === "6");
+    const opcionCicloOAnio = esCiclo ? ciclo : anoFerial;
     
     cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
   }
@@ -941,7 +1089,7 @@
               if (key) {
                 const keyParts = key.split('_');
                 const dia = keyParts[keyParts.length - 1];
-                const esDiaFijoOEspecial = key.startsWith("enero") || !["lu", "ma", "mi", "ju", "vi", "sa", "do"].includes(dia);
+                const esDiaFijoOEspecial = key.startsWith("enero") || ["25", "1", "6"].includes(dia);
                 const opcionCicloOAnio = (dia === "do" || esDiaFijoOEspecial) ? cycle : ferialYear;
                 cargarLiturgiaPorClave(key, opcionCicloOAnio);
               } else {
@@ -1008,7 +1156,7 @@
         if (claveLiturgica) {
           const parts = claveLiturgica.split('_');
           const dia = parts[parts.length - 1]; // "lu", "ma", etc.
-          const esDiaFijoOEspecial = claveLiturgica.startsWith("enero") || !["lu", "ma", "mi", "ju", "vi", "sa", "do"].includes(dia);
+          const esDiaFijoOEspecial = claveLiturgica.startsWith("enero") || ["25", "1", "6"].includes(dia);
           const opcionCicloOAnio = (dia === "do" || esDiaFijoOEspecial) ? ciclo : anoFerial;
           cargarLiturgiaPorClave(claveLiturgica, opcionCicloOAnio);
         } else {

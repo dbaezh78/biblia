@@ -50,6 +50,8 @@ const mapAbreviaturas = {
   "1 cronicas": "13_1cr",
   "1 crónicas": "13_1cr",
   "i crónicas": "13_1cr",
+  "1 Cronicas": "13_1cr",
+  "1 cronicas": "13_1cr",
   "1 crón": "13_1cr",
   "1 cron": "13_1cr",
   "1crónicas": "13_1cr",
@@ -448,7 +450,7 @@ const liturgiaLecturas = {
 ╚════════════════════════════════════════════════╝
 */      "adviento_s2_do": {
             "A": {"lecturas": [
-                {"tipo": "1ª Lectura",      "cita": "Isaías: 11, 1-10"},
+                {"tipo": "1ª Lectura",      "cita": "Isaías 11, 1-10"},
                 {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 12-13. 17"},
                 {"tipo": "2ª Lectura",      "cita": "Romanos: 15, 4-9"},
                 {"tipo": "Evangelio",       "cita": "Mateo: 3, 1-12"}
@@ -487,15 +489,12 @@ const liturgiaLecturas = {
 ║  TIEMPO ADVIENTO - SEMANA 3 DOMINGO CICLO ABC  ║
 ╚════════════════════════════════════════════════╝
 */      "adviento_s3_do": {
-            "A": {
-            "lecturas": [
+            "A": {"titulo": "Domingo 3º de Adviento","lecturas": [
                 {"tipo": "1ª Lectura",      "cita": "Isaías 35, 1-6a. 10"},
                 {"tipo": "Salmo",           "cita": "Salmo 145, 7. 8-9a. 9bc-10"},
                 {"tipo": "2ª Lectura",      "cita": "Santiago 5, 7-10"},
-                {"tipo": "Evangelio",       "cita": "Mateo 11, 2-11"}
-                ],"titulo": "Domingo 3º de Adviento"
-            }
-        },          
+                {"tipo": "Evangelio",       "cita": "Mateo 11, 2-11"}],}
+            },
 /*
 ╔══════════════════════════════════════════════════════════════╗
 ║  TIEMPO ADVIENTO - DIAS DE LA SEMANA 3 CICLO ABC, PAR/IMPAR  ║
@@ -521,9 +520,9 @@ const liturgiaLecturas = {
                     {"tipo": "Salmo",           "cita": "Salmo 66, 2-3. 5. 7-8"},
                     {"tipo": "Evangelio",       "cita": "Juan 5, 33-36"}],},},
 /*SABADO*/     "adviento_s3_sa": {"A": {"titulo": "Sábado 3º de Adviento Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Malaquías 3,1-4. 23-24"},
+                    {"tipo": "Salmo",           "cita": "Salmo 24, 4-5ab. 8-9. 10 y 14"},
+                    {"tipo": "Evangelio",       "cita": "Lucas 1, 57-66"}],},},
 /*
 ╔════════════════════════════════════════════════╗
 ║  TIEMPO ADVIENTO - SEMANA 4 DOMINGO CICLO ABC  ║
@@ -600,10 +599,10 @@ const liturgiaLecturas = {
 //Esta tiene dos opciones en una y se alcanza al 2 de Enero con la opcion 1 y 2 cuando estas en el calendario en el dia 2
 // NATIVIDAD DEL SEÑOR
 /*
- _   _     ___     __   __   ___    ____     ___      ____
-| \ | |   / _ \    \ \ / /   |_ _| |  _ \   / _ \    |  _ \
-|  \| |  / ___ \    \ V /     | |  | |_) | / ___ \   | |_) |
-|_|\__| /_/   \_\    \_/     |___| |____/  /_/   \_\ |____/
+ _   _     ___    __   __   ___    ____     ___      ____
+| \ | |   / _ \   \ \ / /  |_ _|  |  _ \   / _ \    |  _ \
+|  \| |  / ___ \   \ V /    | |   | |_) | / ___ \   | |_) |
+|_|\__| /_/   \_\   \_/    |___|  |____/ /_/   \_\  |____/
 */
 /*25 Diciembre*/"navidad_25_dic": [
                     {"A": {"titulo": "25 de Diciembre, Natividad del Señor, Misa de la Vigilia","lecturas": [
@@ -627,125 +626,198 @@ const liturgiaLecturas = {
                         {"tipo": "2ª Lectura",      "cita": "Hebreos 1, 1-6"},
                         {"tipo": "Evangelio",       "cita": "Juan 1, 1-18 o Juan 1, 1-5. 9-14"}]}},
                             ],
-/*******************************************************************************************/
-
-
-/*29 Diciembre*/"navidad_29_dic": {"A": {"titulo": "29 de diciembre: 5º día de la octava de Navidad, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "1 Juan 2, 3-11"},
-                    {"tipo": "Salmo",           "cita": "Salmo 95, 1-2a. 2b-3. 5b-6"},
-                    {"tipo": "Evangelio",       "cita": "Lucas 2, 22-35"}],},},
-/*30 Diciembre*/"navidad_30_dic": {"A": {"titulo": "30 de diciembre: 6º día de la octava de Navidad, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Juan 2, 12-17"},
-                    {"tipo": "Salmo",           "cita": "Salmo 95, 7-8a. 8b-9. 10"},
-                    {"tipo": "Evangelio",       "cita": "Lucas 2, 36-40"}],},},
-
-/*31 Diciembre*/"navidad_31_dic": {"A": {"titulo": "31 de diciembre: 7º día de la octava de Navidad, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "1 Juan 2, 18-21"},
-                    {"tipo": "Salmo",           "cita": "Salmo 95, 1-2. 11-12. 13-14"},
-                    {"tipo": "Evangelio",       "cita": "Juan 1, 1-18"}],},},
 
 /*
-╔═════════════════════════════╗
-║  SANTA MARIA MADRE DE DIOS  ║
-╚═════════════════════════════╝
-*/
-/*1 Enero*/     "navidad_1_ene": {"A": {"titulo": "1º Enero, Santa María Madre de Dios, Octava de la Natividad del Señor, Navidad","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Números 6, 22-27"},
-                    {"tipo": "Salmo",           "cita": "salmo 66, 2-3. 5. 6 y 8"},
-                    {"tipo": "2ª Lectura",      "cita": "Gálatas 4, 4-7"},
-                    {"tipo": "Evangelio",       "cita": "Lucas 2, 16-21"}],},},
+╔════════════════════════════════════╗
+║  OCTAVA DE NAVIDAD - 26 DICIEMBRE  ║
+╚════════════════════════════════════╝*/ 
+    "navidad_26_dic": [{"A": {"titulo": "26 de Diciembre, SAN ESTEBAN, PROTOMÁRTIR.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 6, 8-10; 7, 54-60"},
+        {"tipo": "Salmo",           "cita": "Salmo 30, 3cd-4. 6 y 8ab. 16bc-17"},
+        {"tipo": "Evangelio",       "cita": "Mateo 10, 17-22"}]}},],
 
-//Esta tiene dos opciones en una y se alcanza al 2 de Enero con la opcion 1 y 2 cuando estas en el calendario en el dia 2
-/*2 Enero*/     "navidad_2_ene": [
-                    {"A": {"titulo": "2 de Enero, Antes de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                                {"tipo": "1ª Lectura",  "cita": "1 Juan 2, 22-28"},
-                                {"tipo": "Salmo",       "cita": "Salmo 97, 1-2ab. 2cd-3ab. 3cd-4"},
-                                {"tipo": "Evangelio",   "cita": "Juan 1, 19-28"}]}},
-                    {"A": {"titulo": "2 de Enero, San Basilio Magno y san Gregorio Nacianceno, obispos y doctores de la Iglesia","lecturas": [
-                                {"tipo": "1ª Lectura",  "cita": "Efesios 4, 1-7. 11-13"},
-                                {"tipo": "Salmo",       "cita": "Salmo 22, 1-3. 4. 5. 6"},
-                                {"tipo": "Evangelio",   "cita": "Mateo 23, 8-12"}]}}],
-/*******************************************************************************************/
+/*
+╔════════════════════════════════════╗
+║  OCTAVA DE NAVIDAD - 27 DICIEMBRE  ║
+╚════════════════════════════════════╝*/ 
+    "navidad_27_dic": [{"A": {"titulo": "27 de Diciembre, SAN JUAN, APÓSTOL Y EVANGELISTA","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 1, 1-4"},
+        {"tipo": "Salmo",           "cita": "Salmo 96, 1-2. 5-6. 11-12"},
+        {"tipo": "Evangelio",       "cita": "Juan 20, 2-8"}]}},],
 
+/*
+╔════════════════════════════════════╗
+║  OCTAVA DE NAVIDAD - 28 DICIEMBRE  ║
+╚════════════════════════════════════╝*/ 
+    "navidad_28_dic": [{"A": {"titulo": "28 de Diciembre, LOS SANTOS INOCENTES, MÁRTIRES","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 1, 5—2, 2"},
+        {"tipo": "Salmo",           "cita": "Salmo 123, 2-3. 4-5. 7b-8"},
+        {"tipo": "Evangelio",       "cita": "Mateo 2, 13-18"}]}},],
 
-/*3 Enero*/     "navidad_3_ene": {"A": {"titulo": "3 de Enero, Antes de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "1 Juan 2, 29—3, 6"},
-                    {"tipo": "Salmo",           "cita": "Salmo 97, 1-2ab. 3cd-4. 5-6"},
-                    {"tipo": "Evangelio",       "cita": "Juan 1, 29-34"}],},},
+/*
+╔════════════════════════════════════╗
+║  OCTAVA DE NAVIDAD - 29 DICIEMBRE  ║
+╚════════════════════════════════════╝*/ 
+    "navidad_29_dic": {"A": {"titulo": "29 de Diciembre: 5º día de la octava de Navidad.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 2, 3-11"},
+        {"tipo": "Salmo",           "cita": "Salmo 95, 1-2a. 2b-3. 5b-6"},
+        {"tipo": "Evangelio",       "cita": "Lucas 2, 22-35"}],},},
 
-/*4 Enero*/     "navidad_4_ene": {"A": {"titulo": "4 de Enero, Antes de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "1 Juan 3, 7-10"},
-                    {"tipo": "Salmo",           "cita": "Salmo 97, 1-2ab. 7-8a. 8b-9"},
-                    {"tipo": "Evangelio",       "cita": "Juan 1, 35-42"}],},},
+/*
+╔════════════════════════════════════╗
+║  OCTAVA DE NAVIDAD - 30 DICIEMBRE  ║
+╚════════════════════════════════════╝*/ 
+    "navidad_30_dic": {"A": {"titulo": "30 de Diciembre: 6º día de la octava de Navidad.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Juan 2, 12-17"},
+        {"tipo": "Salmo",           "cita": "Salmo 95, 7-8a. 8b-9. 10"},
+        {"tipo": "Evangelio",       "cita": "Lucas 2, 36-40"}],},},
 
-/*5 Enero*/     "navidad_5_ene": {"A": {"titulo": "5 de Enero, Antes de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "1 Juan 3, 11-21"},
-                    {"tipo": "Salmo",           "cita": "Salmo 99, 1-2. 3. 4. 5"},
-                    {"tipo": "Evangelio",       "cita": "Juan 1, 43-51"}],},},
+/*
+╔════════════════════════════════════╗
+║  OCTAVA DE NAVIDAD - 31 DICIEMBRE  ║
+╚════════════════════════════════════╝*/ 
+    "navidad_31_dic": {"A": {"titulo": "31 de Diciembre: 7º día de la octava de Navidad.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 2, 18-21"},
+        {"tipo": "Salmo",           "cita": "Salmo 95, 1-2. 11-12. 13-14"},
+        {"tipo": "Evangelio",       "cita": "Juan 1, 1-18"}],},},
+
+/*
+╔══════════════════════════════════════════╗
+║  1 DE ENERO - SANTA MARIA MADRE DE DIOS  ║
+╚══════════════════════════════════════════╝*/
+    "navidad_1_ene": {"A": {"titulo": "1º Enero, Santa María Madre de Dios, Octava de la Natividad del Señor, Navidad","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Números 6, 22-27"},
+        {"tipo": "Salmo",           "cita": "salmo 66, 2-3. 5. 6 y 8"},
+        {"tipo": "2ª Lectura",      "cita": "Gálatas 4, 4-7"},
+        {"tipo": "Evangelio",       "cita": "Lucas 2, 16-21"}],},},
+
+/*
+╔════════════════════════════════════════════════════════════╗
+║  2 DE ENERO - Antes de la epifania                         ║
+║  2 DE ENERO - San Basilio Magno y san Gregorio Nacianceno  ║
+╚════════════════════════════════════════════════════════════╝*/
+    "navidad_2_ene": [
+        {"A": {"titulo": "2 de Enero, Antes de la epifania, Ciclo A,B,C.","lecturas": [
+                    {"tipo": "1ª Lectura",  "cita": "1 Juan 2, 22-28"},
+                    {"tipo": "Salmo",       "cita": "Salmo 97, 1-2ab. 2cd-3ab. 3cd-4"},
+                    {"tipo": "Evangelio",   "cita": "Juan 1, 19-28"}]}},
+        {"A": {"titulo": "2 de Enero, San Basilio Magno y san Gregorio Nacianceno, obispos y doctores de la Iglesia","lecturas": [
+                    {"tipo": "1ª Lectura",  "cita": "Efesios 4, 1-7. 11-13"},
+                    {"tipo": "Salmo",       "cita": "Salmo 22, 1-3. 4. 5. 6"},
+                    {"tipo": "Evangelio",   "cita": "Mateo 23, 8-12"}]}}],
+
+/*
+╔═════════════════════════════════════╗
+║  3 DE ENERO - Antes de la epifania  ║
+╚═════════════════════════════════════╝*/
+    "navidad_3_ene": {"A": {"titulo": "3 de Enero, Antes de la epifania, Ciclo.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 2, 29—3, 6"},
+        {"tipo": "Salmo",           "cita": "Salmo 97, 1-2ab. 3cd-4. 5-6"},
+        {"tipo": "Evangelio",       "cita": "Juan 1, 29-34"}],},},
+
+/*
+╔═════════════════════════════════════╗
+║  4 DE ENERO - Antes de la epifania  ║
+╚═════════════════════════════════════╝*/
+    "navidad_4_ene": {"A": {"titulo": "4 de Enero, Antes de la epifania, Ciclo A,B,C.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 3, 7-10"},
+        {"tipo": "Salmo",           "cita": "Salmo 97, 1-2ab. 7-8a. 8b-9"},
+        {"tipo": "Evangelio",       "cita": "Juan 1, 35-42"}],},},
+
+/*
+╔═════════════════════════════════════╗
+║  5 DE ENERO - Antes de la epifania  ║
+╚═════════════════════════════════════╝*/
+    "navidad_5_ene": {"A": {"titulo": "5 de Enero, Antes de la epifania, Ciclo A,B,C.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "1 Juan 3, 11-21"},
+        {"tipo": "Salmo",           "cita": "Salmo 99, 1-2. 3. 4. 5"},
+        {"tipo": "Evangelio",       "cita": "Juan 1, 43-51"}],},},
 
 //  En otro paises la epifania se celebra Domingo, RD lo celebra el 6 de enero.
 //Esta tiene dos opciones para el día y propio de los santos
-/*6 Enero*/     "navidad_6_ene": [
-                    {"A": {"titulo": "6 de Enero, Epifanía del Señor, Ciclo A,B,C, Par/Impar","lecturas": [
-                            {"tipo": "1ª Lectura",      "cita": "Isaías 60, 1-6"},
-                            {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 10-11. 12-13"},
-                            {"tipo": "2ª Lectura",      "cita": "Efesios 3, 2-3a. 5-6"},
-                            {"tipo": "Evangelio",       "cita": "Mateo 2, 1-12"}]}},
-                    {"A": {"titulo": "6 de Enero, Antes de Epifanía","lecturas": [
-                            {"tipo": "1ª Lectura",  "cita": "1 Juan 5, 5-13"},
-                            {"tipo": "Salmo",       "cita": "Salmo 147,12-13.14-15. 19-20"},
-                            {"tipo": "Evangelio",   "cita": "Marcos 1, 7-11 o Lucas 3, 23-38 o Lucas 3, 23. 31-34. 36. 38"}]}}],
+/*
+╔═══════════════════════════════════╗
+║  6 DE ENERO - Epifania del Señor  ║
+╚═══════════════════════════════════╝*/
+    "navidad_6_ene": [
+        {"A": {"titulo": "6 de Enero, Epifanía del Señor, Ciclo A,B,C.","lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "Isaías 60, 1-6"},
+                {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 7-8. 10-11. 12-13"},
+                {"tipo": "2ª Lectura",      "cita": "Efesios 3, 2-3a. 5-6"},
+                {"tipo": "Evangelio",       "cita": "Mateo 2, 1-12"}]}},
+        {"A": {"titulo": "6 de Enero, Antes de Epifanía","lecturas": [
+                {"tipo": "1ª Lectura",  "cita": "1 Juan 5, 5-13"},
+                {"tipo": "Salmo",       "cita": "Salmo 147,12-13.14-15. 19-20"},
+                {"tipo": "Evangelio",   "cita": "Marcos 1, 7-11 o Lucas 3, 23-38 o Lucas 3, 23. 31-34. 36. 38"}]}}],
 /*******************************************************************************************/
 
-
-//Antes de Epifanía
+/*
+╔═════════════════════════════════════════════════╗
+║  7 DE ENERO - después de la Epifania del Señor  ║
+╚═════════════════════════════════════════════════╝*/
 //Esta tiene dos opciones para el día y propio de los santos
-/*7 Enero*/     "navidad_7_ene": [
-                    {"A": {"titulo": "7 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                            {"tipo": "1ª Lectura",      "cita": "1 Juan 5, 14-21"},
-                            {"tipo": "Salmo",           "cita": "Salmo 149, 1-2. 3-4. 5-6a y 9b"},
-                            {"tipo": "Evangelio",       "cita": "Juan 2, 1-12"}]}},
-                    {"A": {"titulo": "7 de Enero, San Raimundo de Peñafort, presbítero","lecturas": [
-                            {"tipo": "1ª Lectura",  "cita": "2 Corintios 5, 14-20"},
-                            {"tipo": "Salmo",       "cita": "Salmo 102, 1-2. 3-4. 8-9. 13-14. 17-18a"},
-                            {"tipo": "Evangelio",   "cita": "Lucas 12, 35-40"}]}}],
+    "navidad_7_ene": [
+        {"A": {"titulo": "7 de Enero, después de la epifania, Ciclo A,B,C.","lecturas": [
+                {"tipo": "1ª Lectura",      "cita": "1 Juan 5, 14-21"},
+                {"tipo": "Salmo",           "cita": "Salmo 149, 1-2. 3-4. 5-6a y 9b"},
+                {"tipo": "Evangelio",       "cita": "Juan 2, 1-12"}]}},
+        {"A": {"titulo": "7 de Enero, San Raimundo de Peñafort, presbítero","lecturas": [
+                {"tipo": "1ª Lectura",  "cita": "2 Corintios 5, 14-20"},
+                {"tipo": "Salmo",       "cita": "Salmo 102, 1-2. 3-4. 8-9. 13-14. 17-18a"},
+                {"tipo": "Evangelio",   "cita": "Lucas 12, 35-40"}]}}],
 /*******************************************************************************************/
 
-
-/*8 Enero*/     "navidad_8_ene": {"A": {"titulo": "8 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Juan 4, 7-10"},
-                    {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 3-4ab. 7-8"},
-                    {"tipo": "Evangelio",       "cita": "Marcos 6, 34-44"}],},},
+/*
+╔═════════════════════════════════════════════════╗
+║  8 DE ENERO - después de la Epifania del Señor  ║
+╚═════════════════════════════════════════════════╝*/
+    "navidad_8_ene": {"A": {"titulo": "8 de Enero, después de la epifania.","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Juan 4, 7-10"},
+        {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 3-4ab. 7-8"},
+        {"tipo": "Evangelio",       "cita": "Marcos 6, 34-44"}],},},
 
 
 //Esta tiene dos opciones para el día y propio de los santos
-/*9 Enero*/     "navidad_9_ene": [
-                    {"A": {"titulo": "9 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                        {"tipo": "1ª Lectura",      "cita": "1 Juan 4, 11-18"},
-                        {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 10-11. 12-13"},
-                        {"tipo": "Evangelio",       "cita": "Marcos 6, 45-52"}]}},
-                    {"A": {"titulo": "9 de Enero, San Eulogio de Córdoba, presbítero y mártir","lecturas": [
-                        {"tipo": "1ª Lectura",      "cita": "Filipenses 1, 21-30"},
-                        {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 10-11. 12-13"},
-                        {"tipo": "Evangelio",       "cita": "Marcos 6, 45-52"}]}}],
-/*******************************************************************************************/
+/*
+╔═════════════════════════════════════════════════╗
+║  9 DE ENERO - después de la Epifania del Señor  ║
+╚═════════════════════════════════════════════════╝*/
+    "navidad_9_ene": [
+        {"A": {"titulo": "9 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
+            {"tipo": "1ª Lectura",      "cita": "1 Juan 4, 11-18"},
+            {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 10-11. 12-13"},
+            {"tipo": "Evangelio",       "cita": "Marcos 6, 45-52"}]}},
+        {"A": {"titulo": "9 de Enero, San Eulogio de Córdoba, presbítero y mártir","lecturas": [
+            {"tipo": "1ª Lectura",      "cita": "Filipenses 1, 21-30"},
+            {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 10-11. 12-13"},
+            {"tipo": "Evangelio",       "cita": "Marcos 6, 45-52"}]}}],
 
-/*10 Enero*/     "navidad_10_ene": {"A": {"titulo": "10 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Juan 4, 19—5, 4"},
-                    {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 14 y 15bc. 17"},
-                    {"tipo": "Evangelio",       "cita": "Lucas 4, 14-22a"}],},},
+/*
+╔══════════════════════════════════════════════════╗
+║  10 DE ENERO - después de la Epifania del Señor  ║
+╚══════════════════════════════════════════════════╝*/
+    "navidad_10_ene": {"A": {"titulo": "10 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Juan 4, 19—5, 4"},
+        {"tipo": "Salmo",           "cita": "Salmo 71, 1-2. 14 y 15bc. 17"},
+        {"tipo": "Evangelio",       "cita": "Lucas 4, 14-22a"}],},},
 
-/*11 Enero*/     "navidad_11_ene": {"A": {"titulo": "11 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Juan 5, 5-13"},
-                    {"tipo": "Salmo",           "cita": "Salmo 147, 12-13. 14-15. 19-20"},
-                    {"tipo": "Evangelio",       "cita": "Lucas 5, 12-16"}],},},
+/*
+╔══════════════════════════════════════════════════╗
+║  11 DE ENERO - después de la Epifania del Señor  ║
+╚══════════════════════════════════════════════════╝*/
+    "navidad_11_ene": {"A": {"titulo": "11 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Juan 5, 5-13"},
+        {"tipo": "Salmo",           "cita": "Salmo 147, 12-13. 14-15. 19-20"},
+        {"tipo": "Evangelio",       "cita": "Lucas 5, 12-16"}],},},
 
-/*12 Enero*/     "navidad_12_ene": {"A": {"titulo": "12 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Juan 5, 14-21"},
-                    {"tipo": "Salmo",           "cita": "Salmo 149, 1-2. 3-4. 5-6a y 9b"},
-                    {"tipo": "Evangelio",       "cita": "Juan 3, 22-30"}],},},
-
-
+/*
+╔══════════════════════════════════════════════════╗
+║  12 DE ENERO - después de la Epifania del Señor  ║
+╚══════════════════════════════════════════════════╝*/
+    "navidad_12_ene": {"A": {"titulo": "12 de Enero, después de la epifania, Ciclo A,B,C, Par/Impar","lecturas": [
+        {"tipo": "1ª Lectura",      "cita": "Juan 5, 14-21"},
+        {"tipo": "Salmo",           "cita": "Salmo 149, 1-2. 3-4. 5-6a y 9b"},
+        {"tipo": "Evangelio",       "cita": "Juan 3, 22-30"}],},},
 
 /*           BOCETO
 ╔══════════════════════════════════════════════════════════════╗
@@ -790,19 +862,19 @@ const liturgiaLecturas = {
     "A": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Isaías 42, 1-4. 6-7"},
         {"tipo": "Salmo",           "cita": "Salmo 28, 1a y 2. 3ac-4. 3b y 9b-10"},
-        {"tipo": "2ª Lectura",      "cita": "Hechos de los apóstoles 10, 34-38"},
+        {"tipo": "2ª Lectura",      "cita": "Hechos de los Apóstoles 10, 34-38"},
         {"tipo": "Evangelio",       "cita": "Mateo 3, 13-17"}
         ],"titulo": "Bautismo del Señor Ciclo A"},
     "B": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Isaías 42, 1-4. 6-7"},
         {"tipo": "Salmo",           "cita": "Salmo 28, 1a y 2. 3ac-4. 3b y 9b-10"},
-        {"tipo": "2ª Lectura",      "cita": "Hechos de los apóstoles 10, 34-38"},
+        {"tipo": "2ª Lectura",      "cita": "Hechos de los Apóstoles 10, 34-38"},
         {"tipo": "Evangelio",       "cita": "Marcos 1, 7-11"}
         ],"titulo": "Bautismo del Señor Ciclo B"},
     "C": {"lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Isaías 42, 1-4. 6-7"},
         {"tipo": "Salmo",           "cita": "Salmo 28, 1a y 2. 3ac-4. 3b y 9b-10"},
-        {"tipo": "2ª Lectura",      "cita": "Hechos de los apóstoles 10, 34-38"},
+        {"tipo": "2ª Lectura",      "cita": "Hechos de los Apóstoles 10, 34-38"},
         {"tipo": "Evangelio",       "cita": "Lucas 3, 15-16. 21-22"}
         ],"titulo": "Bautismo del Señor Ciclo C"}
   },
@@ -1667,13 +1739,13 @@ const liturgiaLecturas = {
             {"tipo": "Evangelio",       "cita": "Lucas 24, 1-12"}]}},
 
         {"C": {"titulo": "Domingo de Pascua, Ciclo B","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 10, 34a. 37-43"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 10, 34a. 37-43"},
             {"tipo": "Salmo",           "cita": "Salmo 117, 1- 2. 16ab-17. 22-23"},
             {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 1-4 o 1 Corintios 5, 6b-8"},
             {"tipo": "Evangelio",       "cita": "Juan 20, 1-9"}]}},
 
         {"C": {"titulo": "Misa Vespertina, Domingo de Pascua, Ciclo B","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 10, 34a. 37-43"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 10, 34a. 37-43"},
             {"tipo": "Salmo",           "cita": "Salmo 117, 1- 2. 16ab-17. 22-23"},
             {"tipo": "2ª Lectura",      "cita": "Colosenses 3, 1-4 o 1 Corintios 5, 6b-8"},
             {"tipo": "Evangelio",       "cita": "Lucas 24, 13-35"}]}},
@@ -1689,29 +1761,29 @@ const liturgiaLecturas = {
 ║  TIEMPO DE PASCUA - DIAS DE LA 1ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s1_lu": {"A": {"titulo": "Lunes de la 8ª de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 2, 14. 22-23"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 14. 22-23"},
                     {"tipo": "Salmo",           "cita": "Salmo 15, 1-2 y 5. 7-8. 9-10. 11"},
                     {"tipo": "Evangelio",       "cita": "Mateo 28, 8-15"}],},},
 /*MARTES*/      "pascua_s1_ma": {"A": {"titulo": "Martes de la 8ª de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 2, 36-41"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 36-41"},
                     {"tipo": "Salmo",           "cita": "Salmo 32, 4-5. 18-19. 20 y 22"},
                     {"tipo": "Evangelio",       "cita": "Juan 20, 11-18"}],},},
 /*MIERCOLES*/   "pascua_s1_mi": {"A": {"titulo": "Miércoles de la 8ª de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 3, 1-10"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 3, 1-10"},
                     {"tipo": "Salmo",           "cita": "Salmo 104, 1-2. 3-4. 6-7. 8-9"},
                     {"tipo": "Evangelio",       "cita": "Lucas 24, 13-35"}],},},
 /*JUEVES*/     "pascua_s1_ju": {"A": {"titulo": "Jueves de la 8ª de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 3, 11-26"},
+                    {"tipo": "Salmo",           "cita": "Salmo 8, 2a y 5. 6-7. 8-9"},
+                    {"tipo": "Evangelio",       "cita": "Lucas 24, 35-48"}],},},
 /*VIERNES*/     "pascua_s1_vi": {"A": {"titulo": "Viernes de la 8ª de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 4, 1-12"},
+                    {"tipo": "Salmo",           "cita": "Salmo 117, 1-2 y 4. 22-24. 25-27a"},
+                    {"tipo": "Evangelio",       "cita": "Juan 21, 1-14"}],},},
 /*SABADO*/     "pascua_s1_sa": {"A": {"titulo": "Sábado de la 8ª de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 4, 13-21"},
+                    {"tipo": "Salmo",           "cita": "Salmo 117, 1 y 14-15. 16-18. 19-21"},
+                    {"tipo": "Evangelio",       "cita": "Marcos 16, 9-15"}],},},
 
 /*
 ╔═══════════════════════════════════════════════════════════╗
@@ -1739,29 +1811,29 @@ const liturgiaLecturas = {
 ║  TIEMPO DE PASCUA - DIAS DE LA 2ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s2_lu": {"A": {"titulo": "Lunes de la 2ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 4, 23-31"},
+                    {"tipo": "Salmo",           "cita": "Salmo 2, 1-3. 4-6. 7-9"},
+                    {"tipo": "Evangelio",       "cita": "Juan 3, 1-8"}],},},
 /*MARTES*/      "pascua_s2_ma": {"A": {"titulo": "Martes de la 2ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 4, 32-37"},
+                    {"tipo": "Salmo",           "cita": "Salmo 92, 1ab. 1c-2. 5"},
+                    {"tipo": "Evangelio",       "cita": "Juan 3, 5a. 7b-15"}],},},
 /*MIERCOLES*/   "pascua_s2_mi": {"A": {"titulo": "Miércoles de la 2ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 5, 17-26"},
+                    {"tipo": "Salmo",           "cita": "Salmo 33, 2-3. 4-5. 6-7. 8-9"},
+                    {"tipo": "Evangelio",       "cita": "Juan 3, 16-21"}],},},
 /*JUEVES*/     "pascua_s2_ju": {"A": {"titulo": "Jueves de la 2ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 5, 27-33"},
+                    {"tipo": "Salmo",           "cita": "Salmo 33, 2 y 9. 17-18.19-20"},
+                    {"tipo": "Evangelio",       "cita": "Juan 3, 31-36"}],},},
 /*VIERNES*/     "pascua_s2_vi": {"A": {"titulo": "Viernes de la 2ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 5, 34-42"},
+                    {"tipo": "Salmo",           "cita": "Salmo 26, 1. 4. 13-14"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 1-15"}],},},
 /*SABADO*/     "pascua_s2_sa": {"A": {"titulo": "Sábado de la 2ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 6, 1-7"},
+                    {"tipo": "Salmo",           "cita": "Salmo 32, 1-2. 4-5. 18-19"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 16-21"}],},},
 
 /*
 ╔═══════════════════════════════════════════════╗
@@ -1769,7 +1841,7 @@ const liturgiaLecturas = {
 ╚═══════════════════════════════════════════════╝
 */  "pascua_s3_do": {
         "A": {"titulo": "Tercer Domingo de Pascua","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 2, 14. 22-33"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 14. 22-33"},
             {"tipo": "Salmo",           "cita": "Salmo 15, 1-2a y 5. 7-8. 9-10. 11"},
             {"tipo": "2ª Lectura",      "cita": "1 Pedro 1, 17-21"},
             {"tipo": "Evangelio",       "cita": "Lucas 24, 13-35"}],},
@@ -1789,36 +1861,36 @@ const liturgiaLecturas = {
 ║  TIEMPO DE PASCUA - DIAS DE LA 3ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s3_lu": {"A": {"titulo": "Lunes de la 3ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 6, 8-15"},
+                    {"tipo": "Salmo",           "cita": "Salmo 118, 23-24. 26-27. 29-30"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 22-29"}],},},
 /*MARTES*/      "pascua_s3_ma": {"A": {"titulo": "Martes de la 3ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 7, 51—8, 1a"},
+                    {"tipo": "Salmo",           "cita": "Salmo 30, 3cd-4. 6ab y 7b y 8a. 17 y 21ab"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 30-35"}],},},
 /*MIERCOLES*/   "pascua_s3_mi": {"A": {"titulo": "Miércoles de la 3ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 8, 1b-8"},
+                    {"tipo": "Salmo",           "cita": "Salmo 65, 1-3a. 4-5. 6-7a"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 35-40"}],},},
 /*JUEVES*/     "pascua_s3_ju": {"A": {"titulo": "Jueves de la 3ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 8, 26-40"},
+                    {"tipo": "Salmo",           "cita": "Salmo 65, 8-9. 16-17. 20"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 44-51"}],},},
 /*VIERNES*/     "pascua_s3_vi": {"A": {"titulo": "Viernes de la 3ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 9, 1-20"},
+                    {"tipo": "Salmo",           "cita": "Salmo 116, 1. 2"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 52-59"}],},},
 /*SABADO*/     "pascua_s3_sa": {"A": {"titulo": "Sábado de la 3ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 9, 31-42"},
+                    {"tipo": "Salmo",           "cita": "Salmo 115, 12-13. 14-15. 16-17"},
+                    {"tipo": "Evangelio",       "cita": "Juan 6, 60-69"}],},},
 /*
 ╔═══════════════════════════════════════════════╗
 ║  TIEMPO PASCUAL - SEMANA 4 DOMINGO CICLO ABC  ║
 ╚═══════════════════════════════════════════════╝
 */  "pascua_s4_do": {
         "A": {"titulo": "Domingo 4º de Pascua, Ciclo A","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 2, 14a. 36-41"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 14a. 36-41"},
             {"tipo": "Salmo",           "cita": "Salmo 22, 1-3a. 3b-4. 5. 6"},
             {"tipo": "2ª Lectura",      "cita": "1 Pedro 2, 20b-25"},
             {"tipo": "Evangelio",       "cita": "Juan 10, 1-10"}],},
@@ -1839,29 +1911,29 @@ const liturgiaLecturas = {
 ║  TIEMPO DE PASCUA - DIAS DE LA 4ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s4_lu": {"A": {"titulo": "Lunes de la 4ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 11, 1-18"},
+                    {"tipo": "Salmo",           "cita": "Salmo 41, 2-3; 42, 3. 4"},
+                    {"tipo": "Evangelio",       "cita": "Juan 10, 1-10 o Juan 10, 11-18"}],},},
 /*MARTES*/      "pascua_s4_ma": {"A": {"titulo": "Martes de la 4ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 11, 19-26"},
+                    {"tipo": "Salmo",           "cita": "Salmo 86, 1-3. 4-5. 6- 7"},
+                    {"tipo": "Evangelio",       "cita": "Juan 10, 22-30"}],},},
 /*MIERCOLES*/   "pascua_s4_mi": {"A": {"titulo": "Miércoles de la 4ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 12, 24—13, 5"},
+                    {"tipo": "Salmo",           "cita": "Salmo 66, 2-3. 5. 6 y 8"},
+                    {"tipo": "Evangelio",       "cita": "Juan 12, 44-50"}],},},
 /*JUEVES*/     "pascua_s4_ju": {"A": {"titulo": "Jueves de la 4ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 13, 13-25"},
+                    {"tipo": "Salmo",           "cita": "Salmo 88, 2-3. 21-22. 25 y 27"},
+                    {"tipo": "Evangelio",       "cita": "Juan 13, 16-20"}],},},
 /*VIERNES*/     "pascua_s4_vi": {"A": {"titulo": "Viernes de la 4ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 13, 26-33"},
+                    {"tipo": "Salmo",           "cita": "Salmo 2, 6-7. 8-9. 10-11"},
+                    {"tipo": "Evangelio",       "cita": "Juan 14, 1-6"}],},},
 /*SABADO*/     "pascua_s4_sa": {"A": {"titulo": "Sábado de la 4ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 13, 44-52"},
+                    {"tipo": "Salmo",           "cita": "Salmo 97, 1-2ab. 2cd-3ab. 3cd-4"},
+                    {"tipo": "Evangelio",       "cita": "Juan 14, 7-14"}],},},
 
 
 /*
@@ -1870,7 +1942,7 @@ const liturgiaLecturas = {
 ╚═══════════════════════════════════════════════╝
 */  "pascua_s5_do": {
         "A": {"titulo": "Domingo 5º de Pascua, Ciclo A","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos de los apóstoles 6, 1-7"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 6, 1-7"},
             {"tipo": "Salmo",           "cita": "Salmo 32, 1-2. 4-5. 18-19"},
             {"tipo": "2ª Lectura",      "cita": "1 Pedro 2, 4-9"},
             {"tipo": "Evangelio",       "cita": "Juan 14, 1-12"}],},
@@ -1891,81 +1963,79 @@ const liturgiaLecturas = {
 ║  TIEMPO DE PASCUA - DIAS DE LA 5ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s5_lu": {"A": {"titulo": "Lunes de la 5ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 14, 5-18"},
+                    {"tipo": "Salmo",           "cita": "Salmo 113 B, 1-2. 3-4. 15-16"},
+                    {"tipo": "Evangelio",       "cita": "Juan 14, 21-26"}],},},
 /*MARTES*/      "pascua_s5_ma": {"A": {"titulo": "Martes de la 5ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 14, 19-28"},
+                    {"tipo": "Salmo",           "cita": "Salmo 144, 10-11. 12-13ab. 21"},
+                    {"tipo": "Evangelio",       "cita": "Juan 14, 27-31a"}],},},
 /*MIERCOLES*/   "pascua_s5_mi": {"A": {"titulo": "Miércoles de la 5ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 15, 1-6"},
+                    {"tipo": "Salmo",           "cita": "Salmo 121, 1-2. 4-5"},
+                    {"tipo": "Evangelio",       "cita": "Juan 15, 1-8"}],},},
 /*JUEVES*/     "pascua_s5_ju": {"A": {"titulo": "Jueves de la 5ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 15, 7-21"},
+                    {"tipo": "Salmo",           "cita": "Salmo 95, 1-2a. 2b-3. 10"},
+                    {"tipo": "Evangelio",       "cita": "Juan 15, 9-11"}],},},
 /*VIERNES*/     "pascua_s5_vi": {"A": {"titulo": "Viernes de la 5ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 15, 22-31"},
+                    {"tipo": "Salmo",           "cita": "Salmo 56, 8-9. 10-12 "},
+                    {"tipo": "Evangelio",       "cita": "Juan 15, 12-17"}],},},
 /*SABADO*/     "pascua_s5_sa": {"A": {"titulo": "Sábado de la 5ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
-
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 16, 1-10"},
+                    {"tipo": "Salmo",           "cita": "Salmo 99, 1-2. 3. 5"},
+                    {"tipo": "Evangelio",       "cita": "Juan 15, 18-21"}],},},
 
 /*
 ╔═══════════════════════════════════════════════╗
 ║  TIEMPO PASCUAL - SEMANA 6 DOMINGO CICLO ABC  ║
 ╚═══════════════════════════════════════════════╝
-*/  "pascua_s5_do": {
+*/  "pascua_s6_do": {
         "A": {"titulo": "Domingo 6ª de Pascua, Ciclo A","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 8, 5-8. 14-17"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 8, 5-8. 14-17"},
             {"tipo": "Salmo",           "cita": "Salmo 65, 1-3a. 4-5. 6-7a. 16 y 20"},
             {"tipo": "2ª Lectura",      "cita": "1 Pedro 3, 15-18"},
             {"tipo": "Evangelio",       "cita": "Juan 14, 15-21"}],},
         "B": {"titulo": "Domingo 6ª de Pascua, Ciclo B","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": ""},
-            {"tipo": "Salmo",           "cita": ""},
-            {"tipo": "2ª Lectura",      "cita": ""},
-            {"tipo": "Evangelio",       "cita": ""}],},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 10, 25-26. 34-35. 44-48"},
+            {"tipo": "Salmo",           "cita": "Salmo 97, 1. 2-3ab. 3cd-4"},
+            {"tipo": "2ª Lectura",      "cita": "1 Juan 4, 7-10"},
+            {"tipo": "Evangelio",       "cita": "Juan 15, 9-17"}],},
         "C": {"titulo": "Domingo 6ª de Pascua, Ciclo C","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": ""},
-            {"tipo": "Salmo",           "cita": ""},
-            {"tipo": "2ª Lectura",      "cita": ""},
-            {"tipo": "Evangelio",       "cita": ""}],},},
-
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 15, 1-2. 22-29"},
+            {"tipo": "Salmo",           "cita": "Salmo 66, 2-3. 5. 6 y 8"},
+            {"tipo": "2ª Lectura",      "cita": "Apocalipsis 21, 10-14. 22-23"},
+            {"tipo": "Evangelio",       "cita": "Juan 14, 23-29"}],},},
 
 /*
 ╔════════════════════════════════════════════════════════════════╗
 ║  TIEMPO DE PASCUA - DIAS DE LA 6ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s6_lu": {"A": {"titulo": "Lunes de la 6ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 16, 11-15"},
+                    {"tipo": "Salmo",           "cita": "Salmo 149, 1-2. 3-4. 5-6a y 9b"},
+                    {"tipo": "Evangelio",       "cita": "Juan 15, 26—16, 4a"}],},},
 /*MARTES*/      "pascua_s6_ma": {"A": {"titulo": "Martes de la 6ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 16, 22-34"},
+                    {"tipo": "Salmo",           "cita": "Salmo 137, 1-2a. 2bc y 3. 7c-8"},
+                    {"tipo": "Evangelio",       "cita": "Juan 16,5-11"}],},},
 /*MIERCOLES*/   "pascua_s6_mi": {"A": {"titulo": "Miércoles de la 6ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 17, 15. 22—18, 1"},
+                    {"tipo": "Salmo",           "cita": "Salmo 148, 1-2. 11-12. 13. 14"},
+                    {"tipo": "Evangelio",       "cita": "Juan 16, 12-15"}],},},
 /*JUEVES*/     "pascua_s6_ju": {"A": {"titulo": "Jueves de la 6ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 18, 1-8"},
+                    {"tipo": "Salmo",           "cita": "Salmo 97, 1-2ab. 2cd-3ab. 3cd-4"},
+                    {"tipo": "Evangelio",       "cita": "Juan 16, 16-20"}],},},
 /*VIERNES*/     "pascua_s6_vi": {"A": {"titulo": "Viernes de la 6ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 18, 9-18"},
+                    {"tipo": "Salmo",           "cita": "Salmo 46, 2-3. 4-5. 6-7"},
+                    {"tipo": "Evangelio",       "cita": "Juan 16 ,20-23a"}],},},
 /*SABADO*/     "pascua_s6_sa": {"A": {"titulo": "Sábado de la 6ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 18, 23-28"},
+                    {"tipo": "Salmo",           "cita": "Salmo 46, 2-3. 8-9. 10"},
+                    {"tipo": "Evangelio",       "cita": "Juan 16, 23b-28"}],},},
 
 
 /*
@@ -1974,17 +2044,17 @@ const liturgiaLecturas = {
 ╚══════════════════════════════════════════════════╝
 */      "pascua_as_do": {
     "A": {"titulo": "La Ascensión del Señor, Tiempo de Pascua, Ciclo A.","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 1, 1-11"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 1, 1-11"},
             {"tipo": "Salmo",           "cita": "Salmo 46, 2-3. 6-7. 8-9"},
             {"tipo": "2ª Lectura",      "cita": "Efesios 1, 17-23"},
             {"tipo": "Evangelio",       "cita": "Mateo 28, 16-20"}],},
     "B": {"titulo": "La Ascensión del Señor, Tiempo de Pascua, Ciclo B.","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 1, 1-11"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 1, 1-11"},
             {"tipo": "Salmo",           "cita": "Salmo 46, 2-3. 6-7. 8-9"},
             {"tipo": "2ª Lectura",      "cita": "Efesios 1, 17-23 o Efesios 4, 1-13 o Efesios 4, 1-7. 11-13"},
             {"tipo": "Evangelio",       "cita": "Marcos 16, 15-20"}],},
     "C": {"titulo": "La Ascensión del Señor, Tiempo de Pascua, Ciclo  C.","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 1, 1-11"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 1, 1-11"},
             {"tipo": "Salmo",           "cita": "Salmo 46, 2-3. 6-7. 8-9"},
             {"tipo": "2ª Lectura",      "cita": "Efesios 1, 17-23 o Hebreos 9, 24-28; 10, 19-23"},
             {"tipo": "Evangelio",       "cita": "Lucas 24, 46-53"}],}
@@ -1996,17 +2066,17 @@ const liturgiaLecturas = {
 ╚═══════════════════════════════════════════════╝
 */      "pascua_s7_do": {
     "A": {"titulo": "Séptimo Domingo de Pascua","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 1, 12-14"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 1, 12-14"},
             {"tipo": "Salmo",           "cita": "Salmo 26, 1. 4. 7-8a"},
             {"tipo": "2ª Lectura",      "cita": "1 Pedro 4, 13-16"},
             {"tipo": "Evangelio",       "cita": "Juan 17, 1-11a"}],},
     "B": {"titulo": "Séptimo Domingo de Pascua","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 1, 15-17. 20a. 20c-26"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 1, 15-17. 20a. 20c-26"},
             {"tipo": "Salmo",           "cita": "Salmo 102, 1-2. 11-12. 19-20ab"},
             {"tipo": "2ª Lectura",      "cita": "1 Juan 4, 11-16"},
             {"tipo": "Evangelio",       "cita": "Juan 17, 11b-19"}],},
     "C": {"titulo": "Séptimo Domingo de Pascua","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 7, 55-60"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 7, 55-60"},
             {"tipo": "Salmo",           "cita": "Salmo 96, 1 y 2b. 6 y 7c. 9"},
             {"tipo": "2ª Lectura",      "cita": "Apocalipsis 22, 12-14. 16-17. 20"},
             {"tipo": "Evangelio",       "cita": "Juan 17, 20-26"}],},
@@ -2018,29 +2088,29 @@ const liturgiaLecturas = {
 ║  TIEMPO DE PASCUA - DIAS DE LA 7ª SEMANA CICLO ABC, PAR/IMPAR  ║
 ╚════════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s7_lu": {"A": {"titulo": "Lunes de la 7ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 19, 1-8"},
+                    {"tipo": "Salmo",           "cita": "Salmo 67, 2-3. 4-5ac. 6-7ab"},
+                    {"tipo": "Evangelio",       "cita": "Juan 16, 29-33"}],},},
 /*MARTES*/      "pascua_s7_ma": {"A": {"titulo": "Martes de la 7ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 20, 17-27"},
+                    {"tipo": "Salmo",           "cita": "Salmo 67, 10-11. 20-21"},
+                    {"tipo": "Evangelio",       "cita": "Juan 17, 1-11a"}],},},
 /*MIERCOLES*/   "pascua_s7_mi": {"A": {"titulo": "Miércoles de la 7ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 20, 28-38"},
+                    {"tipo": "Salmo",           "cita": "Salmo 67, 29-30. 33-35a. 35b y 36c"},
+                    {"tipo": "Evangelio",       "cita": "Juan 17, 11b-19"}],},},
 /*JUEVES*/     "pascua_s7_ju": {"A": {"titulo": "Jueves de la 7ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 22, 30; 23, 6-11"},
+                    {"tipo": "Salmo",           "cita": "Salmo 15, 1-2 y 5. 7-8. 9-10. 11"},
+                    {"tipo": "Evangelio",       "cita": "Juan 17, 20-26"}],},},
 /*VIERNES*/     "pascua_s7_vi": {"A": {"titulo": "Viernes de la 7ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 25, 13-21"},
+                    {"tipo": "Salmo",           "cita": "Salmo 102, 1-2. 11-12. 19-20ab"},
+                    {"tipo": "Evangelio",       "cita": "Juan 21, 15-19"}],},},
 /*SABADO*/     "pascua_s7_sa": {"A": {"titulo": "Sábado de la 7ª semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": ""},
-                    {"tipo": "Salmo",           "cita": ""},
-                    {"tipo": "Evangelio",       "cita": ""}],},},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 28, 16-20. 30-31"},
+                    {"tipo": "Salmo",           "cita": "Salmo 10, 4. 5 y 7"},
+                    {"tipo": "Evangelio",       "cita": "Juan 21, 20-25"}],},},
 
 
 /*
@@ -2048,27 +2118,27 @@ const liturgiaLecturas = {
 ║  TIEMPO PASCUAL - DIAS DE LA SEMANA 7 CICLO ABC, PAR/IMPAR  ║
 ╚═════════════════════════════════════════════════════════════╝*/ 
 /*LUNES*/       "pascua_s7_lu": {"A": {"titulo": "Lunes de la séptima semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 19, 1-8"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 19, 1-8"},
                     {"tipo": "Salmo",           "cita": "Salmo 67, 2-3. 4-5ac. 6-7ab"},
                     {"tipo": "Evangelio",       "cita": "Juan 16, 29-33"}],},},
 /*MARTES*/      "pascua_s7_ma": {"A": {"titulo": "Martes de la séptima semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 20, 17-27"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 20, 17-27"},
                     {"tipo": "Salmo",           "cita": "Salmo 67, 10-11. 20-21"},
                     {"tipo": "Evangelio",       "cita": "Juan 17, 1-11a"}],},},
 /*MIERCOLES*/   "pascua_s7_mi": {"A": {"titulo": "Miércoles de la séptima semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 20, 28-38"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 20, 28-38"},
                     {"tipo": "Salmo",           "cita": "Salmo 67, 29-30. 33-35a. 35b y 36c"},
                     {"tipo": "Evangelio",       "cita": "Juan 17, 11b-19"}],},},
 /*JUEVES*/     "pascua_s7_ju": {"A": {"titulo": "Jueves de la séptima semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 22, 30; 23, 6-11"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 22, 30; 23, 6-11"},
                     {"tipo": "Salmo",           "cita": "Salmo 15, 1-2 y 5. 7-8. 9-10. 11"},
                     {"tipo": "Evangelio",       "cita": "Juan 17, 20-26"}],},},
 /*VIERNES*/     "pascua_s7_vi": {"A": {"titulo": "Viernes de la séptima semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 25, 13-21"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 25, 13-21"},
                     {"tipo": "Salmo",           "cita": "Salmo 102, 1-2. 11-12. 19-20ab"},
                     {"tipo": "Evangelio",       "cita": "Juan 21, 15-19"}],},},
 /*SABADO*/     "pascua_s7_sa": {"A": {"titulo": "Sábado de la séptima semana de Pascua, Ciclo A,B,C, Par/Impar","lecturas": [
-                    {"tipo": "1ª Lectura",      "cita": "Hechos 28, 16-20. 30-31"},
+                    {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 28, 16-20. 30-31"},
                     {"tipo": "Salmo",           "cita": "Salmo 10, 4. 5 y 7"},
                     {"tipo": "Evangelio",       "cita": "Juan 21, 20-25"}],},},
 
@@ -2084,7 +2154,7 @@ const liturgiaLecturas = {
             {"tipo": "Evangelio",       "cita": "Juan 7, 37-39"}]}},
 
         {"A": {"titulo": "Domingo de Pentecostés, Misa del día, Ciclo A","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 2, 1-11"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 1-11"},
             {"tipo": "Salmo",           "cita": "Salmo 103, 1ab y 24ac. 29bc-30. 31 y 34"},
             {"tipo": "2ª Lectura",      "cita": "1 Corintios 12, 3b-7. 12-13"},
             {"tipo": "Evangelio",       "cita": "Juan 20, 19-23"}]}},
@@ -2096,7 +2166,7 @@ const liturgiaLecturas = {
             {"tipo": "Evangelio",       "cita": "Juan 7, 37-39"}]}},
 
         {"B": {"titulo": "Domingo de Pentecostés, Misa del día, Ciclo B","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 2, 1-11"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 1-11"},
             {"tipo": "Salmo",           "cita": "Salmo 103, 1ab y 24ac. 29bc-30. 31 y 34"},
             {"tipo": "2ª Lectura",      "cita": "1 Corintios 12, 3b-7. 12-13"},
             {"tipo": "Evangelio",       "cita": "Juan 20, 19-23"}]}},
@@ -2108,7 +2178,7 @@ const liturgiaLecturas = {
             {"tipo": "Evangelio",       "cita": "Juan 7, 37-39"}]}},
 
         {"C": {"titulo": "Domingo de Pentecostés, Misa del día, Ciclo C","lecturas": [
-            {"tipo": "1ª Lectura",      "cita": "Hechos 2, 1-11"},
+            {"tipo": "1ª Lectura",      "cita": "Hechos de los Apóstoles 2, 1-11"},
             {"tipo": "Salmo",           "cita": "Salmo 103, 1ab y 24ac. 29bc-30. 31 y 34"},
             {"tipo": "2ª Lectura",      "cita": "1 Corintios 12, 3b-7. 12-13"},
             {"tipo": "Evangelio",       "cita": "Juan 20, 19-23"}]}},],
@@ -2142,7 +2212,7 @@ const liturgiaLecturas = {
     "ordinario_s1_ma": {
             "PAR": {"titulo": "Martes de la 1ª semana del Tiempo Ordinario","lecturas": [
                 {"tipo": "1ª Lectura",      "cita": "1 Samuel 1, 9-20"},
-                {"tipo": "Salmo",           "cita": "1Samuel 2, 1. 4-5. 6-7. 8"},
+                {"tipo": "Salmo",           "cita": "1 Samuel 2, 1. 4-5. 6-7. 8"},
                 {"tipo": "Evangelio",       "cita": "Marcos 1, 21-28"}]},
             "IMPAR": {"titulo": "Martes de la 1ª semana del Tiempo Ordinario","lecturas": [
                 {"tipo": "1ª Lectura",      "cita": "Hebreos 2, 5-12"},
@@ -2405,7 +2475,7 @@ const liturgiaLecturas = {
   "ordinario_s4_ju": {
     "PAR": {"titulo": "Jueves de la 4ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",  "cita": "1 Reyes 2, 1-4. 10-12"},
-        {"tipo": "Salmo",       "cita": "1Crónicas 29, 10. 11ab. 11d-12a. 12"},
+        {"tipo": "Salmo",       "cita": "1 Crónicas 29, 10. 11ab. 11d-12a. 12"},
         {"tipo": "Evangelio",   "cita": "Marcos 6, 7-13"}]},
     "IMPAR": {"titulo": "Jueves de la 4ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",  "cita": "Hebreos 12, 18-19. 21-24"},
@@ -2699,13 +2769,13 @@ const liturgiaLecturas = {
         {"tipo": "Evangelio",   "cita": "Marcos 11, 11-26"}]},
     "IMPAR": {"titulo": "Viernes de la 8ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",  "cita": "Sirácida 44, 1. 9-13"},
-        {"tipo": "Salmo",       "cita": "Salmo149, 1-2. 3-4. 5-6a y 9b"},
+        {"tipo": "Salmo",       "cita": "Salmo 149, 1-2. 3-4. 5-6a y 9b"},
         {"tipo": "Evangelio",   "cita": "Marcos 11, 11-26"}]}},
 
 // TIEMPO ORDINARIO - SEMANA 8 SABADO
   "ordinario_s8_sa": {
     "PAR": {"titulo": "Sabado de la 8ª semana del Tiempo Ordinario","lecturas": [
-        {"tipo": "1ª Lectura",  "cita": "Judas: 17. 20b-25"},
+        {"tipo": "1ª Lectura",  "cita": "Judas 1, 17. 20b-25"},
         {"tipo": "Salmo",       "cita": "Salmo 62, 2. 3-4. 5-6"},
         {"tipo": "Evangelio",   "cita": "Marcos 11, 27-33"}]},
     "IMPAR": {"titulo": "Sabado de la 8ª semana del Tiempo Ordinario","lecturas": [
@@ -3168,7 +3238,7 @@ const liturgiaLecturas = {
   "ordinario_s15_sa": {
     "PAR": {"titulo": "Sabado de la 15ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",  "cita": "Miqueas 2, 1-5"},
-        {"tipo": "Salmo",       "cita": "Salmo 9, 22-23. 24-25. 28-29. 35"},
+        {"tipo": "Salmo",       "cita": "Salmo 9, 1-2. 3-4. 7-8. 14"},
         {"tipo": "Evangelio",   "cita": "Mateo 12, 14-21"}]},
     "IMPAR": {"titulo": "Sabado de la 15ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",  "cita": "Éxodo 12, 37-42"},
@@ -3354,7 +3424,7 @@ const liturgiaLecturas = {
 // TIEMPO ORDINARIO - SEMANA 18 VIERNES
   "ordinario_s18_vi": {
     "PAR": {"titulo": "Viernes de la 18ª semana del Tiempo Ordinario","lecturas": [
-        {"tipo": "1ª Lectura",  "cita": "Nahum 2, 1. 3; 3, 1-3. 6-7"},
+        {"tipo": "1ª Lectura",  "cita": "Nahun 2, 1. 3; 3, 1-3. 6-7"},
         {"tipo": "Salmo",       "cita": "Deuteronomio 32, 35-36. 39. 41"},
         {"tipo": "Evangelio",   "cita": "Mateo 16, 24-28"}]},
     "IMPAR": {"titulo": "Viernes de la 18ª semana del Tiempo Ordinario","lecturas": [
@@ -3773,7 +3843,7 @@ const liturgiaLecturas = {
   "ordinario_s25_lu": {
     "PAR": {"titulo": "Lunes de la 25ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Proverbios 3, 27-34"},
-        {"tipo": "Salmo",           "cita": "14, 2-3ab. 3cd-4ab. 5"},
+        {"tipo": "Salmo",           "cita": "Salmo 14, 2-3ab. 3cd-4ab. 5"},
         {"tipo": "Evangelio",       "cita": "Lucas 8, 16-18"}]},
     "IMPAR": {"titulo": "Lunes de la 25ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",      "cita": "Esdras 1, 1-6"},
@@ -4270,7 +4340,7 @@ const liturgiaLecturas = {
 // TIEMPO ORDINARIO - SEMANA 32 JUEVES
   "ordinario_s32_ju": {
     "PAR": {"titulo": "Jueves de la 32ª semana del Tiempo Ordinario","lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Filemón 7-20"},
+        {"tipo": "1ª Lectura",      "cita": "Filemón 1,7-20"},
         {"tipo": "Salmo",           "cita": "Salmo 145, 7. 8-9a. 9bc-10"},
         {"tipo": "Evangelio",       "cita": "Lucas 17, 20-25"}]},
     "IMPAR": {"titulo": "Jueves de la 32ª semana del Tiempo Ordinario","lecturas": [
@@ -4281,7 +4351,7 @@ const liturgiaLecturas = {
 // TIEMPO ORDINARIO - SEMANA 32 VIERNES
   "ordinario_s32_vi": {
     "PAR": {"titulo": "Viernes de la 32ª semana del Tiempo Ordinario","lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "2 Juan 4-9"},
+        {"tipo": "1ª Lectura",      "cita": "2 Juan 1, 4-9"},
         {"tipo": "Salmo",           "cita": "Salmo 118, 1. 2. 10. 11. 17. 18"},
         {"tipo": "Evangelio",       "cita": "Lucas 17, 26-37"}]},
     "IMPAR": {"titulo": "Viernes de la 32ª semana del Tiempo Ordinario","lecturas": [
@@ -4292,7 +4362,7 @@ const liturgiaLecturas = {
 // TIEMPO ORDINARIO - SEMANA 32 SABADO
   "ordinario_s32_sa": {
     "PAR": {"titulo": "Sabado de la 32ª semana del Tiempo Ordinario","lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "3 Juan 5-8"},
+        {"tipo": "1ª Lectura",      "cita": "3 Juan 1, 5-8"},
         {"tipo": "Salmo",           "cita": "Salmo 111, 1-2. 3-4. 5-6"},
         {"tipo": "Evangelio",       "cita": "Lucas 18, 1-8"}]},
     "IMPAR": {"titulo": "Sabado de la 32ª semana del Tiempo Ordinario","lecturas": [
@@ -4307,7 +4377,7 @@ const liturgiaLecturas = {
         {"tipo": "Salmo",           "cita": "Salmo 1, 1-2. 3. 4 y 6"},
         {"tipo": "Evangelio",       "cita": "Lucas 18, 35-43"}]},
     "IMPAR": {"titulo": "Lunes de la 33ª semana del Tiempo Ordinario","lecturas": [
-        {"tipo": "1ª Lectura",      "cita": "Macabeos 1, 10-15. 41-43. 54-57. 62-64"},
+        {"tipo": "1ª Lectura",      "cita": "1 Macabeos 1, 10-15. 41-43. 54-57. 62-64"},
         {"tipo": "Salmo",           "cita": "Salmo 118, 53. 61. 134. 150. 155. 158"},
         {"tipo": "Evangelio",       "cita": "Lucas 18, 35-43"}]}},
 
@@ -4352,7 +4422,7 @@ const liturgiaLecturas = {
         {"tipo": "Evangelio",       "cita": "Lucas 19, 45-48"}]},
     "IMPAR": {"titulo": "Viernes de la 33ª semana del Tiempo Ordinario","lecturas": [
         {"tipo": "1ª Lectura",      "cita": "1 Macabeos 4, 36-37. 52-59"},
-        {"tipo": "Salmo",           "cita": "1Crónicas 29, 10. 11abc. 11d-12a. 12bcd"},
+        {"tipo": "Salmo",           "cita": "1 Crónicas 29, 10. 11abc. 11d-12a. 12bcd"},
         {"tipo": "Evangelio",       "cita": "Lucas 19, 45-48"}]}},
 
 // TIEMPO ORDINARIO - SEMANA 33 SABADO
