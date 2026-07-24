@@ -32,7 +32,8 @@
     colorSeleccion: '#72de54', // Valor por defecto
     colorHoverParalelo: '#30c6f8', // Valor por defecto (rojo)
     vozSeleccionada: '',
-    velocidadVoz: 1.0
+    velocidadVoz: 1.1,
+    anchoTextoPc: 1020
   };
 
   // Estado actual de la configuración
@@ -46,7 +47,8 @@
     colorSeleccion: DEFAULTS.colorSeleccion,
     colorHoverParalelo: DEFAULTS.colorHoverParalelo,
     vozSeleccionada: DEFAULTS.vozSeleccionada,
-    velocidadVoz: DEFAULTS.velocidadVoz
+    velocidadVoz: DEFAULTS.velocidadVoz,
+    anchoTextoPc: DEFAULTS.anchoTextoPc
   };
 
   // 1. Cargar ajustes guardados en localStorage al iniciar
@@ -62,6 +64,7 @@
       const colorHoverParaleloGuardado = localStorage.getItem('biblia_setting_color_hover_paralelo');
       const vozGuardada = localStorage.getItem('biblia_setting_voz');
       const velocidadVozGuardada = localStorage.getItem('biblia_setting_velocidad_voz');
+      const anchoTextoPcGuardado = localStorage.getItem('biblia_setting_ancho_texto_pc');
 
       if (tamanoGuardado) config.tamano = parseInt(tamanoGuardado, 10);
       if (interlineadoGuardado) config.interlineado = parseFloat(interlineadoGuardado);
@@ -79,6 +82,7 @@
       if (colorHoverParaleloGuardado) config.colorHoverParalelo = colorHoverParaleloGuardado;
       if (vozGuardada) config.vozSeleccionada = vozGuardada;
       if (velocidadVozGuardada) config.velocidadVoz = parseFloat(velocidadVozGuardada);
+      if (anchoTextoPcGuardado) config.anchoTextoPc = parseInt(anchoTextoPcGuardado, 10);
     } catch (e) {
       console.error("Error al acceder a localStorage:", e);
     }
@@ -89,6 +93,7 @@
     const root = document.documentElement;
     root.style.setProperty('--tamano-texto', `${config.tamano}px`);
     root.style.setProperty('--interlineado-texto', config.interlineado);
+    root.style.setProperty('--ancho-texto-pc', `${config.anchoTextoPc}px`);
     
     const fuenteCSS = mapasFuentes[config.fuente] || mapasFuentes['aptos'];
     root.style.setProperty('--fuente-texto', fuenteCSS);
@@ -191,6 +196,14 @@
           <div class="ajustes-control-fila">
             <input type="range" id="sliderInterlineado" class="ajustes-slider" min="1.2" max="2.2" step="0.1" value="${config.interlineado}">
             <span class="ajustes-valor-lbl" id="lblInterlineado">${config.interlineado}</span>
+          </div>
+        </div>
+        
+        <div class="ajustes-seccion solo-pc">
+          <div class="ajustes-seccion-titulo">Ancho del Texto (PC)</div>
+          <div class="ajustes-control-fila">
+            <input type="range" id="sliderAnchoTextoPc" class="ajustes-slider" min="600" max="1400" step="20" value="${config.anchoTextoPc}">
+            <span class="ajustes-valor-lbl" id="lblAnchoTextoPc">${config.anchoTextoPc}px</span>
           </div>
         </div>
         
@@ -493,6 +506,9 @@
     const sliderInterlineado = document.getElementById('sliderInterlineado');
     const lblInterlineado = document.getElementById('lblInterlineado');
 
+    const sliderAnchoTextoPc = document.getElementById('sliderAnchoTextoPc');
+    const lblAnchoTextoPc = document.getElementById('lblAnchoTextoPc');
+
     const selectFuente = document.getElementById('selectFuente');
     const pickerColorSeleccion = document.getElementById('pickerColorSeleccion');
     const pickerColorHoverParalelo = document.getElementById('pickerColorHoverParalelo');
@@ -570,6 +586,22 @@
         
         try {
           localStorage.setItem('biblia_setting_interlineado', val.toString());
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    // Evento Slider de Ancho del Texto (PC)
+    if (sliderAnchoTextoPc && lblAnchoTextoPc) {
+      sliderAnchoTextoPc.addEventListener('input', function (e) {
+        const val = parseInt(e.target.value, 10);
+        config.anchoTextoPc = val;
+        lblAnchoTextoPc.textContent = `${val}px`;
+        aplicarAjustesEnCSS();
+        
+        try {
+          localStorage.setItem('biblia_setting_ancho_texto_pc', val.toString());
         } catch (err) {
           console.error(err);
         }
@@ -771,8 +803,10 @@
         let downloadedCount = 0;
 
         try {
-          // Abrir la caché principal de la app
-          const cache = await caches.open('biblia-digital-cache-v1');
+          // Abrir la caché principal de la app (detectando el nombre dinámicamente)
+          const cacheKeys = await caches.keys();
+          const activeCacheName = cacheKeys.find(k => k.startsWith('biblia-digital-cache-')) || 'biblia-digital-cache-v13';
+          const cache = await caches.open(activeCacheName);
 
           for (let i = 0; i < totalFiles; i++) {
             const url = ASSETS[i];

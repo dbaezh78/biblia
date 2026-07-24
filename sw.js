@@ -1,4 +1,4 @@
-const CACHE_NAME = 'biblia-digital-cache-v1';
+const CACHE_NAME = 'biblia-digital-cache-v24';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS_TO_CACHE = [
   './src/js/googlefirebase.js',
   './src/js/liturgia_data.js',
   './src/js/liturgia.js',
+  './src/js/promesas.js',
   './src/js/annotation.js',
   './src/img/ico.ico',
   './src/img/icon-192.png',

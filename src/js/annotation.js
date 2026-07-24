@@ -216,6 +216,61 @@
     }
   }
 
+  function mostrarLecturaAlAzar() {
+    if (!window.promesasBiblicas || window.promesasBiblicas.length === 0) {
+      console.error("Lista de promesas no cargada.");
+      if (typeof window.closeMenu === 'function') window.closeMenu();
+      return;
+    }
+
+    // Filtrar solo líneas que tengan citas válidas (no comentarios vacíos o títulos de secciones)
+    const citasValidas = window.promesasBiblicas.filter(ref => ref && ref.trim().length > 0 && !ref.trim().startsWith('//'));
+    if (citasValidas.length === 0) {
+      console.error("No hay citas válidas en promesasBiblicas.");
+      if (typeof window.closeMenu === 'function') window.closeMenu();
+      return;
+    }
+
+    // Elegir una al azar
+    const indice = Math.floor(Math.random() * citasValidas.length);
+    const ref = citasValidas[indice];
+
+    // Parsear la cita, ej: "01_gn 28,15" o "23_sal 91,10-11"
+    const parsed = parseCitaPromesa(ref);
+    if (!parsed) {
+      console.error("No se pudo parsear la cita:", ref);
+      if (typeof window.closeMenu === 'function') window.closeMenu();
+      return;
+    }
+
+    // Ir a la cita
+    const libro = window.indiceLibrosRutas[parsed.libroId];
+    if (libro) {
+      irAVersiculo(parsed.libroId, libro.ruta, parsed.capitulo, parsed.versiculo);
+    } else {
+      console.error("Libro no encontrado en índice:", parsed.libroId);
+    }
+    
+    if (typeof window.closeMenu === 'function') window.closeMenu();
+  }
+
+  function parseCitaPromesa(ref) {
+    try {
+      const parts = ref.trim().split(/\s+/);
+      if (parts.length < 2) return null;
+      const libroId = parts[0];
+      const rest = parts[1].split(',');
+      if (rest.length < 2) return null;
+      const capitulo = parseInt(rest[0], 10);
+      const versePart = rest[1];
+      // Si tiene rango como "1-2" o "10-11", nos quedamos con el primer número para ir a él
+      const versiculo = parseInt(versePart.split('-')[0], 10);
+      return { libroId, capitulo, versiculo };
+    } catch (e) {
+      return null;
+    }
+  }
+
   function mostrarVersiculoDiarioHoy() {
     const hoy = obtenerFechaLocalHoy();
     const registro = versiculosDiarios[hoy];
@@ -229,43 +284,58 @@
   }
 
   function generarNuevoVersiculoDiario(fechaStr) {
-    if (!window.indiceLibrosRutas) {
-      console.error("Índice de libros no cargado.");
+    if (!window.promesasBiblicas || window.promesasBiblicas.length === 0) {
+      console.error("Lista de promesas no cargada.");
+      irAVersiculo("01_gn", "src/libros/01_gn.json", 1, 1);
       return;
     }
-    
-    const keys = Object.keys(window.indiceLibrosRutas);
-    if (keys.length === 0) return;
-    
-    const randomBookKey = keys[Math.floor(Math.random() * keys.length)];
-    const randomBook = window.indiceLibrosRutas[randomBookKey];
-    
-    fetch(randomBook.ruta)
+
+    const citasValidas = window.promesasBiblicas.filter(ref => ref && ref.trim().length > 0 && !ref.trim().startsWith('//'));
+    if (citasValidas.length === 0) {
+      console.error("No hay citas válidas en promesasBiblicas.");
+      irAVersiculo("01_gn", "src/libros/01_gn.json", 1, 1);
+      return;
+    }
+
+    // Elegir una al azar de promesas.js
+    const indice = Math.floor(Math.random() * citasValidas.length);
+    const ref = citasValidas[indice];
+
+    const parsed = parseCitaPromesa(ref);
+    if (!parsed) {
+      console.error("No se pudo parsear la cita de promesas:", ref);
+      irAVersiculo("01_gn", "src/libros/01_gn.json", 1, 1);
+      return;
+    }
+
+    const libro = window.indiceLibrosRutas[parsed.libroId];
+    if (!libro) {
+      console.error("Libro no encontrado en índice:", parsed.libroId);
+      irAVersiculo("01_gn", "src/libros/01_gn.json", 1, 1);
+      return;
+    }
+
+    fetch(libro.ruta)
       .then(res => {
         if (!res.ok) throw new Error("No disponible");
         return res.json();
       })
       .then(data => {
-        const chapters = Object.keys(data.capitulos);
-        if (chapters.length === 0) throw new Error("Sin capítulos");
+        const capData = data.capitulos[parsed.capitulo];
+        if (!capData) throw new Error(`Capítulo ${parsed.capitulo} no disponible`);
         
-        const randomCap = chapters[Math.floor(Math.random() * chapters.length)];
-        const verses = Object.keys(data.capitulos[randomCap]);
-        if (verses.length === 0) throw new Error("Sin versículos");
-        
-        const randomVer = verses[Math.floor(Math.random() * verses.length)];
-        const text = data.capitulos[randomCap][randomVer];
-        
+        const text = capData[parsed.versiculo] || "Texto no disponible";
+
         const nuevoRegistro = {
           fecha: fechaStr,
-          libroId: randomBookKey,
-          libroNombre: randomBook.nombre,
-          capitulo: parseInt(randomCap, 10),
-          versiculo: parseInt(randomVer, 10),
+          libroId: parsed.libroId,
+          libroNombre: libro.nombre,
+          capitulo: parsed.capitulo,
+          versiculo: parsed.versiculo,
           texto: text,
-          ruta: randomBook.ruta
+          ruta: libro.ruta
         };
-        
+
         versiculosDiarios[fechaStr] = nuevoRegistro;
         guardarVersiculosDiariosLocales();
         subirVersiculoDiarioFirestore(nuevoRegistro);
@@ -273,7 +343,7 @@
         if (typeof window.closeMenu === 'function') window.closeMenu();
       })
       .catch(err => {
-        console.error("Error al generar versículo diario aleatorio:", err);
+        console.error("Error al generar versículo diario de promesas:", err);
         alert("Hubo un problema al generar el versículo diario. Redirigiendo a Génesis.");
         irAVersiculo("01_gn", "src/libros/01_gn.json", 1, 1);
       });
@@ -1504,13 +1574,13 @@
 
         if (sortedSelected.length === 0) return;
 
-        let textoSeleccionados = "";
-        sortedSelected.forEach(s => {
-          textoSeleccionados += `${s.texto} `;
-        });
+        const items = sortedSelected.map(s => ({
+          numV: s.vNum,
+          texto: s.texto
+        }));
 
         if (typeof window.toggleSpeakText === 'function') {
-          window.toggleSpeakText(textoSeleccionados.trim());
+          window.toggleSpeakText(items, "seleccion_" + items.map(i => i.numV).join('_'));
         }
       });
 

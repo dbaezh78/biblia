@@ -100,7 +100,13 @@ var indiceLibrosRutas = {
    CATEGORÍA 2: NÚCLEO DE NAVEGACIÓN Y CONFIGURACIÓN DE SELECTORES HORIZONTALES
    ========================================================================== */
 function normalizarTexto(texto) {
-  return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (!texto) return '';
+  return texto.toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/[.,;:?¡!¿"'\(\)\[\]\-\—\-\–]/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
 }
 
 function actualizarHistorialLibro(nuevoLibroKey) {
@@ -438,9 +444,14 @@ function ejecutarCargaInicial() {
 }
 
 function cargarLibroYCapitulo(rutaJson, capNum) {
-  if (typeof window.speechSynthesis !== 'undefined') {
+  if (typeof window.detenerLecturaTts === 'function') {
+    window.detenerLecturaTts();
+  } else if (typeof window.speechSynthesis !== 'undefined') {
     window.speechSynthesis.cancel();
     window.lastSpokenText = null;
+    if (typeof window.actualizarIconoVozHeader === 'function') {
+      window.actualizarIconoVozHeader(false);
+    }
   }
 
   const mainContent = document.querySelector('.main-content');
@@ -455,6 +466,11 @@ function cargarLibroYCapitulo(rutaJson, capNum) {
     const trigger = document.getElementById('libroTrigger');
     if (trigger) {
       trigger.textContent = indiceLibrosRutas[encontrado].nombre.toUpperCase();
+    }
+    
+    const searchScopeBookBtn = document.getElementById('searchScopeBookBtn');
+    if (searchScopeBookBtn) {
+      searchScopeBookBtn.textContent = indiceLibrosRutas[encontrado].nombre;
     }
     
     document.querySelectorAll('#libroOptionsList .custom-option').forEach(opt => {
@@ -541,12 +557,7 @@ function compararVersiculos(a, b) {
 function obtenerHtmlCapitulo(libroData, capNum) {
   if (!libroData.capitulos || !libroData.capitulos[capNum]) return '';
   
-  let html = `<h1 class="libro-titulo" style="text-align: center;">
-    ${libroData.libro} ${capNum}
-    <button class="btn-leer-capitulo" title="Leer Capítulo con Voz" style="background: none; border: none; padding: 4px; color: #718096; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s, color 0.2s; vertical-align: middle; margin-left: 6px;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.05)'; this.style.color='#2b6cb0'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#718096'" onclick="window.leerCapituloActualTextToSpeech()">
-      <span class="material-symbols-outlined" style="font-size: 1.5rem; vertical-align: middle;">hearing</span>
-    </button>
-  </h1>`;
+  let html = `<h1 class="libro-titulo">${libroData.libro}</h1>`;
   html += `<div class="texto-sagrado"><span class="capitulo-num">${capNum}</span>`;
   
   const versiculos = libroData.capitulos[capNum];
@@ -564,7 +575,7 @@ function obtenerHtmlCapitulo(libroData, capNum) {
           <span class="num-v v-con-circulo">${numV}</span>${textoVersiculo}
         </span>`;
     } else {
-      html += `<span class="versiculo"><span class="num-v">${numV}</span>${textoVersiculo}</span>`;
+      html += `<span class="versiculo" data-vnum="${numV}"><span class="num-v">${numV}</span>${textoVersiculo}</span>`;
     }
   });
   
@@ -902,6 +913,13 @@ function renderizarVersiculos(libroData, capSeleccionado) {
 
       activarEventosParalelos(); 
       window.scrollTo(0, 0);
+
+      if (window.autoPlayingTtsNext) {
+        window.autoPlayingTtsNext = false;
+        setTimeout(() => {
+          window.leerCapituloActualTextToSpeech();
+        }, 500);
+      }
     }, 300);
   } else {
     // Carga inicial o actualización instantánea post-arrastre
@@ -915,6 +933,13 @@ function renderizarVersiculos(libroData, capSeleccionado) {
 
     activarEventosParalelos(); 
     window.scrollTo(0, 0);
+
+    if (window.autoPlayingTtsNext) {
+      window.autoPlayingTtsNext = false;
+      setTimeout(() => {
+        window.leerCapituloActualTextToSpeech();
+      }, 500);
+    }
   }
 }
 
@@ -1351,6 +1376,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressFill = document.getElementById('searchProgressFill');
     const progressText = document.getElementById('searchProgressText');
 
+    // Configurar botón de audición (TTS) del header
+    const btnLeerCapituloHeader = document.getElementById('btnLeerCapituloHeader');
+    if (btnLeerCapituloHeader) {
+      btnLeerCapituloHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        window.leerCapituloActualTextToSpeech();
+      });
+    }
+
+    // Historial de búsquedas recientes
+    function obtenerHistorialBusquedas() {
+      try {
+        const guardado = localStorage.getItem('biblia_recent_searches');
+        return guardado ? JSON.parse(guardado) : [];
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    }
+
+    function guardarBusquedaEnHistorial(query) {
+      if (!query) return;
+      let historial = obtenerHistorialBusquedas();
+      historial = historial.filter(q => q.toLowerCase() !== query.toLowerCase());
+      historial.unshift(query);
+      historial = historial.slice(0, 100);
+      try {
+        localStorage.setItem('biblia_recent_searches', JSON.stringify(historial));
+      } catch (err) {
+        console.error(err);
+      }
+      renderizarHistorialBusquedas();
+    }
+
+    function eliminarBusquedaEspecifica(query) {
+      let historial = obtenerHistorialBusquedas();
+      historial = historial.filter(q => q.toLowerCase() !== query.toLowerCase());
+      try {
+        localStorage.setItem('biblia_recent_searches', JSON.stringify(historial));
+      } catch (err) {
+        console.error(err);
+      }
+      renderizarHistorialBusquedas();
+    }
+
+    function renderizarHistorialBusquedas() {
+      const container = document.getElementById('recentSearchesContainer');
+      const listElement = document.getElementById('recentSearchesList');
+      if (!container || !listElement) return;
+
+      const historial = obtenerHistorialBusquedas();
+      if (historial.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      listElement.innerHTML = '';
+
+      historial.forEach(query => {
+        const tag = document.createElement('span');
+        tag.className = 'recent-search-tag';
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'recent-search-text';
+        textSpan.textContent = query;
+        textSpan.style.cursor = 'pointer';
+        textSpan.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          globalSearchInput.value = query;
+          ejecutarBusqueda();
+        });
+
+        const deleteBtn = document.createElement('span');
+        deleteBtn.className = 'recent-search-delete-btn';
+        deleteBtn.innerHTML = '&times;';
+        deleteBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          eliminarBusquedaEspecifica(query);
+        });
+
+        tag.appendChild(textSpan);
+        tag.appendChild(deleteBtn);
+        listElement.appendChild(tag);
+      });
+    }
+
+    const clearSearchHistoryBtn = document.getElementById('clearSearchHistoryBtn');
+    if (clearSearchHistoryBtn) {
+      clearSearchHistoryBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+          localStorage.removeItem('biblia_recent_searches');
+        } catch (err) {
+          console.error(err);
+        }
+        renderizarHistorialBusquedas();
+      });
+    }
+
     if (!searchBtn || !modalSearch) return;
 
     // Abrir modal de búsqueda
@@ -1359,6 +1488,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.closeMenu();
       }
       modalSearch.classList.add('open');
+      renderizarHistorialBusquedas();
       globalSearchInput.focus();
     });
 
@@ -1382,6 +1512,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Manejar clics en los botones de opción (toggle buttons) de búsqueda
+    document.querySelectorAll('.search-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const group = btn.getAttribute('data-group');
+        document.querySelectorAll(`.search-toggle-btn[data-group="${group}"]`).forEach(b => {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+      });
+    });
+
     // Ejecutar búsqueda al pulsar Enter o hacer clic en Buscar
     globalSearchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -1400,12 +1542,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      guardarBusquedaEnHistorial(query);
+
       if (searchAbortController) {
         searchAbortController.abort();
       }
       searchAbortController = new AbortController();
 
-      const scope = document.querySelector('input[name="searchScope"]:checked').value;
+      // Obtener modo de búsqueda
+      const activeModeBtn = document.querySelector('.search-toggle-btn.active[data-group="mode"]');
+      const searchMode = activeModeBtn ? activeModeBtn.getAttribute('data-value') : 'exact';
+
+      // Obtener ámbito de búsqueda
+      const activeScopeBtn = document.querySelector('.search-toggle-btn.active[data-group="scope"]');
+      const searchScope = activeScopeBtn ? activeScopeBtn.getAttribute('data-value') : 'current';
+
       modalSearchBody.innerHTML = `<div class="search-loading-msg">Buscando "${query}"...</div>`;
       
       if (progressContainer) {
@@ -1414,20 +1565,21 @@ document.addEventListener('DOMContentLoaded', () => {
         progressText.textContent = 'Buscando... 0%';
       }
 
-      if (scope === 'current') {
-        buscarEnLibroActual(query);
+      if (searchScope === 'current') {
+        buscarEnLibroActual(query, searchMode);
       } else {
-        buscarEnTodaLaBiblia(query, searchAbortController.signal);
+        buscarEnRangoDeLaBiblia(query, searchScope, searchMode, searchAbortController.signal);
       }
     }
 
-    function buscarEnLibroActual(query) {
+    function buscarEnLibroActual(query, mode) {
       if (!window.libroActualData) {
         modalSearchBody.innerHTML = `<div class="search-vacio-msg">El libro actual no está cargado.</div>`;
         return;
       }
 
       const resultados = [];
+      const palabras = obtenerPalabrasBusqueda(query);
       const queryNormalizada = normalizarTexto(query);
 
       const libroNombre = window.libroActualData.libro;
@@ -1439,7 +1591,16 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(versiculos).forEach(vNum => {
           const texto = versiculos[vNum];
           const textoNormalizado = normalizarTexto(texto);
-          if (textoNormalizado.includes(queryNormalizada)) {
+          
+          let coincide = false;
+          if (mode === 'exact') {
+            coincide = textoNormalizado.includes(queryNormalizada);
+          } else {
+            // mode === 'partial'
+            coincide = palabras.length > 0 && palabras.every(p => textoNormalizado.includes(p));
+          }
+
+          if (coincide) {
             resultados.push({
               libroId: libroId,
               libroNombre: libroNombre,
@@ -1451,10 +1612,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
-      renderizarResultados(resultados, query);
+      renderizarResultados(resultados, query, mode);
     }
 
-    async function buscarEnTodaLaBiblia(query, signal) {
+    async function buscarEnRangoDeLaBiblia(query, scope, mode, signal) {
       if (!window.indiceLibrosRutas) {
         modalSearchBody.innerHTML = `<div class="search-vacio-msg">No se pudo acceder al diccionario de libros.</div>`;
         return;
@@ -1462,9 +1623,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (progressContainer) progressContainer.style.display = 'flex';
       const resultados = [];
+      const palabras = obtenerPalabrasBusqueda(query);
       const queryNormalizada = normalizarTexto(query);
 
-      const keysLibros = Object.keys(window.indiceLibrosRutas);
+      // Filtrar libros según el ámbito
+      const allKeys = Object.keys(window.indiceLibrosRutas);
+      const keysLibros = allKeys.filter(key => {
+        const num = parseInt(key.split('_')[0], 10);
+        if (scope === 'at') {
+          return num <= 46;
+        } else if (scope === 'nt') {
+          return num >= 47;
+        }
+        return true; // scope === 'all'
+      });
+
       const totalLibros = keysLibros.length;
 
       try {
@@ -1489,7 +1662,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 Object.keys(versiculos).forEach(vNum => {
                   const texto = versiculos[vNum];
                   const textoNormalizado = normalizarTexto(texto);
-                  if (textoNormalizado.includes(queryNormalizada)) {
+                  
+                  let coincide = false;
+                  if (mode === 'exact') {
+                    coincide = textoNormalizado.includes(queryNormalizada);
+                  } else {
+                    // mode === 'partial'
+                    coincide = palabras.length > 0 && palabras.every(p => textoNormalizado.includes(p));
+                  }
+
+                  if (coincide) {
                     resultados.push({
                       libroId: key,
                       libroNombre: libroInfo.nombre,
@@ -1508,7 +1690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (progressContainer) progressContainer.style.display = 'none';
-        renderizarResultados(resultados, query);
+        renderizarResultados(resultados, query, mode);
       } catch (err) {
         if (err.name === 'AbortError') return;
         console.error("Error en la búsqueda global:", err);
@@ -1518,7 +1700,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    function renderizarResultados(resultados, query) {
+    function renderizarResultados(resultados, query, mode) {
       if (resultados.length === 0) {
         modalSearchBody.innerHTML = `<div class="search-vacio-msg">No se encontraron resultados para "${query}".</div>`;
         return;
@@ -1526,16 +1708,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
       modalSearchBody.innerHTML = "";
       
+      const countHeader = document.createElement('div');
+      countHeader.className = 'search-results-count';
+      const txtRes = resultados.length === 1 ? 'resultado encontrado' : 'resultados encontrados';
+      countHeader.textContent = `${resultados.length} ${txtRes}`;
+      modalSearchBody.appendChild(countHeader);
+      
       const container = document.createElement('div');
       container.className = 'search-results-wrapper';
       
-      const queryRegex = new RegExp(escapeRegExp(query), 'gi');
+      const queryNormalizada = normalizarTexto(query);
+      const palabras = obtenerPalabrasBusqueda(query);
+      
+      const regexExacta = new RegExp(crearRegexDeFrase(query), 'gi');
+      let regexPalabras = null;
+      if (palabras.length > 0) {
+        const regexPatterns = palabras.map(p => crearRegexDePalabra(p));
+        regexPalabras = new RegExp(regexPatterns.join('|'), 'gi');
+      }
 
       resultados.forEach(item => {
         const card = document.createElement('div');
         card.className = 'search-result-card';
         
-        const textoResaltado = item.texto.replace(queryRegex, (match) => `<mark>${match}</mark>`);
+        const textoNormalizado = normalizarTexto(item.texto);
+        let textoResaltado = "";
+
+        if (textoNormalizado.includes(queryNormalizada)) {
+          // Coincidencia exacta de la frase entera (incluyendo stopwords)
+          textoResaltado = item.texto.replace(regexExacta, (match) => `<mark>${match}</mark>`);
+        } else if (regexPalabras) {
+          // Coincidencia distribuida de palabras clave (excluyendo stopwords)
+          textoResaltado = item.texto.replace(regexPalabras, (match) => `<mark>${match}</mark>`);
+        } else {
+          textoResaltado = item.texto;
+        }
 
         card.innerHTML = `
           <div class="search-result-ref">📌 ${item.libroNombre} ${item.capitulo}:${item.versiculo}</div>
@@ -1568,6 +1775,53 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       modalSearchBody.appendChild(container);
+    }
+
+    function obtenerPalabrasBusqueda(query) {
+      const normal = normalizarTexto(query);
+      // Dividir por palabras considerando letras y números
+      const palabras = normal.split(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ]+/);
+      
+      // Stopwords comunes en español que deben descartarse
+      const stopwords = new Set([
+        'y', 'de', 'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas', 
+        'en', 'con', 'por', 'para', 'a', 'del', 'o', 'que', 'al', 'se', 'lo', 'su', 'sus'
+      ]);
+      
+      const palabrasValidas = palabras
+        .map(w => w.trim())
+        .filter(w => w.length > 0 && !stopwords.has(w));
+      
+      // Retornar máximo 3 palabras
+      return palabrasValidas.slice(0, 3);
+    }
+
+    function crearRegexDeFrase(frase) {
+      const palabras = frase.trim().split(/\s+/);
+      const regexPatterns = palabras.map(p => crearRegexDePalabra(p));
+      // Unir las palabras permitiendo opcionalmente espacios y signos de puntuación entre ellas
+      return regexPatterns.join('[\\s.,;:?¡!¿"\'\\(\\)\\[\\]\\-\\—\\-\u2013\u2014]+');
+    }
+
+    function crearRegexDePalabra(palabra) {
+      const mapaVocales = {
+        'a': '[aáäAÁÄ]',
+        'e': '[eéëEÉË]',
+        'i': '[iíïIÍÏ]',
+        'o': '[oóöOÓÖ]',
+        'u': '[uúüUÚÜ]',
+        'n': '[nñNÑ]'
+      };
+      let regexStr = "";
+      for (let i = 0; i < palabra.length; i++) {
+        const char = palabra[i].toLowerCase();
+        if (mapaVocales[char]) {
+          regexStr += mapaVocales[char];
+        } else {
+          regexStr += escapeRegExp(char);
+        }
+      }
+      return regexStr;
     }
 
     function escapeRegExp(string) {
@@ -1630,67 +1884,202 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // 5. TEXT-TO-SPEECH (TTS) - LECTURA DE VOZ DE LAS ESCRITURAS
     // ==========================================================================
+    // ==========================================================================
+    // 5. TEXT-TO-SPEECH (TTS) - LECTURA DE VOZ DE LAS ESCRITURAS CON RESALTE
+    // ==========================================================================
     window.lastSpokenText = null;
+    window.lastSpokenItems = null;
 
-    window.toggleSpeakText = function (text) {
-      if (typeof window.speechSynthesis === 'undefined') {
-        alert("Tu navegador o dispositivo no soporta la lectura de voz (Text-to-Speech).");
+    let ttsQueue = [];
+    let ttsCurrentIndex = -1;
+    let isTtsPlaying = false;
+
+    window.actualizarIconoVozHeader = function (isSpeaking) {
+      const btn = document.getElementById('btnLeerCapituloHeader');
+      if (btn) {
+        const iconSpan = btn.querySelector('.material-symbols-outlined');
+        if (iconSpan) {
+          iconSpan.textContent = isSpeaking ? 'hearing_disabled' : 'hearing';
+        }
+      }
+    };
+
+    function destacarVersiculoLeyendo(numV) {
+      removerDestacadosLeyendo();
+      const activeSlide = document.getElementById('slideActive');
+      if (activeSlide) {
+        const verseEl = activeSlide.querySelector(`.versiculo[data-vnum="${numV}"]`);
+        if (verseEl) {
+          verseEl.classList.add('versiculo-leyendo');
+          // Hacer scroll suave para centrar el versículo en pantalla
+          verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+
+    function removerDestacadosLeyendo() {
+      document.querySelectorAll('.versiculo-leyendo').forEach(el => {
+        el.classList.remove('versiculo-leyendo');
+      });
+    }
+
+    function detenerLecturaTts() {
+      isTtsPlaying = false;
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      removerDestacadosLeyendo();
+      ttsQueue = [];
+      ttsCurrentIndex = -1;
+      window.lastSpokenItems = null;
+      window.lastSpokenText = null;
+      window.actualizarIconoVozHeader(false);
+    }
+    window.detenerLecturaTts = detenerLecturaTts;
+
+    function reproducirSiguienteVersiculo() {
+      if (!isTtsPlaying) return;
+
+      if (ttsCurrentIndex >= ttsQueue.length) {
+        const isChapterReading = window.lastSpokenText && window.lastSpokenText.startsWith("capitulo_");
+        if (isChapterReading) {
+          const nextCap = capituloActualNum + 1;
+          if (libroActualData && libroActualData.capitulos && libroActualData.capitulos[nextCap]) {
+            window.autoPlayingTtsNext = true;
+            window.navDirection = 'next';
+            seleccionarCapitulo(nextCap);
+            return;
+          } else {
+            const claves = Object.keys(window.indiceLibrosRutas).sort();
+            const currentIndex = claves.indexOf(window.idLibroActual);
+            if (currentIndex !== -1 && currentIndex + 1 < claves.length) {
+              const nextBookKey = claves[currentIndex + 1];
+              const nextBookRuta = window.indiceLibrosRutas[nextBookKey].ruta;
+              
+              window.autoPlayingTtsNext = true;
+              window.navDirection = 'next';
+              
+              idLibroActual = nextBookKey;
+              window.idLibroActual = nextBookKey;
+              rutaLibroActual = nextBookRuta;
+              window.rutaLibroActual = nextBookRuta;
+              capituloActualNum = 1;
+              window.capituloActualNum = 1;
+              
+              try {
+                localStorage.setItem('ultimoLibroKey', nextBookKey);
+                localStorage.setItem('ultimoLibroRuta', nextBookRuta);
+                localStorage.setItem('ultimoCapitulo', '1');
+              } catch (e) {}
+              
+              cargarLibroYCapitulo(nextBookRuta, 1);
+              return;
+            }
+          }
+        }
+        detenerLecturaTts();
         return;
       }
 
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
-        // Si el texto a hablar es el mismo, hacemos toggle para detener
-        if (window.lastSpokenText === text) {
-          window.lastSpokenText = null;
-          return;
-        }
-      }
+      const item = ttsQueue[ttsCurrentIndex];
+      destacarVersiculoLeyendo(item.numV);
 
-      window.lastSpokenText = text;
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Intentar obtener la voz seleccionada por el usuario
+      const utterance = new SpeechSynthesisUtterance(item.texto);
+
+      // Configurar la voz seleccionada
       const voices = window.speechSynthesis.getVoices();
       const savedVoiceName = localStorage.getItem('biblia_setting_voz');
-      let voice = null;
-      
-      if (savedVoiceName) {
-        voice = voices.find(v => v.name === savedVoiceName);
-      }
+      let voice = savedVoiceName ? voices.find(v => v.name === savedVoiceName) : null;
       
       if (!voice) {
-        // Fallback a "Google español"
         voice = voices.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('google'));
       }
       if (!voice) {
-        // Fallback a cualquier voz en español
         voice = voices.find(v => v.lang.startsWith('es'));
       }
       if (!voice) {
-        // Fallback a la voz predeterminada del sistema
         voice = voices.find(v => v.default);
       }
-
       if (voice) {
         utterance.voice = voice;
       }
-      
-      // Obtener velocidad guardada en localStorage
+
+      // Configurar la velocidad
       const savedRate = localStorage.getItem('biblia_setting_velocidad_voz');
       utterance.rate = savedRate ? parseFloat(savedRate) : 1.0;
       utterance.pitch = 1.0;
 
       utterance.onend = () => {
-        window.lastSpokenText = null;
+        removerDestacadosLeyendo();
+        ttsCurrentIndex++;
+        reproducirSiguienteVersiculo();
       };
-      
-      utterance.onerror = () => {
-        window.lastSpokenText = null;
+
+      utterance.onerror = (err) => {
+        console.warn("Error en el utterance de TTS:", err);
+        removerDestacadosLeyendo();
+        ttsCurrentIndex++;
+        reproducirSiguienteVersiculo();
       };
 
       window.speechSynthesis.speak(utterance);
+    }
+
+    window.toggleSpeakText = function (items, singleStringText) {
+      if (typeof window.speechSynthesis === 'undefined') {
+        alert("Tu navegador o dispositivo no soporta la lectura de voz (Text-to-Speech).");
+        return;
+      }
+
+      // Si ya está reproduciendo, detenemos todo (toggle behavior)
+      if (window.speechSynthesis.speaking || isTtsPlaying) {
+        const matchesItems = JSON.stringify(window.lastSpokenItems) === JSON.stringify(items);
+        const matchesText = window.lastSpokenText === singleStringText;
+        
+        detenerLecturaTts();
+        
+        if (matchesItems || matchesText) {
+          return; // Detención simple
+        }
+      }
+
+      window.lastSpokenItems = items;
+      window.lastSpokenText = singleStringText;
+
+      // Si nos pasan una lista estructurada de versículos, los leemos con destaque secuencial
+      if (Array.isArray(items) && items.length > 0) {
+        ttsQueue = items;
+        ttsCurrentIndex = 0;
+        isTtsPlaying = true;
+        window.actualizarIconoVozHeader(true);
+        reproducirSiguienteVersiculo();
+      } else if (typeof items === 'string') {
+        // Fallback clásico para texto plano
+        const utterance = new SpeechSynthesisUtterance(items);
+        
+        const voices = window.speechSynthesis.getVoices();
+        const savedVoiceName = localStorage.getItem('biblia_setting_voz');
+        let voice = savedVoiceName ? voices.find(v => v.name === savedVoiceName) : null;
+        if (!voice) voice = voices.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('google'));
+        if (!voice) voice = voices.find(v => v.lang.startsWith('es'));
+        if (!voice) voice = voices.find(v => v.default);
+        if (voice) utterance.voice = voice;
+
+        const savedRate = localStorage.getItem('biblia_setting_velocidad_voz');
+        utterance.rate = savedRate ? parseFloat(savedRate) : 1.0;
+
+        utterance.onend = () => {
+          window.lastSpokenText = null;
+          window.actualizarIconoVozHeader(false);
+        };
+        utterance.onerror = () => {
+          window.lastSpokenText = null;
+          window.actualizarIconoVozHeader(false);
+        };
+
+        window.actualizarIconoVozHeader(true);
+        window.speechSynthesis.speak(utterance);
+      }
     };
 
     window.leerCapituloActualTextToSpeech = function () {
@@ -1701,13 +2090,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const clavesOrdenadas = Object.keys(capData).sort(compararVersiculos);
       
-      let textoCompleto = "";
-      clavesOrdenadas.forEach(numV => {
-        const textoLimpio = capData[numV];
-        textoCompleto += `${textoLimpio} `;
-      });
+      const items = clavesOrdenadas.map(numV => ({
+        numV: numV,
+        texto: capData[numV]
+      }));
 
-      window.toggleSpeakText(textoCompleto.trim());
+      window.toggleSpeakText(items, "capitulo_" + capituloActualNum);
     };
   });
 })();
