@@ -438,6 +438,11 @@ function ejecutarCargaInicial() {
 }
 
 function cargarLibroYCapitulo(rutaJson, capNum) {
+  if (typeof window.speechSynthesis !== 'undefined') {
+    window.speechSynthesis.cancel();
+    window.lastSpokenText = null;
+  }
+
   const mainContent = document.querySelector('.main-content');
   if (mainContent) {
     mainContent.innerHTML = `<div id="loading-view" style="padding: 20px; color: #666; font-style: italic;">Cargando Escrituras...</div>`;
@@ -536,7 +541,12 @@ function compararVersiculos(a, b) {
 function obtenerHtmlCapitulo(libroData, capNum) {
   if (!libroData.capitulos || !libroData.capitulos[capNum]) return '';
   
-  let html = `<h1 class="libro-titulo">${libroData.libro}</h1>`;
+  let html = `<h1 class="libro-titulo" style="text-align: center;">
+    ${libroData.libro} ${capNum}
+    <button class="btn-leer-capitulo" title="Leer Capítulo con Voz" style="background: none; border: none; padding: 4px; color: #718096; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; transition: background-color 0.2s, color 0.2s; vertical-align: middle; margin-left: 6px;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.05)'; this.style.color='#2b6cb0'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#718096'" onclick="window.leerCapituloActualTextToSpeech()">
+      <span class="material-symbols-outlined" style="font-size: 1.5rem; vertical-align: middle;">hearing</span>
+    </button>
+  </h1>`;
   html += `<div class="texto-sagrado"><span class="capitulo-num">${capNum}</span>`;
   
   const versiculos = libroData.capitulos[capNum];
@@ -1616,5 +1626,88 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       deferredPrompt = null;
     });
+
+    // ==========================================================================
+    // 5. TEXT-TO-SPEECH (TTS) - LECTURA DE VOZ DE LAS ESCRITURAS
+    // ==========================================================================
+    window.lastSpokenText = null;
+
+    window.toggleSpeakText = function (text) {
+      if (typeof window.speechSynthesis === 'undefined') {
+        alert("Tu navegador o dispositivo no soporta la lectura de voz (Text-to-Speech).");
+        return;
+      }
+
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        // Si el texto a hablar es el mismo, hacemos toggle para detener
+        if (window.lastSpokenText === text) {
+          window.lastSpokenText = null;
+          return;
+        }
+      }
+
+      window.lastSpokenText = text;
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Intentar obtener la voz seleccionada por el usuario
+      const voices = window.speechSynthesis.getVoices();
+      const savedVoiceName = localStorage.getItem('biblia_setting_voz');
+      let voice = null;
+      
+      if (savedVoiceName) {
+        voice = voices.find(v => v.name === savedVoiceName);
+      }
+      
+      if (!voice) {
+        // Fallback a "Google español"
+        voice = voices.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('google'));
+      }
+      if (!voice) {
+        // Fallback a cualquier voz en español
+        voice = voices.find(v => v.lang.startsWith('es'));
+      }
+      if (!voice) {
+        // Fallback a la voz predeterminada del sistema
+        voice = voices.find(v => v.default);
+      }
+
+      if (voice) {
+        utterance.voice = voice;
+      }
+      
+      // Obtener velocidad guardada en localStorage
+      const savedRate = localStorage.getItem('biblia_setting_velocidad_voz');
+      utterance.rate = savedRate ? parseFloat(savedRate) : 1.0;
+      utterance.pitch = 1.0;
+
+      utterance.onend = () => {
+        window.lastSpokenText = null;
+      };
+      
+      utterance.onerror = () => {
+        window.lastSpokenText = null;
+      };
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    window.leerCapituloActualTextToSpeech = function () {
+      if (!libroActualData || !capituloActualNum) return;
+      
+      const capData = libroActualData.capitulos[capituloActualNum];
+      if (!capData) return;
+
+      const clavesOrdenadas = Object.keys(capData).sort(compararVersiculos);
+      
+      let textoCompleto = "";
+      clavesOrdenadas.forEach(numV => {
+        const textoLimpio = capData[numV];
+        textoCompleto += `${textoLimpio} `;
+      });
+
+      window.toggleSpeakText(textoCompleto.trim());
+    };
   });
 })();

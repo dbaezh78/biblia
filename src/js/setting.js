@@ -30,7 +30,9 @@
     ocultarTitulo: true, // Oculto por defecto
     tema: 'light', // 'light' para Día, 'dark' para Noche
     colorSeleccion: '#72de54', // Valor por defecto
-    colorHoverParalelo: '#30c6f8' // Valor por defecto (rojo)
+    colorHoverParalelo: '#30c6f8', // Valor por defecto (rojo)
+    vozSeleccionada: '',
+    velocidadVoz: 1.0
   };
 
   // Estado actual de la configuración
@@ -42,7 +44,9 @@
     ocultarTitulo: DEFAULTS.ocultarTitulo,
     tema: DEFAULTS.tema,
     colorSeleccion: DEFAULTS.colorSeleccion,
-    colorHoverParalelo: DEFAULTS.colorHoverParalelo
+    colorHoverParalelo: DEFAULTS.colorHoverParalelo,
+    vozSeleccionada: DEFAULTS.vozSeleccionada,
+    velocidadVoz: DEFAULTS.velocidadVoz
   };
 
   // 1. Cargar ajustes guardados en localStorage al iniciar
@@ -56,6 +60,8 @@
       const temaGuardado = localStorage.getItem('biblia_setting_tema');
       const colorSeleccionGuardado = localStorage.getItem('biblia_setting_color_seleccion');
       const colorHoverParaleloGuardado = localStorage.getItem('biblia_setting_color_hover_paralelo');
+      const vozGuardada = localStorage.getItem('biblia_setting_voz');
+      const velocidadVozGuardada = localStorage.getItem('biblia_setting_velocidad_voz');
 
       if (tamanoGuardado) config.tamano = parseInt(tamanoGuardado, 10);
       if (interlineadoGuardado) config.interlineado = parseFloat(interlineadoGuardado);
@@ -71,6 +77,8 @@
       if (temaGuardado) config.tema = temaGuardado;
       if (colorSeleccionGuardado) config.colorSeleccion = colorSeleccionGuardado;
       if (colorHoverParaleloGuardado) config.colorHoverParalelo = colorHoverParaleloGuardado;
+      if (vozGuardada) config.vozSeleccionada = vozGuardada;
+      if (velocidadVozGuardada) config.velocidadVoz = parseFloat(velocidadVozGuardada);
     } catch (e) {
       console.error("Error al acceder a localStorage:", e);
     }
@@ -121,21 +129,38 @@
         </div>
         
         <div class="ajustes-seccion">
-          <div class="ajustes-seccion-titulo">Tipografía</div>
-          <div class="ajustes-control-fila">
-            <select id="selectFuente" class="ajustes-select">
-              <option value="sans-serif" ${config.fuente === 'sans-serif' ? 'selected' : ''} style="font-family: sans-serif;">Sans-serif</option>
-              <option value="arial" ${config.fuente === 'arial' ? 'selected' : ''} style="font-family: 'Arial', sans-serif;">Arial (Body CS)</option>
-              <option value="aptos" ${config.fuente === 'aptos' ? 'selected' : ''} style="font-family: 'Aptos', sans-serif;">Aptos (Body)</option>
-              <option value="cavolini" ${config.fuente === 'cavolini' ? 'selected' : ''} style="font-family: 'Cavolini', sans-serif;">Cavolini</option>
-              <option value="comic-sans" ${config.fuente === 'comic-sans' ? 'selected' : ''} style="font-family: 'Comic Sans MS', sans-serif;">Comic Sans MS</option>
-              <option value="fairwater-script" ${config.fuente === 'fairwater-script' ? 'selected' : ''} style="font-family: 'Fairwater Script', cursive;">Fairwater Script</option>
-              <option value="mv-boli" ${config.fuente === 'mv-boli' ? 'selected' : ''} style="font-family: 'MV Boli', sans-serif;">MV Boli</option>
-              <option value="neocat" ${config.fuente === 'neocat' ? 'selected' : ''} style="font-family: 'Neocat', sans-serif;">Neocat</option>
-              <option value="pristina" ${config.fuente === 'pristina' ? 'selected' : ''} style="font-family: 'Pristina', cursive, serif;">Pristina</option>
-              <option value="segoe-print" ${config.fuente === 'segoe-print' ? 'selected' : ''} style="font-family: 'Segoe Print', cursive, sans-serif;">Segoe Print</option>
-              <option value="viner-hand" ${config.fuente === 'viner-hand' ? 'selected' : ''} style="font-family: 'Viner Hand ITC', cursive, serif;">Viner Hand ITC</option>
-            </select>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+            <div>
+              <div class="ajustes-seccion-titulo" style="margin-bottom: 6px;">Tipografía</div>
+              <select id="selectFuente" class="ajustes-select" style="width: 100%;">
+                <option value="sans-serif" ${config.fuente === 'sans-serif' ? 'selected' : ''} style="font-family: sans-serif;">Sans-serif</option>
+                <option value="arial" ${config.fuente === 'arial' ? 'selected' : ''} style="font-family: 'Arial', sans-serif;">Arial (Body CS)</option>
+                <option value="aptos" ${config.fuente === 'aptos' ? 'selected' : ''} style="font-family: 'Aptos', sans-serif;">Aptos (Body)</option>
+                <option value="cavolini" ${config.fuente === 'cavolini' ? 'selected' : ''} style="font-family: 'Cavolini', sans-serif;">Cavolini</option>
+                <option value="comic-sans" ${config.fuente === 'comic-sans' ? 'selected' : ''} style="font-family: 'Comic Sans MS', sans-serif;">Comic Sans MS</option>
+                <option value="fairwater-script" ${config.fuente === 'fairwater-script' ? 'selected' : ''} style="font-family: 'Fairwater Script', cursive;">Fairwater Script</option>
+                <option value="mv-boli" ${config.fuente === 'mv-boli' ? 'selected' : ''} style="font-family: 'MV Boli', sans-serif;">MV Boli</option>
+                <option value="neocat" ${config.fuente === 'neocat' ? 'selected' : ''} style="font-family: 'Neocat', sans-serif;">Neocat</option>
+                <option value="pristina" ${config.fuente === 'pristina' ? 'selected' : ''} style="font-family: 'Pristina', cursive, serif;">Pristina</option>
+                <option value="segoe-print" ${config.fuente === 'segoe-print' ? 'selected' : ''} style="font-family: 'Segoe Print', cursive, sans-serif;">Segoe Print</option>
+                <option value="viner-hand" ${config.fuente === 'viner-hand' ? 'selected' : ''} style="font-family: 'Viner Hand ITC', cursive, serif;">Viner Hand ITC</option>
+              </select>
+            </div>
+            <div>
+              <div class="ajustes-seccion-titulo" style="margin-bottom: 6px;">Voz de Lectura</div>
+              <select id="selectVozLectura" class="ajustes-select" style="width: 100%;">
+                <option value="">Cargando voces...</option>
+              </select>
+            </div>
+          </div>
+          <div style="border-top: 1px solid rgba(0,0,0,0.06); padding-top: 12px;">
+            <div class="ajustes-seccion-titulo" style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span>Velocidad de Voz</span>
+              <span class="ajustes-valor-lbl" id="lblVelocidadVoz">${config.velocidadVoz.toFixed(1)}x</span>
+            </div>
+            <div class="ajustes-control-fila">
+              <input type="range" id="sliderVelocidadVoz" class="ajustes-slider" min="0.5" max="2.0" step="0.1" value="${config.velocidadVoz}">
+            </div>
           </div>
         </div>
 
@@ -568,6 +593,20 @@
       });
     }
 
+    // Evento Selección de Voces (select dropdown)
+    const selectVoz = document.getElementById('selectVozLectura');
+    if (selectVoz) {
+      selectVoz.addEventListener('change', function (e) {
+        const voiceName = e.target.value;
+        config.vozSeleccionada = voiceName;
+        try {
+          localStorage.setItem('biblia_setting_voz', voiceName);
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
     // Evento Color de Selección Personalizado
     if (pickerColorSeleccion) {
       pickerColorSeleccion.addEventListener('input', function (e) {
@@ -622,6 +661,22 @@
 
         try {
           localStorage.setItem('biblia_setting_ocultar_titulo', checked.toString());
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    // Evento Slider de Velocidad de Voz
+    const sliderVelocidad = document.getElementById('sliderVelocidadVoz');
+    const lblVelocidad = document.getElementById('lblVelocidadVoz');
+    if (sliderVelocidad && lblVelocidad) {
+      sliderVelocidad.addEventListener('input', function (e) {
+        const val = parseFloat(e.target.value);
+        config.velocidadVoz = val;
+        lblVelocidad.textContent = `${val.toFixed(1)}x`;
+        try {
+          localStorage.setItem('biblia_setting_velocidad_voz', val.toString());
         } catch (err) {
           console.error(err);
         }
@@ -786,12 +841,69 @@
     }
   }
 
+  // Cargar las voces de Text-To-Speech disponibles en el selector
+  function cargarVocesEnSelector() {
+    const selectVoz = document.getElementById('selectVozLectura');
+    if (!selectVoz) return;
+
+    if (typeof window.speechSynthesis === 'undefined') {
+      selectVoz.innerHTML = '<option value="">No soportado</option>';
+      return;
+    }
+
+    const voices = window.speechSynthesis.getVoices();
+    // Filtrar voces que hablen español ("es")
+    let vocesEspanol = voices.filter(v => v.lang.startsWith('es'));
+
+    if (vocesEspanol.length === 0) {
+      // Fallback: si no hay en español, mostrar todas para que el usuario pueda elegir
+      vocesEspanol = voices;
+    }
+
+    if (vocesEspanol.length === 0) {
+      selectVoz.innerHTML = '<option value="">Predeterminada del sistema</option>';
+      return;
+    }
+
+    selectVoz.innerHTML = "";
+    vocesEspanol.forEach(voice => {
+      const option = document.createElement('option');
+      option.value = voice.name;
+      // Indicar si es de Google o local
+      const isGoogle = voice.name.toLowerCase().includes('google') ? ' (Google)' : '';
+      option.textContent = `${voice.name}${isGoogle}`;
+      
+      if (config.vozSeleccionada === voice.name) {
+        option.selected = true;
+      }
+      selectVoz.appendChild(option);
+    });
+
+    // Si no hay voz configurada en localStorage, intentar preseleccionar Google o la primera disponible
+    const savedVoz = localStorage.getItem('biblia_setting_voz');
+    if (!savedVoz && vocesEspanol.length > 0) {
+      const googleVoice = vocesEspanol.find(v => v.name.toLowerCase().includes('google') && v.lang.startsWith('es'));
+      const defaultVoice = googleVoice || vocesEspanol[0];
+      selectVoz.value = defaultVoice.name;
+      config.vozSeleccionada = defaultVoice.name;
+      localStorage.setItem('biblia_setting_voz', defaultVoice.name);
+    }
+  }
+
+  // Escuchar cambio de voces asíncrono
+  if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      cargarVocesEnSelector();
+    };
+  }
+
   // 12. Inicialización de la lógica
   document.addEventListener('DOMContentLoaded', function () {
     cargarAjustesGuardados();
     aplicarAjustesEnCSS();
     inyectarPanelAjustes();
     configurarEventos();
+    cargarVocesEnSelector();
     inyectarNavegacionPC();
     configurarGestosDesplazamiento();
     

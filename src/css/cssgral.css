@@ -1826,6 +1826,39 @@ body.modo-oscuro .btn-mas-versiculo:hover {
   color: #ffffff;
 }
 
+.btn-voz-versiculo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+  cursor: pointer;
+  margin-left: 6px;
+  vertical-align: middle;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+  pointer-events: auto;
+}
+.btn-voz-versiculo:hover {
+  transform: scale(1.15);
+  background-color: #f7fafc;
+  border-color: #a0aec0;
+  color: #2b6cb0;
+}
+body.modo-oscuro .btn-voz-versiculo {
+  background-color: #2d3748;
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.16);
+}
+body.modo-oscuro .btn-voz-versiculo:hover {
+  background-color: #4a5568;
+  color: #ffffff;
+}
+
 /* Quick action buttons on card list items */
 .item-anotacion-meta-col {
   display: flex;

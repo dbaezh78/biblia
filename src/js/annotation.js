@@ -1315,6 +1315,8 @@
       el.classList.remove('seleccionado-actual');
       const btn = el.querySelector('.btn-mas-versiculo');
       if (btn) btn.remove();
+      const btnV = el.querySelector('.btn-voz-versiculo');
+      if (btnV) btnV.remove();
     });
     
     if (seleccionados.length > 0) {
@@ -1373,6 +1375,7 @@
               (node.nodeType === Node.ELEMENT_NODE && 
                !node.classList.contains('num-v') && 
                !node.classList.contains('btn-mas-versiculo') && 
+               !node.classList.contains('btn-voz-versiculo') && 
                !node.classList.contains('badge-paralelo'))) {
             nodosTexto.push(node);
           }
@@ -1398,8 +1401,8 @@
       v.parentNode.replaceChild(clon, v);
       
       clon.addEventListener('click', (e) => {
-        // Si el clic viene directamente del botón de más, no hacer nada aquí
-        if (e.target.classList.contains('btn-mas-versiculo')) return;
+        // Si el clic viene directamente del botón de más o de voz, no hacer nada aquí
+        if (e.target.closest('.btn-mas-versiculo') || e.target.closest('.btn-voz-versiculo')) return;
         
         e.preventDefault();
         e.stopPropagation();
@@ -1426,6 +1429,8 @@
       vElement.classList.remove('seleccionado-actual');
       const btn = vElement.querySelector('.btn-mas-versiculo');
       if (btn) btn.remove();
+      const btnV = vElement.querySelector('.btn-voz-versiculo');
+      if (btnV) btnV.remove();
 
       // Si quedan versículos seleccionados, refrescar el Action Sheet (si está abierto)
       const panel = document.getElementById('panelAccionVersiculo');
@@ -1453,10 +1458,19 @@
       btnMas.setAttribute('title', 'Opciones de Versículos');
       vElement.appendChild(btnMas);
       
-      // Limpiar texto (sin el botón de más)
+      // Crear el botón de voz (Google Spanish TTS)
+      const btnVoz = document.createElement('button');
+      btnVoz.className = 'btn-voz-versiculo';
+      btnVoz.setAttribute('title', 'Escuchar Versículos Seleccionados');
+      btnVoz.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">hearing</span>';
+      vElement.appendChild(btnVoz);
+      
+      // Limpiar texto (sin el botón de más ni el de voz)
       const tempClone = vElement.cloneNode(true);
       const btnMasInClone = tempClone.querySelector('.btn-mas-versiculo');
       if (btnMasInClone) btnMasInClone.remove();
+      const btnVozInClone = tempClone.querySelector('.btn-voz-versiculo');
+      if (btnVozInClone) btnVozInClone.remove();
       const textoLimpio = tempClone.innerText.replace(/^\d+\s*/, "").trim();
 
       seleccionados.push({
@@ -1474,6 +1488,30 @@
         e.preventDefault();
         e.stopPropagation();
         abrirActionSheetMulti();
+      });
+
+      // Configurar clic en el botón de voz (TTS)
+      btnVoz.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Obtener versículos seleccionados ordenados
+        const sortedSelected = [...seleccionados].sort((a, b) => {
+          const numA = parseInt(a.vNum, 10);
+          const numB = parseInt(b.vNum, 10);
+          return numA - numB;
+        });
+
+        if (sortedSelected.length === 0) return;
+
+        let textoSeleccionados = "";
+        sortedSelected.forEach(s => {
+          textoSeleccionados += `${s.texto} `;
+        });
+
+        if (typeof window.toggleSpeakText === 'function') {
+          window.toggleSpeakText(textoSeleccionados.trim());
+        }
       });
 
       // Refrescar Action Sheet si ya está abierto
@@ -1889,6 +1927,8 @@
         el.classList.remove('seleccionado-actual');
         const btn = el.querySelector('.btn-mas-versiculo');
         if (btn) btn.remove();
+        const btnV = el.querySelector('.btn-voz-versiculo');
+        if (btnV) btnV.remove();
       });
       seleccionados = [];
     }
