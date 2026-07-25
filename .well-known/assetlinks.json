@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "db.resucito.biblia.twa",
+      "sha256_cert_fingerprints": [
+        "DC:EA:E3:30:B3:4D:78:B6:CE:59:C3:E8:9B:01:DF:C8:E0:2E:23:CE:03:4D:37:C8:A6:D6:2A:31:AE:3A:F2:F8"
+      ]
+    }
+  }
+]
