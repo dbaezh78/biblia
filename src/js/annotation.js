@@ -1532,7 +1532,7 @@
       const btnVoz = document.createElement('button');
       btnVoz.className = 'btn-voz-versiculo';
       btnVoz.setAttribute('title', 'Escuchar Versículos Seleccionados');
-      btnVoz.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px;">hearing</span>';
+      btnVoz.innerHTML = '<span class="material-symbols-outlined">hearing</span>';
       vElement.appendChild(btnVoz);
       
       // Limpiar texto (sin el botón de más ni el de voz)

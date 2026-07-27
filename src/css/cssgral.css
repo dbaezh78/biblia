@@ -1801,11 +1801,11 @@ body.modo-oscuro .accion-v-referencia {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: #ffffff;
-  color: #4a5568;
+  color: #2b6cb0c4;
   font-size: 16px;
   font-weight: bold;
   border: 1px solid #cbd5e0;
@@ -1815,6 +1815,7 @@ body.modo-oscuro .accion-v-referencia {
   box-shadow: 0 2px 5px rgba(0,0,0,0.15);
   transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
   pointer-events: auto;
+  font-size: x-large;
 }
 .btn-mas-versiculo:hover {
   transform: scale(1.15);
@@ -1832,12 +1833,17 @@ body.modo-oscuro .btn-mas-versiculo:hover {
   color: #ffffff;
 }
 
+
+.btn-voz-versiculo .material-symbols-outlined {
+  font-size: 18px;
+}
+
 .btn-voz-versiculo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 33px;
+  height: 33px;
   border-radius: 50%;
   background-color: #ffffff;
   color: #4a5568;
