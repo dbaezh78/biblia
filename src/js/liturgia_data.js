@@ -276,44 +276,9 @@ const mapAbreviaturas = {
   "apocalipsis": "73_ap"
 };
 
-// Mapeo de fechas específicas a claves litúrgicas para la Lectura del día automática
-
-const liturgiaFechas = {
-    "29/11/2026": "adviento_s1_do",
-    "30/11/2026": "adviento_s1_lu",
-    "01/12/2026": "adviento_s1_ma",
-    "02/12/2026": "adviento_s1_mi",
-    "03/12/2026": "adviento_s1_ju",
-    "04/12/2026": "adviento_s1_vi",
-    "05/12/2026": "adviento_s1_sa",
-    "17/07/2026": "ordinario_s15_vi",
-    "20/07/2026": "ordinario_s16_lu",
-    "21/07/2026": "ordinario_s16_ma",
-    "22/07/2026": "ordinario_s16_mi",
-    "23/07/2026": "ordinario_s16_ju",
-    "24/07/2026": "ordinario_s16_vi",
-    "25/07/2026": "ordinario_s16_sa",
-    "19/07/2026": "ordinario_s16_do",
-    "26/07/2026": "ordinario_s17_do",
-    "27/07/2026": "ordinario_s17_lu",
-    "02/08/2026": "ordinario_s18_do",
-    "09/08/2026": "ordinario_s19_do",
-    "16/08/2026": "ordinario_s20_do",
-    "23/08/2026": "ordinario_s21_do",
-    "30/08/2026": "ordinario_s22_do",
-    "06/09/2026": "ordinario_s23_do",
-    "13/09/2026": "ordinario_s24_do",
-    "20/09/2026": "ordinario_s25_do",
-    "27/09/2026": "ordinario_s26_do",
-    "04/10/2026": "ordinario_s27_do",
-    "11/10/2026": "ordinario_s28_do",
-    "18/10/2026": "ordinario_s29_do",
-    "25/10/2026": "ordinario_s30_do",
-    "01/11/2026": "ordinario_s31_do",
-    "08/11/2026": "ordinario_s32_do",
-    "15/11/2026": "ordinario_s33_do",
-    "22/11/2026": "ordinario_s34_do",
-
+// Mapeo de fechas específicas a claves litúrgicas
+const liturgiaFechas = Object.assign({
+    // Fallbacks históricos sin año para ferias y días festivos fijos
     "17/12": "adviento_17_dic",
     "18/12": "adviento_18_dic",
     "19/12": "adviento_19_dic",
@@ -323,17 +288,13 @@ const liturgiaFechas = {
     "23/12": "adviento_23_dic",
     "24/12": "adviento_24_dic",
     "25/12": "navidad_25_dic",
-
     "26/12": "navidad_26_dic",
     "27/12": "navidad_27_dic",
     "28/12": "navidad_28_dic",
     "29/12": "navidad_29_dic",
     "30/12": "navidad_30_dic",
     "31/12": "navidad_31_dic",
-    
-    //Segundo domingo despues de navidad ahora cae el 3 de Enero 2027
     "3/1": "navidad_s2_do",
-
     "1/1": "navidad_1_ene",
     "2/1": "navidad_2_ene",
     "3/1": "navidad_3_ene",
@@ -346,8 +307,7 @@ const liturgiaFechas = {
     "10/1": "navidad_10_ene",
     "11/1": "navidad_11_ene",
     "12/1": "navidad_12_ene",
-    
-};
+}, window.liturgiaFechasGeneradas || {});
 
 // Base de datos de lecturas litúrgicas
 const liturgiaLecturas = {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'biblia-digital-cache-v25';
+const CACHE_NAME = 'biblia-digital-cache-v27';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS_TO_CACHE = [
   './src/js/jsgral.js',
   './src/js/setting.js',
   './src/js/googlefirebase.js',
+  './src/js/tiempoliturgico.js',
   './src/js/liturgia_data.js',
   './src/js/liturgia.js',
   './src/js/promesas.js',
