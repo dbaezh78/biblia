@@ -2127,6 +2127,10 @@ body.modo-oscuro .item-accion-btn.btn-item-borrar:hover {
   border-color: #2b6cb0;
 }
 
+.clear-search-input-btn:hover {
+  color: #e53e3e !important;
+}
+
 .modal-search-btn-ejecutar {
   padding: 10px 20px;
   background-color: #2b6cb0;
@@ -3273,21 +3277,7 @@ body.modo-oscuro .custom-select-option:hover {
   transform: scale(0.95);
 }
 
-/*Campo Calendario CampCal*/
 
-@media (min-width: 384px) {
-  .msize{font-size: 11px;}
-  .lectdia {color: white;font-size: small;}
-  .CampCal {  padding: 6px;font-size: 0.8rem;width: 100%;}
-  .CampCal1 { padding: 6px;font-size: 0.8rem;width: 100%;}
-}
-
-@media (min-width: 768px) {
-  .select-escrutacio-control:focus{font-size: initial;}
-  .msize{font-size: initial;}
-  .lectdia {color: white;font-size: initial;}
-  .CampCal1 { padding: 6px;font-size: initial;width: 100%;}
-}
 
 .versiculo-leyendo {
   /*background-color: rgba(255, 235, 153, 0.45) !important;*/
@@ -3303,6 +3293,25 @@ body.modo-oscuro .versiculo-leyendo {
   display: none !important;
 }
 
+
+@media (min-width: 384px) {
+  .msize{font-size: 11px;}
+  .lectdia {color: white;font-size: small;}
+  .CampCal {  padding: 6px;font-size: 0.8rem;width: 100%;}
+  .CampCal1 { padding: 6px;font-size: 0.8rem;width: 100%;}
+}
+
+@media (min-width: 768px) {
+  .select-escrutacio-control:focus{font-size: initial;}
+  .msize{font-size: initial;}
+  .lectdia {color: white;font-size: initial;}
+  .CampCal1 { padding: 6px;font-size: initial;width: 100%;}
+
+  .modal-search {
+    padding: 10%;
+  }
+}
+
 @media (min-width: 1024px) {
   .solo-pc {
     display: block !important;
@@ -3314,10 +3323,12 @@ body.modo-oscuro .versiculo-leyendo {
     max-width: var(--ancho-texto-pc, 800px) !important;
   }
   .modal-search {
-    width: 28%;
+    width: 40%;
     height: 85%;
     justify-self: center;
     top: 10%;
     left: unset;
+    padding: 4%;
+
   }
 }

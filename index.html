@@ -126,7 +126,10 @@
       </div>
       <div class="modal-search-busqueda">
         <div class="search-input-container">
-          <input type="text" class="modal-search-input-buscar" id="globalSearchInput" placeholder="Escribe para buscar... (ej. fe, amor, Jesús)" autocomplete="off">
+          <div class="search-input-wrapper" style="position: relative; flex: 1; display: flex;">
+            <input type="text" class="modal-search-input-buscar" id="globalSearchInput" placeholder="Escribe para buscar... (ej. fe, amor, Jesús)" autocomplete="off" style="width: 100%; padding-right: 35px;">
+            <button id="clearSearchInputBtn" class="clear-search-input-btn" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.4rem; color: #a0aec0; cursor: pointer; display: none; align-items: center; justify-content: center; padding: 0 4px; line-height: 1; z-index: 2;" title="Limpiar búsqueda">&times;</button>
+          </div>
           <button class="modal-search-btn-ejecutar" id="executeSearchBtn">Buscar</button>
         </div>
         <!-- Grupo de Modo: Frase exacta / Parcial -->

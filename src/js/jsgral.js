@@ -1448,6 +1448,9 @@ document.addEventListener('DOMContentLoaded', () => {
           e.preventDefault();
           e.stopPropagation();
           globalSearchInput.value = query;
+          if (typeof actualizarBotonLimpiarSearch === 'function') {
+            actualizarBotonLimpiarSearch();
+          }
           ejecutarBusqueda();
         });
 
@@ -1489,6 +1492,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       modalSearch.classList.add('open');
       renderizarHistorialBusquedas();
+      if (typeof actualizarBotonLimpiarSearch === 'function') {
+        actualizarBotonLimpiarSearch();
+      }
       globalSearchInput.focus();
     });
 
@@ -1524,6 +1530,20 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Actualizar botón de limpiar buscador al escribir
+    globalSearchInput.addEventListener('input', actualizarBotonLimpiarSearch);
+
+    // Evento del botón de limpiar buscador
+    const clearSearchInputBtn = document.getElementById('clearSearchInputBtn');
+    if (clearSearchInputBtn) {
+      clearSearchInputBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        globalSearchInput.value = '';
+        actualizarBotonLimpiarSearch();
+        globalSearchInput.focus();
+      });
+    }
+
     // Ejecutar búsqueda al pulsar Enter o hacer clic en Buscar
     globalSearchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -1535,7 +1555,21 @@ document.addEventListener('DOMContentLoaded', () => {
       executeSearchBtn.addEventListener('click', ejecutarBusqueda);
     }
 
+    function actualizarBotonLimpiarSearch() {
+      const clearBtn = document.getElementById('clearSearchInputBtn');
+      if (clearBtn) {
+        if (globalSearchInput.value.length > 0) {
+          clearBtn.style.display = 'flex';
+        } else {
+          clearBtn.style.display = 'none';
+        }
+      }
+    }
+
     function ejecutarBusqueda() {
+      if (typeof actualizarBotonLimpiarSearch === 'function') {
+        actualizarBotonLimpiarSearch();
+      }
       const query = globalSearchInput.value.trim();
       if (!query) {
         alert("Por favor, ingresa un texto para buscar.");
