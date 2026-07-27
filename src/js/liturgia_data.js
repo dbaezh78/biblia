@@ -295,6 +295,7 @@ const liturgiaFechas = {
     "25/07/2026": "ordinario_s16_sa",
     "19/07/2026": "ordinario_s16_do",
     "26/07/2026": "ordinario_s17_do",
+    "27/07/2026": "ordinario_s17_lu",
     "02/08/2026": "ordinario_s18_do",
     "09/08/2026": "ordinario_s19_do",
     "16/08/2026": "ordinario_s20_do",
