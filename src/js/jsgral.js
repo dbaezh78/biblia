@@ -1933,7 +1933,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btn) {
         const iconSpan = btn.querySelector('.material-symbols-outlined');
         if (iconSpan) {
-          iconSpan.textContent = isSpeaking ? 'hearing_disabled' : 'hearing';
+          iconSpan.textContent = isSpeaking ? 'volume_off' : 'volume_up';
         }
       }
     };

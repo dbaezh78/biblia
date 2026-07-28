@@ -1,4 +1,4 @@
-const CACHE_NAME = 'biblia-digital-cache-v28';
+const CACHE_NAME = 'biblia-digital-cache-v29';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
