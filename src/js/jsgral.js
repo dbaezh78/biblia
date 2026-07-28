@@ -586,9 +586,12 @@ function obtenerHtmlCapitulo(libroData, capNum) {
 function configurarEventosSwiper(slider) {
   let isDragging = false;
   let startX = 0;
+  let startY = 0;
   let currentX = 0;
   let deltaX = 0;
   let sliderWidth = 0;
+  let isScrollPrevented = false;
+  let directionLocked = false;
   
   const slidePrev = document.getElementById('slidePrev');
   const slideActive = document.getElementById('slideActive');
@@ -651,34 +654,57 @@ function configurarEventosSwiper(slider) {
 
   window.blockClick = false;
 
-  function onDragStart(x) {
+  function onDragStart(x, y) {
     if (document.getElementById('modalSearch').classList.contains('open')) return;
     isDragging = true;
+    directionLocked = false;
+    isScrollPrevented = false;
     startX = x;
+    startY = y;
     sliderWidth = slideActive ? slideActive.offsetWidth : (slider.offsetWidth / 3);
     slider.style.transition = 'none';
     slider.style.cursor = 'grabbing';
     cargarDiapositivasAdyacentes();
   }
 
-  function onDragMove(x) {
+  function onDragMove(x, y) {
     if (!isDragging) return;
     currentX = x;
     deltaX = currentX - startX;
     
+    // Si no está bloqueada la dirección, la determinamos
+    if (!directionLocked) {
+      const deltaY = y - startY;
+      if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+        directionLocked = true;
+        if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
+          // El usuario está haciendo scroll vertical. Cancelamos el arrastre horizontal.
+          isDragging = false;
+          deltaX = 0;
+          slider.style.transform = 'translate3d(calc(-100% / 3 - 26.667px), 0, 0)';
+          slider.style.cursor = 'grab';
+          return;
+        } else {
+          // El usuario está haciendo swipe horizontal.
+          isScrollPrevented = true;
+        }
+      }
+    }
+
     if (Math.abs(deltaX) > 10) {
       window.blockClick = true;
     }
 
     // Efecto liga (rubberband) si no hay contenido adyacente
-    if (deltaX > 0 && !slidePrev.innerHTML) {
-      deltaX = deltaX * 0.2;
+    let currentDeltaX = deltaX;
+    if (currentDeltaX > 0 && !slidePrev.innerHTML) {
+      currentDeltaX = currentDeltaX * 0.2;
     }
-    if (deltaX < 0 && !slideNext.innerHTML) {
-      deltaX = deltaX * 0.2;
+    if (currentDeltaX < 0 && !slideNext.innerHTML) {
+      currentDeltaX = currentDeltaX * 0.2;
     }
     
-    slider.style.transform = `translate3d(calc(-100% / 3 - 26.667px + ${deltaX}px), 0, 0)`;
+    slider.style.transform = `translate3d(calc(-100% / 3 - 26.667px + ${currentDeltaX}px), 0, 0)`;
   }
 
   function onDragEnd() {
@@ -829,23 +855,33 @@ function configurarEventosSwiper(slider) {
 
   // Eventos táctiles
   slider.addEventListener('touchstart', (e) => {
-    onDragStart(e.touches[0].clientX);
+    if (e.touches.length !== 1) return;
+    onDragStart(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
 
   slider.addEventListener('touchmove', (e) => {
-    onDragMove(e.touches[0].clientX);
-  }, { passive: true });
+    if (e.touches.length !== 1) return;
+    const clientX = e.touches[0].clientX;
+    const clientY = e.touches[0].clientY;
+    
+    // Si la dirección está bloqueada y es un swipe horizontal, evitamos scroll vertical nativo
+    if (directionLocked && isScrollPrevented) {
+      if (e.cancelable) e.preventDefault();
+    }
+    
+    onDragMove(clientX, clientY);
+  }, { passive: false });
 
   slider.addEventListener('touchend', onDragEnd);
 
   // Eventos de ratón (permite pruebas de arrastre en PC)
   slider.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || e.target.closest('.versiculo.tiene-paralelo') || e.target.closest('button') || e.target.closest('select')) return;
-    onDragStart(e.clientX);
+    onDragStart(e.clientX, e.clientY);
   });
 
   window.addEventListener('mousemove', (e) => {
-    onDragMove(e.clientX);
+    onDragMove(e.clientX, e.clientY);
   });
 
   window.addEventListener('mouseup', onDragEnd);
