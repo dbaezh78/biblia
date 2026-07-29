@@ -63,14 +63,14 @@
   box-sizing: border-box;
 }
 
-html, body {
+body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--color-fondo);
   color: var(--color-texto);
   transition: background-color 0.3s, color 0.3s;
   overflow-x: hidden; /* Evita desbordamiento en la animación de paso de página */
-  overscroll-behavior-y: none; /* Desactiva el gesto de recargar arrastrando hacia abajo (Pull-to-refresh) */
+  overscroll-behavior-y: contain; /* Desactiva el gesto de recargar arrastrando hacia abajo (Pull-to-refresh) sin bloquear scroll */
 }
 
 /* Header */
