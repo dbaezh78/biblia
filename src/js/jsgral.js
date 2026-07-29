@@ -1289,6 +1289,14 @@ function obtenerEstadoInicial() {
    5. INICIALIZACIÓN CORREGIDA
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
+  // Evitar que la aplicación se cierre al pulsar el botón físico de "Atrás" en Android / TWA
+  (function () {
+    window.history.pushState({ noExit: true }, "");
+    window.addEventListener('popstate', function (event) {
+      window.history.pushState({ noExit: true }, "");
+    });
+  })();
+
   // A. Construir visualmente la barra limpia (Libro y número rojo) desde el JS
   construirNavegacionDinamica();
 
