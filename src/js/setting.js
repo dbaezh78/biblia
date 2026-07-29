@@ -227,7 +227,7 @@
         <div class="ajustes-seccion" style="border-top: 1px solid #edf2f7; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
           <div style="text-align: left; display: flex; flex-direction: column;">
             <span style="font-size: 0.95rem; font-weight: bold; color: var(--color-texto, #2d3748);">Actualizar Aplicación</span>
-            <span style="font-size: 0.8rem; color: #718096; margin-top: 2px;">v1.34.0</span>
+            <span style="font-size: 0.8rem; color: #718096; margin-top: 2px;">v1.35.0</span>
           </div>
           <button id="btnActualizarAplicacion" style="width: 44px; height: 36px; background-color: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s;" title="Actualizar Aplicación">
             <span class="material-symbols-outlined" style="font-size: 20px;">sync</span>
