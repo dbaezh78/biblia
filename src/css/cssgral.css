@@ -2427,8 +2427,8 @@ body.modo-oscuro .custom-history-btn:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Selector de Libros y Capítulos como Pantalla Completa (Celular, PC, Laptop) */
-#libroDropdown, #capituloDropdown {
+/* Selector de Libros, Capítulos y Versículos como Pantalla Completa (Celular, PC, Laptop) */
+#libroDropdown, #capituloDropdown, #versiculoDropdown {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -2448,7 +2448,7 @@ body.modo-oscuro .custom-history-btn:hover {
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
-body.modo-oscuro #libroDropdown, body.modo-oscuro #capituloDropdown {
+body.modo-oscuro #libroDropdown, body.modo-oscuro #capituloDropdown, body.modo-oscuro #versiculoDropdown {
   background: rgba(18, 18, 18, 0.98) !important;
 }
 

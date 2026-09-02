@@ -29,9 +29,11 @@ try {
     auth = firebase.auth();
     db = firebase.firestore();
     
-    // Habilitar persistencia offline en Firestore para uso móvil offline
-    db.enablePersistence().catch(err => {
-      console.warn("Firestore offline persistence fallback:", err.code);
+    // Habilitar persistencia offline en Firestore para uso móvil offline con soporte multi-pestaña
+    db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+      if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+        console.warn("Firestore offline persistence fallback:", err.code);
+      }
     });
     
     firebaseConfigured = true;

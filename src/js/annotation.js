@@ -15,7 +15,7 @@
 
   // Base de datos local de escrutacios (clave: YYYY-MM-DD, valor: array de objetos)
   let escrutacios = {};
-  let fechaSeleccionadaEscrutacio = null;
+  let fechaSeleccionadaEscrutacio = new Date();
 
   // 1. Inicialización y Carga de LocalStorage
   function cargarAnotacionesLocales() {
@@ -1049,6 +1049,10 @@
     
     grid.innerHTML = "";
     
+    if (!fechaSeleccionadaEscrutacio) {
+      fechaSeleccionadaEscrutacio = new Date();
+    }
+
     const mes = fechaSeleccionadaEscrutacio.getMonth();
     const anio = fechaSeleccionadaEscrutacio.getFullYear();
     

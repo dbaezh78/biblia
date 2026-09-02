@@ -262,6 +262,117 @@ function seleccionarCapitulo(cap) {
   }
 }
 
+function abrirSelectorVersiculos(cap) {
+  const capNum = parseInt(cap, 10);
+  capituloActualNum = capNum;
+  
+  cerrarTodosDropdowns();
+
+  const versiculoDropdown = document.getElementById('versiculoDropdown');
+  const versiculoSearch = document.getElementById('versiculoSearch');
+  const versiculoOptionsList = document.getElementById('versiculoOptionsList');
+  const versiculoModalTitulo = document.getElementById('versiculoModalTitulo');
+  
+  if (!versiculoDropdown || !versiculoOptionsList) return;
+
+  const libroInfo = indiceLibrosRutas[idLibroActual];
+  const nombreLibro = libroInfo ? libroInfo.nombre : "Libro";
+
+  if (versiculoModalTitulo) {
+    versiculoModalTitulo.textContent = `${nombreLibro} ${capNum} - Versículo`;
+  }
+
+  function poblarVersiculos(capData) {
+    versiculoOptionsList.innerHTML = "";
+    if (!capData) {
+      versiculoOptionsList.innerHTML = `<div style="grid-column: span 5; color: #aaa; font-size: 0.9em; padding: 10px; text-align: center;">No disponible</div>`;
+      return;
+    }
+
+    const versiculosKeys = Object.keys(capData).sort(compararVersiculos);
+    versiculosKeys.forEach(vNum => {
+      const item = document.createElement('div');
+      item.className = "custom-option-grid-item";
+      item.dataset.value = vNum;
+      item.textContent = vNum;
+
+      item.addEventListener('click', () => {
+        seleccionarVersiculo(capNum, vNum);
+      });
+
+      versiculoOptionsList.appendChild(item);
+    });
+
+    versiculoDropdown.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (versiculoSearch) {
+      versiculoSearch.value = "";
+      filtrarVersiculos("");
+      setTimeout(() => versiculoSearch.focus(), 50);
+    }
+  }
+
+  if (libroActualData && libroActualData.capitulos && libroActualData.capitulos[capNum]) {
+    poblarVersiculos(libroActualData.capitulos[capNum]);
+  } else {
+    fetch(rutaLibroActual)
+      .then(res => res.json())
+      .then(data => {
+        libroActualData = data;
+        poblarVersiculos(data.capitulos ? data.capitulos[capNum] : null);
+      })
+      .catch(err => {
+        console.error("Error al cargar versículos:", err);
+        poblarVersiculos(null);
+      });
+  }
+}
+
+function seleccionarVersiculo(cap, vNum) {
+  capituloActualNum = parseInt(cap, 10);
+  cerrarTodosDropdowns();
+
+  window.scrollToVerseAfterRender = vNum.toString();
+  cargarLibroYCapitulo(rutaLibroActual, capituloActualNum);
+  
+  if (typeof actualizarUrlUbicacion === 'function' && idLibroActual) {
+    actualizarUrlUbicacion(idLibroActual, capituloActualNum, vNum.toString());
+  }
+
+  try {
+    localStorage.setItem('ultimoCapitulo', cap.toString());
+  } catch (e) {
+    console.error("Error al guardar estado de capítulo en localStorage:", e);
+  }
+}
+
+function filtrarVersiculos(query) {
+  const gridContainer = document.getElementById('versiculoOptionsList');
+  if (!gridContainer) return;
+
+  const options = gridContainer.querySelectorAll('.custom-option-grid-item');
+  let primerMatch = null;
+  let count = 0;
+
+  options.forEach(opt => {
+    const vNum = opt.dataset.value;
+    if (vNum.startsWith(query)) {
+      opt.style.display = "flex";
+      opt.classList.remove('highlighted');
+      if (count === 0) {
+        primerMatch = opt;
+        opt.classList.add('highlighted');
+      }
+      count++;
+    } else {
+      opt.style.display = "none";
+      opt.classList.remove('highlighted');
+    }
+  });
+
+  return primerMatch;
+}
+
 function filtrarLibros(query) {
   const listContainer = document.getElementById('libroOptionsList');
   if (!listContainer) return;
@@ -335,6 +446,12 @@ function configurarNavegacionSuperior() {
   const capituloDropdown = document.getElementById('capituloDropdown');
   const capituloSearch = document.getElementById('capituloSearch');
 
+  const versiculoDropdown = document.getElementById('versiculoDropdown');
+  const versiculoSearch = document.getElementById('versiculoSearch');
+  const closeVersiculoBtn = document.getElementById('closeVersiculoDropdownBtn');
+  const backToCapitulosBtn = document.getElementById('backToCapitulosBtn');
+  const btnLeerCapituloEnteroModal = document.getElementById('btnLeerCapituloEnteroModal');
+
   if (!libroTrigger || !capituloTrigger) return;
 
   libroTrigger.addEventListener('click', (e) => {
@@ -404,19 +521,72 @@ function configurarNavegacionSuperior() {
     if (e.key === 'Enter') {
       const valor = capituloSearch.value.trim();
       if (valor && libroActualData && libroActualData.capitulos && libroActualData.capitulos[valor]) {
-        seleccionarCapitulo(valor);
+        abrirSelectorVersiculos(valor);
       } else {
         const gridContainer = document.getElementById('capituloOptionsList');
         const match = gridContainer.querySelector('.custom-option-grid-item.highlighted') ||
                       Array.from(gridContainer.querySelectorAll('.custom-option-grid-item')).find(el => el.style.display !== 'none');
         if (match) {
-          seleccionarCapitulo(match.dataset.value);
+          abrirSelectorVersiculos(match.dataset.value);
         }
       }
     } else if (e.key === 'Escape') {
       cerrarTodosDropdowns();
     }
   });
+
+  // Configuración de eventos para el Selector de Versículos
+  if (closeVersiculoBtn) {
+    closeVersiculoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cerrarTodosDropdowns();
+    });
+  }
+
+  if (backToCapitulosBtn) {
+    backToCapitulosBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cerrarTodosDropdowns();
+      if (capituloDropdown && capituloSearch) {
+        capituloDropdown.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        capituloSearch.value = "";
+        filtrarCapitulos("");
+        setTimeout(() => capituloSearch.focus(), 50);
+      }
+    });
+  }
+
+  if (btnLeerCapituloEnteroModal) {
+    btnLeerCapituloEnteroModal.addEventListener('click', (e) => {
+      e.stopPropagation();
+      seleccionarCapitulo(capituloActualNum);
+    });
+  }
+
+  if (versiculoSearch) {
+    versiculoSearch.addEventListener('input', (e) => {
+      filtrarVersiculos(e.target.value);
+    });
+
+    versiculoSearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const valor = versiculoSearch.value.trim();
+        const gridContainer = document.getElementById('versiculoOptionsList');
+        const match = gridContainer ? (gridContainer.querySelector('.custom-option-grid-item.highlighted') ||
+                      Array.from(gridContainer.querySelectorAll('.custom-option-grid-item')).find(el => el.style.display !== 'none')) : null;
+        if (valor && !match) {
+          seleccionarVersiculo(capituloActualNum, valor);
+        } else if (match) {
+          seleccionarVersiculo(capituloActualNum, match.dataset.value);
+        } else {
+          seleccionarCapitulo(capituloActualNum);
+        }
+      } else if (e.key === 'Escape') {
+        cerrarTodosDropdowns();
+      }
+    });
+  }
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-select-container')) {
@@ -542,7 +712,7 @@ function actualizarSelectorCapitulos(capitulosData, capSeleccionado) {
       const current = window.capituloActualNum || 1;
       const target = parseInt(cap, 10);
       window.navDirection = target >= current ? 'next' : 'prev';
-      seleccionarCapitulo(cap);
+      abrirSelectorVersiculos(cap);
     });
 
     gridContainer.appendChild(item);
@@ -1298,6 +1468,33 @@ function construirNavegacionDinamica() {
         </div>
       </div>
     </div>
+
+    <!-- Selector de Versículo -->
+    <div class="custom-select-container" id="versiculoContainer">
+      <div class="custom-dropdown ver-dropdown" id="versiculoDropdown">
+        <!-- Botón de Volver a Capítulos -->
+        <button id="backToCapitulosBtn" class="close-dropdown-btn" style="position: absolute; top: 20px; left: 20px; background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; opacity: 0.7; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;" title="Volver a capítulos">
+          <span class="material-symbols-outlined" style="font-size: 1.6rem;">arrow_back</span>
+        </button>
+
+        <!-- Botón de Cerrar Modal -->
+        <button id="closeVersiculoDropdownBtn" class="close-dropdown-btn" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: inherit; opacity: 0.6; transition: all 0.2s ease;">✕</button>
+        
+        <!-- Contenedor centralizado para no estirarse feo en pantallas anchas (PC / Laptop) -->
+        <div style="max-width: 600px; margin: 40px auto 0 auto; width: 100%; display: flex; flex-direction: column; box-sizing: border-box;">
+          <input type="text" class="custom-search-input" id="versiculoSearch" placeholder="Buscar versículo..." autocomplete="off" style="margin-bottom: 16px; padding: 12px 16px; font-size: 1.1rem; border-radius: 10px;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 2px;">
+            <div class="custom-book-history-title" id="versiculoModalTitulo" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85; font-weight: bold; text-align: left; margin: 0;">Seleccionar Versículo</div>
+            <button id="btnLeerCapituloEnteroModal" style="background: rgba(49, 130, 206, 0.1); color: #3182ce; border: 1px solid rgba(49, 130, 206, 0.3); border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: bold; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#3182ce';this.style.color='#fff';" onmouseout="this.style.background='rgba(49,130,206,0.1)';this.style.color='#3182ce';">
+              📖 Leer todo el capítulo
+            </button>
+          </div>
+
+          <div class="custom-options-grid" id="versiculoOptionsList" style="max-height: calc(100vh - 200px) !important; overflow-y: auto;"></div>
+        </div>
+      </div>
+    </div>
   `;
 }
 
@@ -1708,7 +1905,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       mapaEnlacesParalelos = data;
-      console.log("Diag - mapaEnlacesParalelos loaded. 27_sab-c7-v26:", data["27_sab-c7-v26"]);
       
       const estado = obtenerEstadoInicial();
       idLibroActual = estado.key;
