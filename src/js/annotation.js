@@ -1343,13 +1343,29 @@
     // Aplicar sombreado y subrayado en el nuevo capítulo
     aplicarAnotacionesAlCapituloActual();
 
-    // Comprobar si hay un scroll pendiente a un versículo específico (o múltiples separados por punto)
+    // Comprobar si hay un scroll pendiente a un versículo específico (o múltiples separados por punto o rango por guión)
     if (window.scrollToVerseAfterRender) {
       const vTargetRaw = window.scrollToVerseAfterRender;
       window.scrollToVerseAfterRender = null;
       
       setTimeout(() => {
-        const vNums = vTargetRaw.toString().includes('.') ? vTargetRaw.toString().split('.') : [vTargetRaw.toString()];
+        let vNums = [];
+        const rawStr = vTargetRaw.toString().trim();
+        if (rawStr.includes('.')) {
+          vNums = rawStr.split('.');
+        } else if (rawStr.includes('-')) {
+          const parts = rawStr.split('-');
+          const start = parseInt(parts[0], 10);
+          const end = parseInt(parts[1], 10);
+          if (!isNaN(start) && !isNaN(end) && end >= start) {
+            for (let i = start; i <= end; i++) vNums.push(i.toString());
+          } else if (!isNaN(start)) {
+            vNums.push(start.toString());
+          }
+        } else {
+          vNums = [rawStr];
+        }
+
         const primerVNum = vNums[0];
         
         // Scroll al primer versículo de la lista
@@ -1421,6 +1437,9 @@
         });
       }
       seleccionados = [];
+      if (typeof window.actualizarUrlUbicacion === 'function' && window.idLibroActual && window.capituloActualNum) {
+        window.actualizarUrlUbicacion(window.idLibroActual, window.capituloActualNum);
+      }
     }
   }
 
@@ -1792,6 +1811,11 @@
     
     const referenciaCompleta = `${libroNombre} ${capNum}:${citacionV}`;
     const textoConcatenado = seleccionados.map(s => s.texto).join(' ');
+
+    // Actualizar URL con los versículos seleccionados en tiempo real
+    if (typeof window.actualizarUrlUbicacion === 'function' && window.idLibroActual) {
+      window.actualizarUrlUbicacion(window.idLibroActual, capNum, citacionV);
+    }
 
     // Cargar en la UI
     document.getElementById('accionVReferencia').textContent = referenciaCompleta;

@@ -493,6 +493,11 @@ function cargarLibroYCapitulo(rutaJson, capNum) {
 
       actualizarSelectorCapitulos(data.capitulos, capNum);
       renderizarVersiculos(data, capNum);
+
+      // Actualizar URL con la cita actual (ej. ?cita=rm5 o ?cita=gn1)
+      if (typeof actualizarUrlUbicacion === 'function' && idLibroActual) {
+        actualizarUrlUbicacion(idLibroActual, capNum);
+      }
     })
     .catch(err => {
       console.error("Fallo cargando las escrituras:", err);
@@ -1096,6 +1101,48 @@ function activarEventosParalelos() {
       });
     });
   });
+
+  // Auto-scroll y resaltado al versículo objetivo (o rango de versículos) si viene de una cita externa
+  if (window.targetVersiculoGlobal) {
+    const rawTarget = window.targetVersiculoGlobal.toString().trim();
+    let vNums = [];
+    if (rawTarget.includes('.')) {
+      vNums = rawTarget.split('.');
+    } else if (rawTarget.includes('-')) {
+      const p = rawTarget.split('-');
+      const s = parseInt(p[0], 10), e = parseInt(p[1], 10);
+      if (!isNaN(s) && !isNaN(e) && e >= s) {
+        for (let i = s; i <= e; i++) vNums.push(i.toString());
+      } else if (!isNaN(s)) {
+        vNums.push(s.toString());
+      }
+    } else {
+      vNums = [rawTarget];
+    }
+
+    setTimeout(() => {
+      const primerV = document.querySelector(`.versiculo[data-vnum="${vNums[0]}"]`);
+      if (primerV) {
+        primerV.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      const elementos = [];
+      vNums.forEach(vNum => {
+        const el = document.querySelector(`.versiculo[data-vnum="${vNum}"]`);
+        if (el) {
+          el.classList.add('seleccionado-actual');
+          elementos.push(el);
+        }
+      });
+      if (elementos.length > 0) {
+        setTimeout(() => {
+          elementos.forEach(el => {
+            el.classList.remove('seleccionado-actual');
+          });
+        }, 3000);
+      }
+    }, 300);
+    window.targetVersiculoGlobal = null;
+  }
 }
 
 
@@ -1255,14 +1302,278 @@ function construirNavegacionDinamica() {
 }
 
 
+const MAPA_ALIAS_LIBROS = {
+  "gn": "01_gn", "gen": "01_gn", "genesis": "01_gn", "génesis": "01_gn",
+  "ex": "02_ex", "exo": "02_ex", "exod": "02_ex", "exodo": "02_ex", "éxodo": "02_ex",
+  "lv": "03_lv", "lev": "03_lv", "levitico": "03_lv", "levítico": "03_lv",
+  "nm": "04_nm", "num": "04_nm", "numeros": "04_nm", "números": "04_nm",
+  "dt": "05_dt", "deu": "05_dt", "deut": "05_dt", "deuteronomio": "05_dt",
+  "js": "06_js", "jos": "06_js", "josue": "06_js", "josué": "06_js",
+  "jc": "07_jc", "jue": "07_jc", "juez": "07_jc", "jueces": "07_jc",
+  "rt": "08_rt", "rut": "08_rt", "ruth": "08_rt",
+  "1s": "09_1s", "1sam": "09_1s", "1samuel": "09_1s", "1 samuel": "09_1s", "1 sam": "09_1s",
+  "2s": "10_2s", "2sam": "10_2s", "2samuel": "10_2s", "2 samuel": "10_2s", "2 sam": "10_2s",
+  "1r": "11_1r", "1re": "11_1r", "1rey": "11_1r", "1reyes": "11_1r", "1 reyes": "11_1r", "1 r": "11_1r",
+  "2r": "12_2r", "2re": "12_2r", "2rey": "12_2r", "2reyes": "12_2r", "2 reyes": "12_2r", "2 r": "12_2r",
+  "1cr": "13_1cr", "1cro": "13_1cr", "1cron": "13_1cr", "1cronicas": "13_1cr", "1 crónicas": "13_1cr", "1 cronicas": "13_1cr", "1 cr": "13_1cr",
+  "2cr": "14_2cr", "2cro": "14_2cr", "2cron": "14_2cr", "2cronicas": "14_2cr", "2 crónicas": "14_2cr", "2 cronicas": "14_2cr", "2 cr": "14_2cr",
+  "esd": "15_esd", "esdr": "15_esd", "esdras": "15_esd",
+  "nh": "16_nh", "neh": "16_nh", "nehem": "16_nh", "nehemias": "16_nh", "nehemías": "16_nh",
+  "tb": "17_tb", "tob": "17_tb", "tobit": "17_tb", "tobias": "17_tb", "tobías": "17_tb",
+  "jd": "18_jd", "jdt": "18_jd", "judit": "18_jd", "judith": "18_jd",
+  "est": "19_est", "ester": "19_est",
+  "1mac": "20_1mac", "1m": "20_1mac", "1macabeos": "20_1mac", "1 macabeos": "20_1mac", "1mc": "20_1mac",
+  "2mac": "21_2mac", "2m": "21_2mac", "2macabeos": "21_2mac", "2 macabeos": "21_2mac", "2mc": "21_2mac",
+  "jb": "22_jb", "job": "22_jb",
+  "sal": "23_sal", "salm": "23_sal", "salmo": "23_sal", "salmos": "23_sal", "ps": "23_sal", "psa": "23_sal",
+  "pr": "24_pr", "pro": "24_pr", "prov": "24_pr", "proverbios": "24_pr",
+  "qo": "25_qo", "qoh": "25_qo", "qohelet": "25_qo", "ecl": "25_qo", "ecles": "25_qo", "eclesiastes": "25_qo", "eclesiastés": "25_qo",
+  "cant": "26_cant", "cantar": "26_cant", "cantares": "26_cant", "ct": "26_cant", "cnt": "26_cant",
+  "sab": "27_sab", "sb": "27_sab", "sabi": "27_sab", "sabiduria": "27_sab", "sabiduría": "27_sab",
+  "si": "28_si", "sir": "28_si", "sirac": "28_si", "siracida": "28_si", "sirácida": "28_si", "eclo": "28_si", "eclesiastico": "28_si", "eclesiástico": "28_si",
+  "is": "29_is", "isa": "29_is", "isaias": "29_is", "isaías": "29_is",
+  "jr": "30_jr", "jer": "30_jr", "jerem": "30_jr", "jeremias": "30_jr", "jeremías": "30_jr",
+  "lam": "31_lam", "lament": "31_lam", "lamentaciones": "31_lam",
+  "ba": "32_ba", "bar": "32_ba", "baruc": "32_ba",
+  "ez": "33_ez", "eze": "33_ez", "ezeq": "33_ez", "ezequiel": "33_ez",
+  "dn": "34_dn", "dan": "34_dn", "daniel": "34_dn",
+  "os": "35_os", "ose": "35_os", "oseas": "35_os",
+  "jl": "36_jl", "joe": "36_jl", "joel": "36_jl",
+  "am": "37_am", "amo": "37_am", "amos": "37_am", "amós": "37_am",
+  "ab": "38_ab", "abd": "38_ab", "abdias": "38_ab", "abdías": "38_ab",
+  "jon": "39_jon", "jona": "39_jon", "jonas": "39_jon", "jonás": "39_jon",
+  "mi": "40_mi", "mic": "40_mi", "miq": "40_mi", "miqueas": "40_mi",
+  "na": "41_na", "nah": "41_na", "nahun": "41_na", "nahún": "41_na", "nahum": "41_na",
+  "ha": "42_ha", "hab": "42_ha", "habacuc": "42_ha",
+  "so": "43_so", "sof": "43_so", "sofonias": "43_so", "sofonías": "43_so",
+  "ag": "44_ag", "age": "44_ag", "ageo": "44_ag", "hag": "44_ag",
+  "za": "45_za", "zac": "45_za", "zacarias": "45_za", "zacarías": "45_za",
+  "ml": "46_ml", "mal": "46_ml", "malaquias": "46_ml", "malaquías": "46_ml",
+  "mt": "47_mt", "mat": "47_mt", "mateo": "47_mt",
+  "mc": "48_mc", "mar": "48_mc", "marc": "48_mc", "marcos": "48_mc", "mr": "48_mc", "mk": "48_mc",
+  "lc": "49_lc", "luc": "49_lc", "lucas": "49_lc", "lk": "49_lc",
+  "jn": "50_jn", "jua": "50_jn", "juan": "50_jn", "jhn": "50_jn",
+  "hch": "51_hch", "hec": "51_hch", "hech": "51_hch", "hechos": "51_hch", "act": "51_hch", "acts": "51_hch",
+  "rm": "52_rm", "ro": "52_rm", "rom": "52_rm", "roman": "52_rm", "romanos": "52_rm",
+  "1co": "53_1co", "1cor": "53_1co", "1corintios": "53_1co", "1 corintios": "53_1co", "1 cor": "53_1co", "1 co": "53_1co",
+  "2co": "54_2co", "2cor": "54_2co", "2corintios": "54_2co", "2 corintios": "54_2co", "2 cor": "54_2co", "2 co": "54_2co",
+  "ga": "55_ga", "gal": "55_ga", "galat": "55_ga", "galatas": "55_ga", "gálatas": "55_ga",
+  "ef": "56_ef", "efe": "56_ef", "efes": "56_ef", "efesios": "56_ef", "eph": "56_ef",
+  "flp": "57_flp", "fil": "57_flp", "filip": "57_flp", "filipenses": "57_flp", "php": "57_flp",
+  "col": "58_col", "colos": "58_col", "colosenses": "58_col",
+  "1ts": "59_1ts", "1tes": "59_1ts", "1tesalonicenses": "59_1ts", "1 tesalonicenses": "59_1ts", "1 tes": "59_1ts", "1 ts": "59_1ts", "1th": "59_1ts",
+  "2ts": "60_2ts", "2tes": "60_2ts", "2tesalonicenses": "60_2ts", "2 tesalonicenses": "60_2ts", "2 tes": "60_2ts", "2 ts": "60_2ts", "2th": "60_2ts",
+  "1tm": "61_1tm", "1tim": "61_1tm", "1timoteo": "61_1tm", "1 timoteo": "61_1tm", "1 tim": "61_1tm", "1 tm": "61_1tm",
+  "2tm": "62_2tm", "2tim": "62_2tm", "2timoteo": "62_2tm", "2 timoteo": "62_2tm", "2 tim": "62_2tm", "2 tm": "62_2tm",
+  "tt": "63_tt", "tit": "63_tt", "tito": "63_tt",
+  "flm": "64_flm", "filem": "64_flm", "filemon": "64_flm", "filemón": "64_flm", "phm": "64_flm",
+  "hb": "65_hb", "heb": "65_hb", "hebr": "65_hb", "hebreos": "65_hb",
+  "st": "66_st", "stg": "66_st", "sant": "66_st", "santiago": "66_st", "jas": "66_st",
+  "1p": "67_1p", "1ped": "67_1p", "1pedro": "67_1p", "1 pedro": "67_1p", "1 ped": "67_1p", "1 p": "67_1p", "1pt": "67_1p",
+  "2p": "68_2p", "2ped": "68_2p", "2pedro": "68_2p", "2 pedro": "68_2p", "2 ped": "68_2p", "2 p": "68_2p", "2pt": "68_2p",
+  "1jn": "69_1jn", "1jua": "69_1jn", "1juan": "69_1jn", "1 juan": "69_1jn", "1 jn": "69_1jn",
+  "2jn": "70_2jn", "2jua": "70_2jn", "2juan": "70_2jn", "2 juan": "70_2jn", "2 jn": "70_2jn",
+  "3jn": "71_3jn", "3jua": "71_3jn", "3juan": "71_3jn", "3 juan": "71_3jn", "3 jn": "71_3jn",
+  "judas": "72_judas", "jud": "72_judas", "juda": "72_judas",
+  "ap": "73_ap", "apo": "73_ap", "apoc": "73_ap", "apocalipsis": "73_ap", "rev": "73_ap"
+};
+
+const SINGLE_CHAPTER_BOOKS = {
+  "38_ab": true,
+  "64_flm": true,
+  "70_2jn": true,
+  "71_3jn": true,
+  "72_judas": true
+};
+
+function parseCitaBiblicaParam(citaStr) {
+  if (!citaStr || typeof citaStr !== 'string') return null;
+  
+  let raw = decodeURIComponent(citaStr).trim();
+  raw = raw.replace(/^[#?]/, '').trim();
+  raw = raw.replace(/^(cita|q|ref)=/i, '').trim();
+  raw = raw.replace(/\+/g, ' ');
+
+  // Normalización de texto (eliminar acentos, símbolos ordinales, números romanos en prefijos)
+  let clean = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  
+  // Reemplazar números romanos o prefijos textuales por números arábigos
+  clean = clean
+    .replace(/^iii\s+/, '3')
+    .replace(/^ii\s+/, '2')
+    .replace(/^i\s+/, '1')
+    .replace(/^1[ªºra|er|ra]\s*/, '1')
+    .replace(/^2[ªºda|do]\s*/, '2')
+    .replace(/^3[ªºra|er|ro]\s*/, '3')
+    .replace(/^(primer|primera)\s+/, '1')
+    .replace(/^(segundo|segunda)\s+/, '2')
+    .replace(/^(tercer|tercero|tercera)\s+/, '3');
+
+  clean = clean.replace(/[\(\)]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // Patrón principal: Libro, Capítulo y Versículo(s)
+  // Ejemplos: "rm5,1", "rm 5,1-3", "1co 13:4-8", "mateo 5", "judas 5", "sal 23, 1-6"
+  const regexPrincipal = /^([123]?\s*[a-z]+)\s*(\d+)?(?:\s*[,:.\sv]\s*([\d\s\-\.,al]+))?$/i;
+  const m = clean.match(regexPrincipal);
+  if (!m) return null;
+
+  const rawBookStr = m[1].replace(/\s+/g, '').trim();
+  const bookKey = MAPA_ALIAS_LIBROS[rawBookStr] || MAPA_ALIAS_LIBROS[m[1].trim()] || null;
+  if (!bookKey || !indiceLibrosRutas[bookKey]) return null;
+
+  let cap = m[2] ? parseInt(m[2], 10) : 1;
+  let rawVerses = m[3] ? m[3].trim() : null;
+
+  // Manejo de libros de un solo capítulo (Abdías, Filemón, 2 Juan, 3 Juan, Judas)
+  if (SINGLE_CHAPTER_BOOKS[bookKey] && !rawVerses && m[2]) {
+    rawVerses = m[2];
+    cap = 1;
+  }
+
+  let vInicio = null;
+  let vFin = null;
+  let vList = [];
+  let versiculosTarget = null;
+  let versiculoStr = "";
+
+  if (rawVerses) {
+    // Normalizar separadores de rango como '-', '—', ' al ', ' a '
+    const normalizedRange = rawVerses
+      .replace(/[\—\–]/g, '-')
+      .replace(/\s+(?:al|a)\s+/gi, '-')
+      .replace(/\s*-\s*/g, '-');
+
+    if (normalizedRange.includes('-')) {
+      const parts = normalizedRange.split('-');
+      vInicio = parseInt(parts[0], 10);
+      vFin = parseInt(parts[1], 10);
+      if (!isNaN(vInicio) && !isNaN(vFin) && vFin >= vInicio) {
+        for (let i = vInicio; i <= vFin; i++) {
+          vList.push(i);
+        }
+        versiculoStr = `${vInicio}-${vFin}`;
+      } else if (!isNaN(vInicio)) {
+        vList.push(vInicio);
+        versiculoStr = `${vInicio}`;
+      }
+    } else if (normalizedRange.includes('.') || normalizedRange.includes(',')) {
+      // Múltiples versículos: ej "1.3.5" o "1, 3, 5"
+      const nums = normalizedRange.match(/\d+/g);
+      if (nums && nums.length > 0) {
+        vList = nums.map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+        vInicio = vList[0];
+        vFin = vList[vList.length - 1];
+        versiculoStr = vList.join('.');
+      }
+    } else {
+      // Un solo versículo
+      const vNum = parseInt(normalizedRange, 10);
+      if (!isNaN(vNum)) {
+        vInicio = vNum;
+        vFin = vNum;
+        vList = [vNum];
+        versiculoStr = `${vNum}`;
+      }
+    }
+
+    if (vList.length > 0) {
+      versiculosTarget = vList.join('.');
+    }
+  }
+
+  const aliasLibro = bookKey.split('_')[1] || bookKey;
+  const nombreOficial = indiceLibrosRutas[bookKey].nombre;
+  
+  let citaFormateada = `${aliasLibro} ${cap}`;
+  let citaCompleta = `${nombreOficial} ${cap}`;
+  if (versiculoStr) {
+    citaFormateada += `,${versiculoStr}`;
+    citaCompleta += `,${versiculoStr}`;
+  }
+
+  return {
+    key: bookKey,
+    alias: aliasLibro,
+    nombreLibro: nombreOficial,
+    ruta: indiceLibrosRutas[bookKey].ruta,
+    capitulo: cap,
+    versiculoInicio: vInicio,
+    versiculoFin: vFin,
+    versiculoStr: versiculoStr,
+    versiculosTarget: versiculosTarget,
+    citaFormateada: citaFormateada,
+    citaCompleta: citaCompleta
+  };
+}
+
+function actualizarUrlUbicacion(libroKey, capNum, versiculoStr) {
+  try {
+    if (!libroKey) return;
+    const aliasLibro = libroKey.split('_')[1] || libroKey;
+    let citaQuery = `${aliasLibro}${capNum}`;
+    if (versiculoStr) {
+      // Formato compacto limpio: ej rm5,1-3 o rm5,1
+      const vClean = versiculoStr.toString().replace(/\s+/g, '');
+      citaQuery += `,${vClean}`;
+    }
+    const newUrl = `${window.location.pathname}?cita=${encodeURIComponent(citaQuery)}`;
+    window.history.replaceState({ noExit: true, cita: citaQuery }, '', newUrl);
+  } catch (e) {
+    console.error("Error actualizando URL con cita:", e);
+  }
+}
+
+window.parseCitaBiblicaParam = parseCitaBiblicaParam;
+window.actualizarUrlUbicacion = actualizarUrlUbicacion;
+
 function obtenerEstadoInicial() {
   let estado = {
     key: "01_gn",
     ruta: "src/libros/01_gn.json",
-    capitulo: 1
+    capitulo: 1,
+    targetVersiculo: null
   };
 
   try {
+    // 1. Revisar si viene una cita o parámetros en la URL (ej: ?cita=rm5,1-3 o #rm5,1-3 o ?libro=54_2co&cap=6&v=3)
+    const urlParams = new URLSearchParams(window.location.search);
+    let citaParam = urlParams.get('cita') || urlParams.get('q') || urlParams.get('ref');
+    
+    // Si no hay parámetro con nombre, revisar si el search completo o el hash es una cita directa
+    if (!citaParam && window.location.search && window.location.search.length > 1) {
+      citaParam = window.location.search.replace(/^\?/, '').trim();
+    }
+    if (!citaParam && window.location.hash && window.location.hash.length > 1) {
+      citaParam = window.location.hash.replace(/^#\/?/, '').trim();
+    }
+
+    const libroParam = urlParams.get('libro');
+    const capParam = urlParams.get('cap');
+    const vParam = urlParams.get('v') || urlParams.get('versiculo');
+
+    if (citaParam) {
+      const parsed = parseCitaBiblicaParam(citaParam);
+      if (parsed) {
+        estado.key = parsed.key;
+        estado.ruta = parsed.ruta;
+        estado.capitulo = parsed.capitulo;
+        estado.targetVersiculo = parsed.versiculosTarget;
+        window.targetVersiculoGlobal = parsed.versiculosTarget;
+        window.scrollToVerseAfterRender = parsed.versiculosTarget;
+        return estado;
+      }
+    } else if (libroParam && indiceLibrosRutas[libroParam]) {
+      estado.key = libroParam;
+      estado.ruta = indiceLibrosRutas[libroParam].ruta;
+      if (capParam) estado.capitulo = parseInt(capParam, 10) || 1;
+      if (vParam) {
+        estado.targetVersiculo = vParam.toString();
+        window.targetVersiculoGlobal = estado.targetVersiculo;
+        window.scrollToVerseAfterRender = estado.targetVersiculo;
+      }
+      return estado;
+    }
+
     const savedKey = localStorage.getItem('ultimoLibroKey');
     const savedRuta = localStorage.getItem('ultimoLibroRuta');
     const savedCap = localStorage.getItem('ultimoCapitulo');
@@ -1279,7 +1590,7 @@ function obtenerEstadoInicial() {
       }
     }
   } catch (e) {
-    console.error("Error leyendo desde localStorage:", e);
+    console.error("Error leyendo desde localStorage o URL:", e);
   }
 
   return estado;
@@ -1296,6 +1607,20 @@ document.addEventListener('DOMContentLoaded', () => {
       window.history.pushState({ noExit: true }, "");
     });
   })();
+
+  // Escuchar cambios en el hash de la URL para navegación profunda por citas (ej. #rm5,1-3)
+  window.addEventListener('hashchange', () => {
+    const rawHash = window.location.hash.replace(/^#\/?/, '').trim();
+    if (rawHash) {
+      const parsed = parseCitaBiblicaParam(rawHash);
+      if (parsed) {
+        if (parsed.versiculosTarget) {
+          window.scrollToVerseAfterRender = parsed.versiculosTarget;
+        }
+        cargarLibroYCapitulo(parsed.ruta, parsed.capitulo);
+      }
+    }
+  });
 
   // A. Construir visualmente la barra limpia (Libro y número rojo) desde el JS
   construirNavegacionDinamica();
@@ -1621,6 +1946,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       guardarBusquedaEnHistorial(query);
+
+      // 1. Detectar si la consulta es una Cita Bíblica directa (ej: rm5,1 o rm 5,1-3 o Mateo 5:1-12 o sal 23)
+      const parsedCita = parseCitaBiblicaParam(query);
+      if (parsedCita) {
+        cerrarBuscar();
+        if (parsedCita.versiculosTarget) {
+          window.scrollToVerseAfterRender = parsedCita.versiculosTarget;
+        }
+        actualizarUrlUbicacion(parsedCita.key, parsedCita.capitulo, parsedCita.versiculoStr);
+        cargarLibroYCapitulo(parsedCita.ruta, parsedCita.capitulo);
+        return;
+      }
 
       if (searchAbortController) {
         searchAbortController.abort();
